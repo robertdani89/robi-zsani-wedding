@@ -1,59 +1,174 @@
-# RobiZsaniWedding
+# Robi & Zsani Wedding App 💕
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 19.1.7.
+A mobile wedding guest engagement application built with React Native and Expo.
 
-## Development server
+> 📖 **New here?** Check [INDEX.md](INDEX.md) for a complete guide to all documentation!
 
-To start a local development server, run:
+## Features
 
-```bash
-ng serve
-```
+- **Guest Identification**: Guests can register with their name
+- **Interactive Questions**: Answer randomized fun questions from different categories
+  - Travel & Vacation
+  - Activities & Hobbies
+  - Fun / Personal
+- **Photo Upload**: Take photos or upload from gallery
+- **Progress Tracking**: Real-time progress indicator
+- **Gift Eligibility**: Complete all tasks to unlock a gift
+- **Data Persistence**: All data saved locally using AsyncStorage
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+## Tech Stack
 
-## Code scaffolding
+- **React Native** with Expo
+- **expo-router** for navigation
+- **TypeScript** for type safety
+- **expo-image-picker** for camera and gallery access
+- **AsyncStorage** for local data persistence
 
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+## Prerequisites
 
-```bash
-ng generate component component-name
-```
+- Node.js (v18 or higher)
+- npm or yarn
+- Expo Go app on your mobile device (for testing)
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+## Installation
 
-```bash
-ng generate --help
-```
-
-## Building
-
-To build the project run:
-
-```bash
-ng build
-```
-
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
-
-## Running unit tests
-
-To execute unit tests with the [Karma](https://karma-runner.github.io) test runner, use the following command:
+1. Install dependencies:
 
 ```bash
-ng test
+npm install
 ```
 
-## Running end-to-end tests
-
-For end-to-end (e2e) testing, run:
+2. Start the development server:
 
 ```bash
-ng e2e
+npm start
 ```
 
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
+3. Run on your device:
+   - **iOS**: Scan QR code with Camera app or press `i` in terminal
+   - **Android**: Scan QR code with Expo Go app or press `a` in terminal
+   - **Web**: Press `w` in terminal (limited functionality)
 
-## Additional Resources
+## Project Structure
 
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+```
+robi-zsani-wedding/
+├── app/                      # Screen components (expo-router)
+│   ├── _layout.tsx          # Root layout with navigation
+│   ├── index.tsx            # Welcome screen
+│   ├── identify.tsx         # Guest identification
+│   ├── dashboard.tsx        # Main dashboard
+│   ├── questions.tsx        # Questions interface
+│   ├── photos.tsx           # Photo upload
+│   ├── review.tsx           # Review & submit
+│   └── completion.tsx       # Completion/gift screen
+├── context/
+│   └── AppContext.tsx       # Global state management
+├── data/
+│   └── questions.ts         # Question data and utilities
+├── types/
+│   └── index.ts             # TypeScript type definitions
+├── assets/                   # Images and icons
+├── app.json                 # Expo configuration
+├── package.json             # Dependencies
+└── tsconfig.json            # TypeScript configuration
+```
+
+## User Flow
+
+1. **Welcome Screen**: Introduction and "Get Started" button
+2. **Guest Identification**: Enter name (can be fictional)
+3. **Dashboard**: View progress and access tasks
+4. **Answer Questions**: Complete 8 randomized questions
+5. **Upload Photos**: Upload minimum 1 photo (max 5)
+6. **Review & Submit**: Verify completion and submit
+7. **Completion**: View gift eligibility confirmation
+
+## Configuration
+
+### Minimum Requirements
+
+- Questions to answer: 8 (configurable in `data/questions.ts`)
+- Photos required: 1 minimum (configurable in `data/questions.ts`)
+- Maximum photos: 5 (configurable in `data/questions.ts`)
+
+### Customization
+
+**Wedding Details**: Edit [app/index.tsx](app/index.tsx)
+
+- Couple names: Line 21
+- Wedding date: Line 27
+- Welcome message: Lines 30-36
+
+**Question Bank**: Edit [data/questions.ts](data/questions.ts)
+
+- Add/remove questions
+- Modify categories
+- Change question types
+
+**Theme Colors**: Update styles in each screen
+
+- Primary: `#D4526E` (Pink)
+- Secondary: `#7D5260` (Muted pink)
+- Background: `#FFF5F7` (Light pink)
+
+## Building for Production
+
+### iOS
+
+```bash
+eas build --platform ios
+```
+
+### Android
+
+```bash
+eas build --platform android
+```
+
+You'll need to set up an Expo account and configure EAS Build. See [Expo documentation](https://docs.expo.dev/build/setup/) for details.
+
+## Future Enhancements
+
+- [ ] Firebase/Supabase integration for cloud storage
+- [ ] Admin dashboard to view all submissions
+- [ ] QR code for gift claim
+- [ ] Social sharing features
+- [ ] Multiple language support
+- [ ] Push notifications
+- [ ] Offline mode improvements
+
+## Permissions Required
+
+- **Camera**: To take photos at the wedding
+- **Photo Library**: To upload existing photos
+- **Storage**: To save data locally
+
+## Troubleshooting
+
+**Photos not uploading?**
+
+- Ensure camera/gallery permissions are granted
+- Check device storage space
+
+**App crashing on start?**
+
+- Clear cache: `npm start -- --clear`
+- Reinstall dependencies: `rm -rf node_modules && npm install`
+
+**Questions not randomizing?**
+
+- Data persists per user session
+- Questions are randomized once at guest identification
+
+## License
+
+Private project for Robi & Zsani's wedding.
+
+## Support
+
+For issues or questions, contact the development team.
+
+---
+
+Made with ❤️ for Robi & Zsani's Special Day
