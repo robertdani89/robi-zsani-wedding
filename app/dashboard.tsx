@@ -154,7 +154,7 @@ export default function DashboardScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#FFF5F7",
+    backgroundColor: "transparent",
   },
   scrollView: {
     flex: 1,

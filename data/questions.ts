@@ -1,7 +1,6 @@
 import { Question, QuestionCategory, QuestionType } from "@/types";
 
 export const QUESTIONS: Question[] = [
-  // Travel & Vacation
   {
     id: "q1",
     category: QuestionCategory.TRAVEL,
@@ -34,7 +33,6 @@ export const QUESTIONS: Question[] = [
     ],
   },
 
-  // Activities & Hobbies
   {
     id: "q4",
     category: QuestionCategory.ACTIVITIES,
@@ -76,7 +74,6 @@ export const QUESTIONS: Question[] = [
     ],
   },
 
-  // Fun / Personal
   {
     id: "q7",
     category: QuestionCategory.FUN,
@@ -140,7 +137,6 @@ export const MIN_QUESTIONS_TO_ANSWER = 8;
 export const MIN_PHOTOS_REQUIRED = 1;
 export const MAX_PHOTOS_ALLOWED = 5;
 
-// Utility function to get randomized questions
 export const getRandomizedQuestions = (
   count: number = MIN_QUESTIONS_TO_ANSWER
 ): Question[] => {
@@ -148,7 +144,6 @@ export const getRandomizedQuestions = (
   return shuffled.slice(0, count);
 };
 
-// Utility function to group questions by category
 export const groupQuestionsByCategory = (questions: Question[]) => {
   return questions.reduce((acc, question) => {
     if (!acc[question.category]) {

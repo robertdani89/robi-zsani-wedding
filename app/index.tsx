@@ -14,7 +14,6 @@ export default function WelcomeScreen() {
   return (
     <View style={styles.container}>
       <StatusBar style="dark" />
-
       <View style={styles.content}>
         <Text style={styles.coupleNames}>{COUPLE_NAMES}</Text>
 
@@ -49,7 +48,7 @@ export default function WelcomeScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#FFF5F7",
+    backgroundColor: "transparent",
   },
   content: {
     flex: 1,

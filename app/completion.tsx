@@ -104,7 +104,6 @@ export default function CompletionScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#FFF5F7",
   },
   scrollView: {
     flex: 1,
@@ -135,7 +134,6 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
   giftCard: {
-    backgroundColor: "#FFF",
     borderRadius: 20,
     padding: 30,
     marginBottom: 25,
@@ -166,7 +164,6 @@ const styles = StyleSheet.create({
     lineHeight: 24,
   },
   confirmationBox: {
-    backgroundColor: "#FFF5F7",
     borderRadius: 12,
     padding: 20,
     width: "100%",
@@ -205,7 +202,6 @@ const styles = StyleSheet.create({
     color: "#999",
   },
   statsCard: {
-    backgroundColor: "#FFF",
     borderRadius: 16,
     padding: 25,
     marginBottom: 25,
@@ -244,11 +240,9 @@ const styles = StyleSheet.create({
   },
   statDivider: {
     width: 1,
-    backgroundColor: "#FFD1DC",
     marginHorizontal: 20,
   },
   thanksSection: {
-    backgroundColor: "#FFF",
     borderRadius: 16,
     padding: 25,
     marginBottom: 25,
@@ -273,7 +267,6 @@ const styles = StyleSheet.create({
     fontStyle: "italic",
   },
   dashboardButton: {
-    backgroundColor: "#FFF",
     borderWidth: 2,
     borderColor: "#D4526E",
     paddingVertical: 16,

@@ -89,7 +89,7 @@ export default function IdentifyScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#FFF5F7",
+    backgroundColor: "transparent",
   },
   content: {
     flex: 1,
