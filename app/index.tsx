@@ -1,6 +1,7 @@
 import { COUPLE_NAMES, WEDDING_DATE } from "@/constants";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
+import Card from "@/components/Card";
 import { StatusBar } from "expo-status-bar";
 import { useRouter } from "expo-router";
 
@@ -15,30 +16,38 @@ export default function WelcomeScreen() {
     <View style={styles.container}>
       <StatusBar style="dark" />
       <View style={styles.content}>
-        <Text style={styles.coupleNames}>{COUPLE_NAMES}</Text>
+        <Card>
+          <Text style={styles.coupleNames}>{COUPLE_NAMES}</Text>
+        </Card>
 
         <View style={styles.heartContainer}>
           <Text style={styles.heart}>💕</Text>
         </View>
 
-        <Text style={styles.weddingDate}>{WEDDING_DATE}</Text>
+        <Card style={styles.weddingDate}>
+          <Text>{WEDDING_DATE}</Text>
+        </Card>
 
         <View style={styles.messageContainer}>
-          <Text style={styles.message}>
-            Segíts nekünk szép emlékeket teremteni, és nyerj egy kis ajándékot!
-          </Text>
-          <Text style={styles.subMessage}>
-            Válaszolj néhány apró kérdésre, ossz meg fotókat, és légy részese
-            különleges napunknak!
-          </Text>
+          <Card>
+            <Text style={styles.message}>
+              Segíts nekünk szép emlékeket teremteni, és nyerj egy kis
+              ajándékot!
+            </Text>
+          </Card>
+
+          <Card style={styles.subMessage}>
+            <Text>
+              Válaszolj néhány apró kérdésre, ossz meg fotókat, és légy részese
+              különleges napunknak!
+            </Text>
+          </Card>
         </View>
 
-        <TouchableOpacity
-          style={styles.button}
-          onPress={handleGetStarted}
-          activeOpacity={0.8}
-        >
-          <Text style={styles.buttonText}>Kezdjük!</Text>
+        <TouchableOpacity onPress={handleGetStarted} activeOpacity={0.8}>
+          <Card>
+            <Text style={styles.buttonText}>Kezdjük!</Text>
+          </Card>
         </TouchableOpacity>
       </View>
     </View>
@@ -105,7 +114,7 @@ const styles = StyleSheet.create({
     shadowRadius: 3.84,
   },
   buttonText: {
-    color: "#FFF",
+    color: "#000",
     fontSize: 18,
     fontWeight: "bold",
   },
