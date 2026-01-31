@@ -1,6 +1,7 @@
 import * as ImagePicker from "expo-image-picker";
 
 import {
+  ActivityIndicator,
   Alert,
   Image,
   ScrollView,
@@ -11,8 +12,10 @@ import {
 } from "react-native";
 import { MAX_PHOTOS_ALLOWED, MIN_PHOTOS_REQUIRED } from "@/data/questions";
 
+import ConfirmationModal from "@/components/ConfirmationModal";
 import { Photo } from "@/types";
 import { StatusBar } from "expo-status-bar";
+import apiService from "@/services/api";
 import { useApp } from "@/context/AppContext";
 import { useRouter } from "expo-router";
 import { useState } from "react";
@@ -21,24 +24,59 @@ export default function PhotosScreen() {
   const router = useRouter();
   const { state, addPhoto, removePhoto } = useApp();
   const [isLoading, setIsLoading] = useState(false);
+  const [uploadingPhotoUri, setUploadingPhotoUri] = useState<string | null>(
+    null,
+  );
+  const [deleteModalVisible, setDeleteModalVisible] = useState(false);
+  const [photoToDelete, setPhotoToDelete] = useState<string | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const requestPermissions = async () => {
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (status !== "granted") {
       Alert.alert(
         "Permission Required",
-        "Sorry, we need camera roll permissions to upload photos."
+        "Sorry, we need camera roll permissions to upload photos.",
       );
       return false;
     }
     return true;
   };
 
+  const uploadPhotoToServer = async (uri: string) => {
+    try {
+      setUploadingPhotoUri(uri);
+
+      // Upload to server
+      const serverPhoto = await apiService.uploadPhoto(state.guest!.id, uri);
+
+      // Save locally with server photo ID
+      const newPhoto: Photo = {
+        id: serverPhoto.id,
+        guestId: state.guest!.id,
+        uri: uri, // Keep local URI for display
+        uploadedAt: serverPhoto.createdAt,
+      };
+
+      await addPhoto(newPhoto);
+      return true;
+    } catch (error) {
+      console.error("Upload error:", error);
+      Alert.alert(
+        "Upload Failed",
+        "Could not upload the photo to the server. Please check your connection and try again.",
+      );
+      return false;
+    } finally {
+      setUploadingPhotoUri(null);
+    }
+  };
+
   const handleTakePhoto = async () => {
     if (state.photos.length >= MAX_PHOTOS_ALLOWED) {
       Alert.alert(
         "Limit Reached",
-        `You can only upload up to ${MAX_PHOTOS_ALLOWED} photos.`
+        `You can only upload up to ${MAX_PHOTOS_ALLOWED} photos.`,
       );
       return;
     }
@@ -47,7 +85,7 @@ export default function PhotosScreen() {
     if (status !== "granted") {
       Alert.alert(
         "Permission Required",
-        "Sorry, we need camera permissions to take photos."
+        "Sorry, we need camera permissions to take photos.",
       );
       return;
     }
@@ -62,13 +100,7 @@ export default function PhotosScreen() {
       });
 
       if (!result.canceled && result.assets[0]) {
-        const newPhoto: Photo = {
-          id: Date.now().toString(),
-          guestId: state.guest!.id,
-          uri: result.assets[0].uri,
-          uploadedAt: new Date().toISOString(),
-        };
-        await addPhoto(newPhoto);
+        await uploadPhotoToServer(result.assets[0].uri);
       }
     } catch (error) {
       Alert.alert("Error", "Failed to take photo. Please try again.");
@@ -81,7 +113,7 @@ export default function PhotosScreen() {
     if (state.photos.length >= MAX_PHOTOS_ALLOWED) {
       Alert.alert(
         "Limit Reached",
-        `You can only upload up to ${MAX_PHOTOS_ALLOWED} photos.`
+        `You can only upload up to ${MAX_PHOTOS_ALLOWED} photos.`,
       );
       return;
     }
@@ -99,13 +131,7 @@ export default function PhotosScreen() {
       });
 
       if (!result.canceled && result.assets[0]) {
-        const newPhoto: Photo = {
-          id: Date.now().toString(),
-          guestId: state.guest!.id,
-          uri: result.assets[0].uri,
-          uploadedAt: new Date().toISOString(),
-        };
-        await addPhoto(newPhoto);
+        await uploadPhotoToServer(result.assets[0].uri);
       }
     } catch (error) {
       Alert.alert("Error", "Failed to upload photo. Please try again.");
@@ -115,14 +141,41 @@ export default function PhotosScreen() {
   };
 
   const handleDeletePhoto = (photoId: string) => {
-    Alert.alert("Delete Photo", "Are you sure you want to remove this photo?", [
-      { text: "Cancel", style: "cancel" },
-      {
-        text: "Delete",
-        style: "destructive",
-        onPress: () => removePhoto(photoId),
-      },
-    ]);
+    setPhotoToDelete(photoId);
+    setDeleteModalVisible(true);
+  };
+
+  const confirmDeletePhoto = async () => {
+    if (!photoToDelete) return;
+
+    setIsDeleting(true);
+    try {
+      // Delete locally first (optimistic update)
+      await removePhoto(photoToDelete);
+
+      // Then try to delete from server
+      try {
+        await apiService.deletePhoto(photoToDelete);
+      } catch (serverError) {
+        // Log server error but don't revert - photo is already removed from UI
+        console.error("Server delete error:", serverError);
+      }
+    } catch (error) {
+      console.error("Delete error:", error);
+      Alert.alert(
+        "Delete Failed",
+        "Could not delete the photo. Please try again.",
+      );
+    } finally {
+      setIsDeleting(true);
+      setDeleteModalVisible(false);
+      setPhotoToDelete(null);
+    }
+  };
+
+  const cancelDeletePhoto = () => {
+    setDeleteModalVisible(false);
+    setPhotoToDelete(null);
   };
 
   return (
@@ -191,7 +244,11 @@ export default function PhotosScreen() {
             <View style={styles.photoGrid}>
               {state.photos.map((photo) => (
                 <View key={photo.id} style={styles.photoContainer}>
-                  <Image source={{ uri: photo.uri }} style={styles.photo} />
+                  <Image
+                    source={{ uri: photo.uri }}
+                    style={styles.photo}
+                    resizeMode="cover"
+                  />
                   <TouchableOpacity
                     style={styles.deleteButton}
                     onPress={() => handleDeletePhoto(photo.id)}
@@ -201,6 +258,16 @@ export default function PhotosScreen() {
                   </TouchableOpacity>
                 </View>
               ))}
+            </View>
+          </View>
+        )}
+
+        {/* Upload in progress indicator */}
+        {uploadingPhotoUri && (
+          <View style={styles.uploadingContainer}>
+            <View style={styles.uploadingOverlay}>
+              <ActivityIndicator size="large" color="#D4526E" />
+              <Text style={styles.uploadingText}>Uploading photo...</Text>
             </View>
           </View>
         )}
@@ -218,13 +285,24 @@ export default function PhotosScreen() {
         {state.photos.length >= MIN_PHOTOS_REQUIRED && (
           <TouchableOpacity
             style={styles.doneButton}
-            onPress={() => router.back()}
+            onPress={() => router.replace("/dashboard")}
             activeOpacity={0.8}
           >
             <Text style={styles.doneButtonText}>Done ✓</Text>
           </TouchableOpacity>
         )}
       </ScrollView>
+
+      <ConfirmationModal
+        visible={deleteModalVisible}
+        title="Delete Photo"
+        message="Are you sure you want to remove this photo?"
+        confirmText={isDeleting ? "Deleting..." : "Delete"}
+        cancelText="Cancel"
+        onConfirm={confirmDeletePhoto}
+        onCancel={cancelDeletePhoto}
+        confirmStyle="destructive"
+      />
     </View>
   );
 }
@@ -388,5 +466,26 @@ const styles = StyleSheet.create({
     color: "#FFF",
     fontSize: 18,
     fontWeight: "bold",
+  },
+  uploadingContainer: {
+    marginVertical: 20,
+    alignItems: "center",
+  },
+  uploadingOverlay: {
+    backgroundColor: "#FFF",
+    borderRadius: 16,
+    padding: 30,
+    alignItems: "center",
+    elevation: 3,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+  },
+  uploadingText: {
+    marginTop: 15,
+    fontSize: 16,
+    color: "#666",
+    fontWeight: "600",
   },
 });
