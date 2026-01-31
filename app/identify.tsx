@@ -1,4 +1,5 @@
 import {
+  ActivityIndicator,
   Alert,
   KeyboardAvoidingView,
   Platform,
@@ -11,13 +12,16 @@ import {
 
 import { Guest } from "@/types";
 import { StatusBar } from "expo-status-bar";
-import { getRandomizedQuestions } from "@/data/questions";
+import apiService from "@/services/api";
 import { useApp } from "@/context/AppContext";
 import { useRouter } from "expo-router";
 import { useState } from "react";
 
+const ADMIN_SECRET = "zsanirobi";
+
 export default function IdentifyScreen() {
   const [name, setName] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
   const { setGuest, setAssignedQuestions } = useApp();
 
@@ -29,20 +33,39 @@ export default function IdentifyScreen() {
       return;
     }
 
-    const newGuest: Guest = {
-      id: Date.now().toString(),
-      name: trimmedName,
-      completed: false,
-      createdAt: new Date().toISOString(),
-    };
+    // Check for admin secret
+    if (trimmedName.toLowerCase() === ADMIN_SECRET) {
+      router.replace("/admin");
+      return;
+    }
 
-    await setGuest(newGuest);
+    setIsLoading(true);
 
-    // Assign randomized questions to this guest
-    const randomQuestions = getRandomizedQuestions();
-    await setAssignedQuestions(randomQuestions);
+    try {
+      // Register guest on server and get assigned questions
+      const { guest: serverGuest, questions } =
+        await apiService.registerGuest(trimmedName);
 
-    router.replace("/dashboard");
+      const newGuest: Guest = {
+        id: serverGuest.id,
+        name: serverGuest.name,
+        completed: false,
+        createdAt: serverGuest.createdAt,
+      };
+
+      await setGuest(newGuest);
+      await setAssignedQuestions(questions);
+
+      router.replace("/dashboard");
+    } catch (error) {
+      console.error("Registration error:", error);
+      Alert.alert(
+        "Connection Error",
+        "Could not connect to the server. Please check your connection and try again.",
+      );
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -67,6 +90,7 @@ export default function IdentifyScreen() {
             autoFocus
             returnKeyType="done"
             onSubmitEditing={handleContinue}
+            editable={!isLoading}
           />
           <Text style={styles.hint}>
             Ha szeretnéd, használhatsz becenevet is.
@@ -74,12 +98,19 @@ export default function IdentifyScreen() {
         </View>
 
         <TouchableOpacity
-          style={[styles.button, !name.trim() && styles.buttonDisabled]}
+          style={[
+            styles.button,
+            (!name.trim() || isLoading) && styles.buttonDisabled,
+          ]}
           onPress={handleContinue}
           activeOpacity={0.8}
-          disabled={!name.trim()}
+          disabled={!name.trim() || isLoading}
         >
-          <Text style={styles.buttonText}>Continue</Text>
+          {isLoading ? (
+            <ActivityIndicator color="#FFF" />
+          ) : (
+            <Text style={styles.buttonText}>Continue</Text>
+          )}
         </TouchableOpacity>
       </View>
     </KeyboardAvoidingView>

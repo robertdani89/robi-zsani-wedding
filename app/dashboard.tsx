@@ -28,13 +28,15 @@ export default function DashboardScreen() {
 
   const questionStatus = getStatusBadge(
     taskStatus.questionsCompleted,
-    state.answers.length > 0 && !taskStatus.questionsCompleted
+    state.answers.length > 0 && !taskStatus.questionsCompleted,
   );
 
   const photoStatus = getStatusBadge(
     taskStatus.photosUploaded,
-    state.photos.length > 0 && !taskStatus.photosUploaded
+    state.photos.length > 0 && !taskStatus.photosUploaded,
   );
+
+  const songStatus = getStatusBadge(taskStatus.songSelected, false);
 
   return (
     <View style={styles.container}>
@@ -123,6 +125,35 @@ export default function DashboardScreen() {
             >
               <Text style={[styles.statusText, { color: photoStatus.color }]}>
                 {photoStatus.text}
+              </Text>
+            </View>
+          </TouchableOpacity>
+
+          {/* Song Card */}
+          <TouchableOpacity
+            style={styles.taskCard}
+            onPress={() => router.push("/song")}
+            activeOpacity={0.7}
+          >
+            <View style={styles.taskIcon}>
+              <Text style={styles.taskEmoji}>🎵</Text>
+            </View>
+            <View style={styles.taskContent}>
+              <Text style={styles.taskTitle}>Pick a Song</Text>
+              <Text style={styles.taskDescription}>
+                {state.song
+                  ? `Selected: ${state.song.name}`
+                  : "Choose a song for the party"}
+              </Text>
+            </View>
+            <View
+              style={[
+                styles.statusBadge,
+                { backgroundColor: songStatus.bgColor },
+              ]}
+            >
+              <Text style={[styles.statusText, { color: songStatus.color }]}>
+                {songStatus.text}
               </Text>
             </View>
           </TouchableOpacity>

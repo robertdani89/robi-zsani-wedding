@@ -1,4 +1,12 @@
-import { Answer, AppState, Guest, Photo, Question, TaskStatus } from "@/types";
+import {
+  Answer,
+  AppState,
+  Guest,
+  Photo,
+  Question,
+  Song,
+  TaskStatus,
+} from "@/types";
 import { MIN_PHOTOS_REQUIRED, MIN_QUESTIONS_TO_ANSWER } from "@/data/questions";
 import React, {
   ReactNode,
@@ -16,6 +24,7 @@ interface AppContextType {
   addAnswer: (answer: Answer) => Promise<void>;
   addPhoto: (photo: Photo) => Promise<void>;
   removePhoto: (photoId: string) => Promise<void>;
+  setSong: (song: Song | null) => Promise<void>;
   markAsCompleted: () => Promise<void>;
   getTaskStatus: () => TaskStatus;
   resetApp: () => Promise<void>;
@@ -30,6 +39,7 @@ const STORAGE_KEYS = {
   ANSWERS: "@wedding_app_answers",
   PHOTOS: "@wedding_app_photos",
   QUESTIONS: "@wedding_app_questions",
+  SONG: "@wedding_app_song",
 };
 
 export const AppProvider = ({ children }: { children: ReactNode }) => {
@@ -37,11 +47,12 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     guest: null,
     answers: [],
     photos: [],
+    song: null,
     completedQuestions: new Set(),
   });
 
   const [assignedQuestions, setAssignedQuestionsState] = useState<Question[]>(
-    []
+    [],
   );
 
   // Load data from AsyncStorage on mount
@@ -51,23 +62,26 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
 
   const loadData = async () => {
     try {
-      const [guestData, answersData, photosData, questionsData] =
+      const [guestData, answersData, photosData, questionsData, songData] =
         await Promise.all([
           AsyncStorage.getItem(STORAGE_KEYS.GUEST),
           AsyncStorage.getItem(STORAGE_KEYS.ANSWERS),
           AsyncStorage.getItem(STORAGE_KEYS.PHOTOS),
           AsyncStorage.getItem(STORAGE_KEYS.QUESTIONS),
+          AsyncStorage.getItem(STORAGE_KEYS.SONG),
         ]);
 
       const guest = guestData ? JSON.parse(guestData) : null;
       const answers = answersData ? JSON.parse(answersData) : [];
       const photos = photosData ? JSON.parse(photosData) : [];
       const questions = questionsData ? JSON.parse(questionsData) : [];
+      const song = songData ? JSON.parse(songData) : null;
 
       setState({
         guest,
         answers,
         photos,
+        song,
         completedQuestions: new Set(answers.map((a: Answer) => a.questionId)),
       });
 
@@ -94,7 +108,7 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
       ];
       await AsyncStorage.setItem(
         STORAGE_KEYS.ANSWERS,
-        JSON.stringify(updatedAnswers)
+        JSON.stringify(updatedAnswers),
       );
 
       setState((prev) => ({
@@ -115,7 +129,7 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
       const updatedPhotos = [...state.photos, photo];
       await AsyncStorage.setItem(
         STORAGE_KEYS.PHOTOS,
-        JSON.stringify(updatedPhotos)
+        JSON.stringify(updatedPhotos),
       );
       setState((prev) => ({ ...prev, photos: updatedPhotos }));
     } catch (error) {
@@ -128,7 +142,7 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
       const updatedPhotos = state.photos.filter((p) => p.id !== photoId);
       await AsyncStorage.setItem(
         STORAGE_KEYS.PHOTOS,
-        JSON.stringify(updatedPhotos)
+        JSON.stringify(updatedPhotos),
       );
       setState((prev) => ({ ...prev, photos: updatedPhotos }));
     } catch (error) {
@@ -143,24 +157,44 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
+  const setSong = async (song: Song | null) => {
+    try {
+      if (song) {
+        await AsyncStorage.setItem(STORAGE_KEYS.SONG, JSON.stringify(song));
+      } else {
+        await AsyncStorage.removeItem(STORAGE_KEYS.SONG);
+      }
+      setState((prev) => ({ ...prev, song }));
+    } catch (error) {
+      console.error("Error saving song:", error);
+    }
+  };
+
   const getTaskStatus = (): TaskStatus => {
     const questionsCompleted = state.answers.length >= MIN_QUESTIONS_TO_ANSWER;
     const photosUploaded = state.photos.length >= MIN_PHOTOS_REQUIRED;
-    const allTasksCompleted = questionsCompleted && photosUploaded;
+    const songSelected = state.song !== null;
+    const allTasksCompleted =
+      questionsCompleted && photosUploaded && songSelected;
 
+    // Now 3 tasks: questions 33%, photos 33%, song 34%
     const questionProgress = Math.min(
-      (state.answers.length / MIN_QUESTIONS_TO_ANSWER) * 50,
-      50
+      (state.answers.length / MIN_QUESTIONS_TO_ANSWER) * 33,
+      33,
     );
     const photoProgress = Math.min(
-      (state.photos.length / MIN_PHOTOS_REQUIRED) * 50,
-      50
+      (state.photos.length / MIN_PHOTOS_REQUIRED) * 33,
+      33,
     );
-    const progressPercentage = Math.round(questionProgress + photoProgress);
+    const songProgress = songSelected ? 34 : 0;
+    const progressPercentage = Math.round(
+      questionProgress + photoProgress + songProgress,
+    );
 
     return {
       questionsCompleted,
       photosUploaded,
+      songSelected,
       allTasksCompleted,
       progressPercentage,
     };
@@ -170,7 +204,7 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     try {
       await AsyncStorage.setItem(
         STORAGE_KEYS.QUESTIONS,
-        JSON.stringify(questions)
+        JSON.stringify(questions),
       );
       setAssignedQuestionsState(questions);
     } catch (error) {
@@ -189,11 +223,13 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
         STORAGE_KEYS.ANSWERS,
         STORAGE_KEYS.PHOTOS,
         STORAGE_KEYS.QUESTIONS,
+        STORAGE_KEYS.SONG,
       ]);
       setState({
         guest: null,
         answers: [],
         photos: [],
+        song: null,
         completedQuestions: new Set(),
       });
       setAssignedQuestionsState([]);
@@ -210,6 +246,7 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
         addAnswer,
         addPhoto,
         removePhoto,
+        setSong,
         markAsCompleted,
         getTaskStatus,
         resetApp,

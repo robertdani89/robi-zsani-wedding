@@ -1,4 +1,5 @@
 import {
+  ActivityIndicator,
   Alert,
   ScrollView,
   StyleSheet,
@@ -11,6 +12,7 @@ import { Answer, Question, QuestionType } from "@/types";
 import { useEffect, useState } from "react";
 
 import { StatusBar } from "expo-status-bar";
+import apiService from "@/services/api";
 import { useApp } from "@/context/AppContext";
 import { useRouter } from "expo-router";
 
@@ -20,6 +22,7 @@ export default function QuestionsScreen() {
   const [questions, setQuestions] = useState<Question[]>([]);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [currentAnswer, setCurrentAnswer] = useState<string | string[]>("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     const assignedQuestions = getAssignedQuestions();
@@ -32,7 +35,7 @@ export default function QuestionsScreen() {
 
     // Load existing answer if available
     const existingAnswer = state.answers.find(
-      (a) => a.questionId === assignedQuestions[0].id
+      (a) => a.questionId === assignedQuestions[0].id,
     );
     if (existingAnswer) {
       setCurrentAnswer(existingAnswer.value);
@@ -43,13 +46,13 @@ export default function QuestionsScreen() {
     if (questions.length > 0) {
       const currentQuestion = questions[currentQuestionIndex];
       const existingAnswer = state.answers.find(
-        (a) => a.questionId === currentQuestion.id
+        (a) => a.questionId === currentQuestion.id,
       );
       if (existingAnswer) {
         setCurrentAnswer(existingAnswer.value);
       } else {
         setCurrentAnswer(
-          currentQuestion.type === QuestionType.MULTIPLE_CHOICE ? [] : ""
+          currentQuestion.type === QuestionType.MULTIPLE_CHOICE ? [] : "",
         );
       }
     }
@@ -82,31 +85,50 @@ export default function QuestionsScreen() {
     ) {
       Alert.alert(
         "Answer Required",
-        "Please provide an answer before continuing."
+        "Please provide an answer before continuing.",
       );
       return;
     }
 
-    // Save answer
-    const newAnswer: Answer = {
-      id: Date.now().toString(),
-      guestId: state.guest!.id,
-      questionId: currentQuestion.id,
-      value: currentAnswer,
-      answeredAt: new Date().toISOString(),
-    };
+    setIsSubmitting(true);
 
-    await addAnswer(newAnswer);
-
-    // Move to next question or go back to dashboard
-    if (currentQuestionIndex < questions.length - 1) {
-      setCurrentQuestionIndex(currentQuestionIndex + 1);
-    } else {
-      Alert.alert(
-        "Great Job!",
-        "You've answered all the questions. You can review your answers anytime.",
-        [{ text: "OK", onPress: () => router.back() }]
+    try {
+      // Submit answer to server
+      await apiService.submitAnswer(
+        state.guest!.id,
+        currentQuestion.id,
+        currentAnswer,
       );
+
+      // Save answer locally
+      const newAnswer: Answer = {
+        id: Date.now().toString(),
+        guestId: state.guest!.id,
+        questionId: currentQuestion.id,
+        value: currentAnswer,
+        answeredAt: new Date().toISOString(),
+      };
+
+      await addAnswer(newAnswer);
+
+      // Move to next question or go back to dashboard
+      if (currentQuestionIndex < questions.length - 1) {
+        setCurrentQuestionIndex(currentQuestionIndex + 1);
+      } else {
+        Alert.alert(
+          "Great Job!",
+          "You've answered all the questions. You can review your answers anytime.",
+          [{ text: "OK", onPress: () => router.replace("/dashboard") }],
+        );
+      }
+    } catch (error) {
+      console.error("Error submitting answer:", error);
+      Alert.alert(
+        "Submission Error",
+        "Could not submit your answer. Please check your connection and try again.",
+      );
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -271,15 +293,20 @@ export default function QuestionsScreen() {
         </View>
 
         <TouchableOpacity
-          style={styles.nextButton}
+          style={[styles.nextButton, isSubmitting && styles.nextButtonDisabled]}
           onPress={handleNext}
           activeOpacity={0.8}
+          disabled={isSubmitting}
         >
-          <Text style={styles.nextButtonText}>
-            {currentQuestionIndex === questions.length - 1
-              ? "Complete"
-              : "Next"}
-          </Text>
+          {isSubmitting ? (
+            <ActivityIndicator color="#FFF" />
+          ) : (
+            <Text style={styles.nextButtonText}>
+              {currentQuestionIndex === questions.length - 1
+                ? "Complete"
+                : "Next"}
+            </Text>
+          )}
         </TouchableOpacity>
       </ScrollView>
     </View>
@@ -453,6 +480,10 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.25,
     shadowRadius: 3.84,
+  },
+  nextButtonDisabled: {
+    backgroundColor: "#DDD",
+    elevation: 0,
   },
   nextButtonText: {
     color: "#FFF",
