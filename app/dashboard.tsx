@@ -1,4 +1,3 @@
-import { MIN_PHOTOS_REQUIRED, MIN_QUESTIONS_TO_ANSWER } from "@/data/questions";
 import {
   ScrollView,
   StyleSheet,
@@ -47,14 +46,19 @@ export default function DashboardScreen() {
         contentContainerStyle={styles.scrollContent}
       >
         <View style={styles.header}>
-          <Text style={styles.greeting}>Hi, {state.guest?.name}! 👋</Text>
-          <Text style={styles.subtitle}>Let's complete your tasks</Text>
+          <Text style={styles.greeting}>Szia, {state.guest?.name}! 👋</Text>
+          <Text style={styles.subtitle}>
+            Nászutunkon minden választ elolvasunk
+          </Text>
+          <Text style={styles.subtitle}>
+            Kérlek, ne hagyd, hogy unatkozzunk a repülőn! 😉
+          </Text>
         </View>
 
         {/* Progress Bar */}
         <View style={styles.progressContainer}>
           <View style={styles.progressHeader}>
-            <Text style={styles.progressLabel}>Overall Progress</Text>
+            <Text style={styles.progressLabel}>Mennyi van hátra?</Text>
             <Text style={styles.progressPercentage}>
               {taskStatus.progressPercentage}%
             </Text>
@@ -71,7 +75,7 @@ export default function DashboardScreen() {
 
         {/* Task Cards */}
         <View style={styles.tasksContainer}>
-          <Text style={styles.sectionTitle}>Your Tasks</Text>
+          <Text style={styles.sectionTitle}>Feladatok</Text>
 
           {/* Questions Card */}
           <TouchableOpacity
@@ -83,9 +87,9 @@ export default function DashboardScreen() {
               <Text style={styles.taskEmoji}>❓</Text>
             </View>
             <View style={styles.taskContent}>
-              <Text style={styles.taskTitle}>Answer Questions</Text>
+              <Text style={styles.taskTitle}>Kérdések</Text>
               <Text style={styles.taskDescription}>
-                {state.answers.length} of {MIN_QUESTIONS_TO_ANSWER} completed
+                {state.answers.length} / {4} kérdés kész
               </Text>
             </View>
             <View
@@ -112,9 +116,9 @@ export default function DashboardScreen() {
               <Text style={styles.taskEmoji}>📸</Text>
             </View>
             <View style={styles.taskContent}>
-              <Text style={styles.taskTitle}>Upload Photos</Text>
+              <Text style={styles.taskTitle}>Fotók feltöltése</Text>
               <Text style={styles.taskDescription}>
-                {state.photos.length} of {MIN_PHOTOS_REQUIRED} minimum uploaded
+                {state.photos.length} / {1} minimum feltöltve
               </Text>
             </View>
             <View
@@ -139,11 +143,11 @@ export default function DashboardScreen() {
               <Text style={styles.taskEmoji}>🎵</Text>
             </View>
             <View style={styles.taskContent}>
-              <Text style={styles.taskTitle}>Pick a Song</Text>
+              <Text style={styles.taskTitle}>Válassz egy dalt</Text>
               <Text style={styles.taskDescription}>
                 {state.song
-                  ? `Selected: ${state.song.name}`
-                  : "Choose a song for the party"}
+                  ? `Kiválasztva: ${state.song.name}`
+                  : "Válassz egy dalt a bulira"}
               </Text>
             </View>
             <View
@@ -164,15 +168,15 @@ export default function DashboardScreen() {
           {taskStatus.allTasksCompleted ? (
             <TouchableOpacity
               style={styles.reviewButton}
-              onPress={() => router.push("/review")}
+              onPress={() => router.push("/gift")}
               activeOpacity={0.8}
             >
-              <Text style={styles.reviewButtonText}>Review & Submit 🎉</Text>
+              <Text style={styles.reviewButtonText}>Végeztem!</Text>
             </TouchableOpacity>
           ) : (
             <View style={styles.motivationBox}>
               <Text style={styles.motivationText}>
-                Complete all tasks to unlock your gift! 🎁
+                Fejezd be a feladatokat, hogy megkapd az ajándékodat! 🎁
               </Text>
             </View>
           )}

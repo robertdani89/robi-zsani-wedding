@@ -13,9 +13,9 @@ interface SpotifySearchResult {
 
 const getBaseUrl = () => {
   if (Platform.OS === "android") {
-    return "http://192.168.0.232:3000";
+    return "http://192.168.0.232:8096/api";
   }
-  return "http://localhost:3000";
+  return "http://localhost:8096/api";
 };
 
 const API_BASE_URL = getBaseUrl();
@@ -23,6 +23,12 @@ const API_BASE_URL = getBaseUrl();
 interface RegisterResponse {
   guest: Guest;
   questions: Question[];
+}
+
+interface UpdateGuestPayload {
+  gotGiftAt?: string;
+  typeOfGift?: string;
+  completed?: boolean;
 }
 
 interface UploadPhotoResponse {
@@ -75,6 +81,23 @@ class ApiService {
 
   async getGuest(guestId: string): Promise<Guest> {
     return this.fetch<Guest>(`/guests/${guestId}`);
+  }
+
+  async updateGuest(
+    guestId: string,
+    payload: UpdateGuestPayload,
+  ): Promise<Guest> {
+    try {
+      return await this.fetch<Guest>(`/guests/${guestId}`, {
+        method: "PATCH",
+        body: JSON.stringify(payload),
+      });
+    } catch (error) {
+      return this.fetch<Guest>(`/guests/${guestId}`, {
+        method: "PUT",
+        body: JSON.stringify(payload),
+      });
+    }
   }
 
   async getGuestQuestions(guestId: string): Promise<Question[]> {

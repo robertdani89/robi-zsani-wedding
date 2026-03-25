@@ -76,7 +76,7 @@ export default function IdentifyScreen() {
       <StatusBar style="dark" />
 
       <View style={styles.content}>
-        <Text style={styles.title}>Üdvözlünk! 👋</Text>
+        <Text style={styles.title}>Csodás, hogy itt vagy! 👋</Text>
         <Text style={styles.subtitle}>Köszönjük, hogy velünk ünnepelsz!</Text>
 
         <View style={styles.inputContainer}>
@@ -109,7 +109,7 @@ export default function IdentifyScreen() {
           {isLoading ? (
             <ActivityIndicator color="#FFF" />
           ) : (
-            <Text style={styles.buttonText}>Continue</Text>
+            <Text style={styles.buttonText}>Kezdjük!</Text>
           )}
         </TouchableOpacity>
       </View>

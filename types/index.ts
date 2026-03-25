@@ -4,6 +4,8 @@ export interface Guest {
   invitationCode?: string;
   completed: boolean;
   createdAt: string;
+  gotGiftAt?: string;
+  typeOfGift?: string;
 }
 
 export enum QuestionType {
@@ -12,15 +14,8 @@ export enum QuestionType {
   FREE_TEXT = "free_text",
 }
 
-export enum QuestionCategory {
-  TRAVEL = "Travel & Vacation",
-  ACTIVITIES = "Activities & Hobbies",
-  FUN = "Fun / Personal",
-}
-
 export interface Question {
   id: string;
-  category: QuestionCategory;
   text: string;
   type: QuestionType;
   options?: string[];

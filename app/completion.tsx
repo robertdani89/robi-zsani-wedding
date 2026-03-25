@@ -94,7 +94,7 @@ export default function CompletionScreen() {
           onPress={handleBackToDashboard}
           activeOpacity={0.8}
         >
-          <Text style={styles.dashboardButtonText}>Back to Dashboard</Text>
+          <Text style={styles.dashboardButtonText}>Vissza</Text>
         </TouchableOpacity>
       </ScrollView>
     </View>

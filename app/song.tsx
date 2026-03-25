@@ -116,31 +116,29 @@ export default function SongScreen() {
             onPress={() => router.back()}
             style={styles.backButton}
           >
-            <Text style={styles.backButtonText}>← Back</Text>
+            <Text style={styles.backButtonText}>← Vissza</Text>
           </TouchableOpacity>
 
-          <Text style={styles.title}>Pick a Song 🎵</Text>
+          <Text style={styles.title}>Válassz egy dalt 🎵</Text>
           <Text style={styles.subtitle}>
-            Choose a song you'd love to hear at the wedding party!
+            Válassz egy dalt, amit szívesen hallanál az esküvői bulin!
           </Text>
         </View>
 
         <View style={styles.infoCard}>
           <Text style={styles.infoText}>
-            🎶 Search for your favorite song below
+            🎶 Keresd meg a kedvenc dalodat alább
           </Text>
           <Text style={styles.infoText}>
-            💃 We'll try to play it during the celebration
-          </Text>
-          <Text style={styles.infoText}>
-            ❤️ Pick something that makes you want to dance!
+            A mennyasszony ellenorzi a választásokat, szóval csak jó dalokat
+            válassz! 😉
           </Text>
         </View>
 
         {/* Current Selection */}
         {state.song && (
           <View style={styles.currentSelection}>
-            <Text style={styles.currentSelectionTitle}>Your Selection</Text>
+            <Text style={styles.currentSelectionTitle}>A Te választásod</Text>
             <View style={styles.selectedSongCard}>
               {state.song.albumArt && (
                 <Image
@@ -172,13 +170,13 @@ export default function SongScreen() {
         {/* Search Section */}
         <View style={styles.searchSection}>
           <Text style={styles.sectionTitle}>
-            {state.song ? "Search for a different song" : "Search for a song"}
+            {state.song ? "Keress egy másik dalt" : "Keresés dalra"}
           </Text>
           <View style={styles.searchInputContainer}>
             <Text style={styles.searchIcon}>🔍</Text>
             <TextInput
               style={styles.searchInput}
-              placeholder="Search songs or artists..."
+              placeholder="Keresés dalokra vagy előadókra..."
               placeholderTextColor="#999"
               value={searchQuery}
               onChangeText={setSearchQuery}
@@ -273,9 +271,9 @@ export default function SongScreen() {
           searchResults.length === 0 && (
             <View style={styles.emptyState}>
               <Text style={styles.emptyStateEmoji}>🎧</Text>
-              <Text style={styles.emptyStateText}>Ready to pick a song?</Text>
+              <Text style={styles.emptyStateText}>Kész vagy választani?</Text>
               <Text style={styles.emptyStateSubtext}>
-                Type at least 2 characters to search
+                Írj be legalább 2 karaktert a kereséshez
               </Text>
             </View>
           )}

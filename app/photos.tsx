@@ -191,26 +191,21 @@ export default function PhotosScreen() {
             onPress={() => router.back()}
             style={styles.backButton}
           >
-            <Text style={styles.backButtonText}>← Back</Text>
+            <Text style={styles.backButtonText}>← Vissza</Text>
           </TouchableOpacity>
 
-          <Text style={styles.title}>Upload Photos 📸</Text>
+          <Text style={styles.title}>Fényképek feltöltése 📸</Text>
           <Text style={styles.subtitle}>
-            Share your fun moments at the wedding
+            Oszd meg a szórakoztató pillanataidat az esküvőn
           </Text>
         </View>
 
         <View style={styles.infoCard}>
           <Text style={styles.infoText}>
-            📝 Minimum: {MIN_PHOTOS_REQUIRED} photo
-            {MIN_PHOTOS_REQUIRED > 1 ? "s" : ""} required
+            📝 Minimum: {MIN_PHOTOS_REQUIRED} fotó
           </Text>
           <Text style={styles.infoText}>
-            📷 Maximum: {MAX_PHOTOS_ALLOWED} photos allowed
-          </Text>
-          <Text style={styles.infoText}>
-            ✅ Current: {state.photos.length} photo
-            {state.photos.length !== 1 ? "s" : ""} uploaded
+            ✅ Feltöltöttél eddig {state.photos.length} fotót
           </Text>
         </View>
 
@@ -233,14 +228,14 @@ export default function PhotosScreen() {
             disabled={isLoading}
           >
             <Text style={styles.actionButtonIcon}>🖼️</Text>
-            <Text style={styles.actionButtonText}>From Gallery</Text>
+            <Text style={styles.actionButtonText}>Gallériából</Text>
           </TouchableOpacity>
         </View>
 
         {/* Photo Grid */}
         {state.photos.length > 0 && (
           <View style={styles.photosSection}>
-            <Text style={styles.sectionTitle}>Your Photos</Text>
+            <Text style={styles.sectionTitle}>A te fotóid</Text>
             <View style={styles.photoGrid}>
               {state.photos.map((photo) => (
                 <View key={photo.id} style={styles.photoContainer}>
@@ -267,7 +262,7 @@ export default function PhotosScreen() {
           <View style={styles.uploadingContainer}>
             <View style={styles.uploadingOverlay}>
               <ActivityIndicator size="large" color="#D4526E" />
-              <Text style={styles.uploadingText}>Uploading photo...</Text>
+              <Text style={styles.uploadingText}>Feltöltés folyamatban...</Text>
             </View>
           </View>
         )}
@@ -275,9 +270,9 @@ export default function PhotosScreen() {
         {state.photos.length === 0 && (
           <View style={styles.emptyState}>
             <Text style={styles.emptyStateEmoji}>📸</Text>
-            <Text style={styles.emptyStateText}>No photos yet</Text>
+            <Text style={styles.emptyStateText}>Még nincsenek fotók</Text>
             <Text style={styles.emptyStateSubtext}>
-              Take a photo or upload from your gallery to get started
+              Készíts egy fotót vagy tölts fel a galériádból, hogy elkezdhesd
             </Text>
           </View>
         )}
@@ -288,17 +283,17 @@ export default function PhotosScreen() {
             onPress={() => router.replace("/dashboard")}
             activeOpacity={0.8}
           >
-            <Text style={styles.doneButtonText}>Done ✓</Text>
+            <Text style={styles.doneButtonText}>Kész ✓</Text>
           </TouchableOpacity>
         )}
       </ScrollView>
 
       <ConfirmationModal
         visible={deleteModalVisible}
-        title="Delete Photo"
-        message="Are you sure you want to remove this photo?"
-        confirmText={isDeleting ? "Deleting..." : "Delete"}
-        cancelText="Cancel"
+        title="Fotó törlése"
+        message="Biztosan el akarod távolítani ezt a fotót?"
+        confirmText={isDeleting ? "Törlés..." : "Törlés"}
+        cancelText="Mégse"
         onConfirm={confirmDeletePhoto}
         onCancel={cancelDeletePhoto}
         confirmStyle="destructive"

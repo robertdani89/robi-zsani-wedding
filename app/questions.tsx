@@ -116,16 +116,16 @@ export default function QuestionsScreen() {
         setCurrentQuestionIndex(currentQuestionIndex + 1);
       } else {
         Alert.alert(
-          "Great Job!",
-          "You've answered all the questions. You can review your answers anytime.",
+          "Köszönjük!",
+          "Minden kérdésre válaszoltál. Bármikor áttekintheted a válaszaidat.",
           [{ text: "OK", onPress: () => router.replace("/dashboard") }],
         );
       }
     } catch (error) {
       console.error("Error submitting answer:", error);
       Alert.alert(
-        "Submission Error",
-        "Could not submit your answer. Please check your connection and try again.",
+        "Hiba a beküldés során",
+        "Nem sikerült beküldeni a válaszodat. Kérlek, ellenőrizd a kapcsolatot és próbáld újra.",
       );
     } finally {
       setIsSubmitting(false);
@@ -247,22 +247,21 @@ export default function QuestionsScreen() {
             onPress={() => router.back()}
             style={styles.backButton}
           >
-            <Text style={styles.backButtonText}>← Back</Text>
+            <Text style={styles.backButtonText}>← Vissza</Text>
           </TouchableOpacity>
 
           <View style={styles.progressIndicator}>
             <Text style={styles.progressText}>
-              Question {currentQuestionIndex + 1} of {questions.length}
+              Kérdés {currentQuestionIndex + 1} / {questions.length}
             </Text>
           </View>
         </View>
 
         <View style={styles.questionCard}>
-          <Text style={styles.categoryLabel}>{currentQuestion.category}</Text>
           <Text style={styles.questionText}>{currentQuestion.text}</Text>
 
           {currentQuestion.type === QuestionType.MULTIPLE_CHOICE && (
-            <Text style={styles.hint}>Select all that apply</Text>
+            <Text style={styles.hint}>Jelöld be az összes megfelelőt</Text>
           )}
         </View>
 
@@ -275,7 +274,7 @@ export default function QuestionsScreen() {
               onPress={handlePrevious}
               activeOpacity={0.7}
             >
-              <Text style={styles.previousButtonText}>← Previous</Text>
+              <Text style={styles.previousButtonText}>← Előző</Text>
             </TouchableOpacity>
           )}
 
@@ -286,8 +285,8 @@ export default function QuestionsScreen() {
           >
             <Text style={styles.skipButtonText}>
               {currentQuestionIndex === questions.length - 1
-                ? "Finish Later"
-                : "Skip"}
+                ? "Később befejezem"
+                : "Kihagyás"}
             </Text>
           </TouchableOpacity>
         </View>
@@ -303,8 +302,8 @@ export default function QuestionsScreen() {
           ) : (
             <Text style={styles.nextButtonText}>
               {currentQuestionIndex === questions.length - 1
-                ? "Complete"
-                : "Next"}
+                ? "Befejezés"
+                : "Következő"}
             </Text>
           )}
         </TouchableOpacity>
