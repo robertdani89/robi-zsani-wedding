@@ -10,10 +10,12 @@ import {
   View,
 } from "react-native";
 
+import Card from "@/components/Card";
 import { Guest } from "@/types";
 import { StatusBar } from "expo-status-bar";
 import apiService from "@/services/api";
 import { useApp } from "@/context/AppContext";
+import { useFonts } from "expo-font";
 import { useRouter } from "expo-router";
 import { useState } from "react";
 
@@ -24,6 +26,13 @@ export default function IdentifyScreen() {
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
   const { setGuest, setAssignedQuestions } = useApp();
+  const [fontsLoaded] = useFonts({
+    GreatVibes: require("@/assets/GreatVibes-Regular.ttf"),
+  });
+
+  if (!fontsLoaded) {
+    return null;
+  }
 
   const handleContinue = async () => {
     const trimmedName = name.trim();
@@ -71,18 +80,24 @@ export default function IdentifyScreen() {
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === "ios" ? "padding" : "height"}
-      style={styles.container}
+      style={[styles.text, styles.container]}
     >
       <StatusBar style="dark" />
 
       <View style={styles.content}>
-        <Text style={styles.title}>Csodás, hogy itt vagy! 👋</Text>
-        <Text style={styles.subtitle}>Köszönjük, hogy velünk ünnepelsz!</Text>
+        <Card>
+          <Text style={[styles.text, styles.title]}>
+            Csodás, hogy itt vagy! 👋
+          </Text>
+          <Text style={[styles.text, styles.subtitle]}>
+            Köszönjük, hogy velünk ünnepelsz!
+          </Text>
+        </Card>
 
-        <View style={styles.inputContainer}>
-          <Text style={styles.label}>Mi a neved?</Text>
+        <Card style={styles.inputContainer}>
+          <Text style={[styles.text, styles.label]}>Mi a neved?</Text>
           <TextInput
-            style={styles.input}
+            style={[styles.text, styles.input]}
             placeholder="Írd be kérlek a neved"
             placeholderTextColor="#999"
             value={name}
@@ -92,10 +107,10 @@ export default function IdentifyScreen() {
             onSubmitEditing={handleContinue}
             editable={!isLoading}
           />
-          <Text style={styles.hint}>
+          <Text style={[styles.text, styles.hint]}>
             Ha szeretnéd, használhatsz becenevet is.
           </Text>
-        </View>
+        </Card>
 
         <TouchableOpacity
           style={[
@@ -109,7 +124,7 @@ export default function IdentifyScreen() {
           {isLoading ? (
             <ActivityIndicator color="#FFF" />
           ) : (
-            <Text style={styles.buttonText}>Kezdjük!</Text>
+            <Text style={[styles.text, styles.buttonText]}>Kezdjük!</Text>
           )}
         </TouchableOpacity>
       </View>
@@ -118,6 +133,9 @@ export default function IdentifyScreen() {
 }
 
 const styles = StyleSheet.create({
+  text: {
+    fontFamily: "GreatVibes",
+  },
   container: {
     flex: 1,
     backgroundColor: "transparent",
@@ -128,7 +146,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 30,
   },
   title: {
-    fontSize: 36,
+    fontSize: 24,
     fontWeight: "bold",
     color: "#D4526E",
     marginBottom: 10,
@@ -136,9 +154,9 @@ const styles = StyleSheet.create({
   subtitle: {
     fontSize: 18,
     color: "#7D5260",
-    marginBottom: 50,
   },
   inputContainer: {
+    marginTop: 40,
     marginBottom: 40,
   },
   label: {
@@ -159,9 +177,8 @@ const styles = StyleSheet.create({
   },
   hint: {
     fontSize: 13,
-    color: "#999",
+    color: "#444",
     marginTop: 8,
-    fontStyle: "italic",
   },
   button: {
     backgroundColor: "#D4526E",
@@ -181,6 +198,5 @@ const styles = StyleSheet.create({
   buttonText: {
     color: "#FFF",
     fontSize: 18,
-    fontWeight: "bold",
   },
 });

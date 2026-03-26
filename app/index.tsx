@@ -3,10 +3,18 @@ import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 import Card from "@/components/Card";
 import { StatusBar } from "expo-status-bar";
+import { useFonts } from "expo-font";
 import { useRouter } from "expo-router";
 
 export default function WelcomeScreen() {
   const router = useRouter();
+  const [fontsLoaded] = useFonts({
+    GreatVibes: require("@/assets/GreatVibes-Regular.ttf"),
+  });
+
+  if (!fontsLoaded) {
+    return null;
+  }
 
   const handleGetStarted = () => {
     router.push("/identify");
@@ -17,27 +25,29 @@ export default function WelcomeScreen() {
       <StatusBar style="dark" />
       <View style={styles.content}>
         <Card>
-          <Text style={styles.coupleNames}>{COUPLE_NAMES}</Text>
+          <Text style={[styles.text, styles.coupleNames]}>{COUPLE_NAMES}</Text>
         </Card>
 
         <View style={styles.heartContainer}>
-          <Text style={styles.heart}>💕</Text>
+          <Text style={[styles.text, styles.heart]}>💕</Text>
         </View>
 
         <Card style={styles.weddingDate}>
-          <Text>{WEDDING_DATE}</Text>
+          <Text style={[styles.text, styles.weddingDateText]}>
+            {WEDDING_DATE}
+          </Text>
         </Card>
 
         <View style={styles.messageContainer}>
           <Card>
-            <Text style={styles.message}>
+            <Text style={[styles.text, styles.message]}>
               Segíts nekünk szép emlékeket teremteni, és nyerj egy kis
               ajándékot!
             </Text>
           </Card>
 
-          <Card style={styles.subMessage}>
-            <Text>
+          <Card style={styles.subMessageContainer}>
+            <Text style={[styles.text, styles.subMessage]}>
               Válaszolj néhány apró kérdésre, ossz meg fotókat, és légy részese
               különleges napunknak!
             </Text>
@@ -46,7 +56,7 @@ export default function WelcomeScreen() {
 
         <TouchableOpacity onPress={handleGetStarted} activeOpacity={0.8}>
           <Card>
-            <Text style={styles.buttonText}>Kezdjük!</Text>
+            <Text style={[styles.text, styles.buttonText]}>Kezdjük!</Text>
           </Card>
         </TouchableOpacity>
       </View>
@@ -65,42 +75,46 @@ const styles = StyleSheet.create({
     alignItems: "center",
     paddingHorizontal: 30,
   },
+  text: {
+    fontFamily: "GreatVibes",
+  },
   coupleNames: {
-    fontSize: 48,
-    fontWeight: "bold",
+    fontSize: 36,
     color: "#D4526E",
-    marginBottom: 20,
+    marginBottom: 0,
     textAlign: "center",
   },
   heartContainer: {
     marginVertical: 20,
   },
   heart: {
-    fontSize: 64,
+    fontSize: 36,
   },
   weddingDate: {
-    fontSize: 20,
-    color: "#7D5260",
     marginTop: 10,
-    fontWeight: "500",
+  },
+  weddingDateText: {
+    fontSize: 24,
+    textAlign: "center",
   },
   messageContainer: {
     marginTop: 40,
     marginBottom: 50,
   },
   message: {
-    fontSize: 18,
+    fontSize: 24,
     color: "#333",
     textAlign: "center",
-    lineHeight: 26,
-    fontWeight: "600",
+    lineHeight: 32,
+  },
+  subMessageContainer: {
+    marginTop: 15,
   },
   subMessage: {
-    fontSize: 15,
-    color: "#666",
+    fontSize: 24,
+    color: "#333",
     textAlign: "center",
-    marginTop: 15,
-    lineHeight: 22,
+    lineHeight: 32,
   },
   button: {
     backgroundColor: "#D4526E",
@@ -115,7 +129,7 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     color: "#000",
-    fontSize: 18,
-    fontWeight: "bold",
+    fontSize: 24,
+    textAlign: "center",
   },
 });

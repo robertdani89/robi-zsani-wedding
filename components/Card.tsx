@@ -29,7 +29,6 @@ const styles = StyleSheet.create({
   outerBorder: {
     backgroundColor: "#8B4513",
     padding: 8,
-    borderRadius: 12,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,

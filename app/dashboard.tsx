@@ -6,6 +6,7 @@ import {
   View,
 } from "react-native";
 
+import Card from "@/components/Card";
 import { StatusBar } from "expo-status-bar";
 import { useApp } from "@/context/AppContext";
 import { useRouter } from "expo-router";
@@ -45,7 +46,7 @@ export default function DashboardScreen() {
         style={styles.scrollView}
         contentContainerStyle={styles.scrollContent}
       >
-        <View style={styles.header}>
+        <Card style={styles.header}>
           <Text style={styles.greeting}>Szia, {state.guest?.name}! 👋</Text>
           <Text style={styles.subtitle}>
             Nászutunkon minden választ elolvasunk
@@ -53,10 +54,10 @@ export default function DashboardScreen() {
           <Text style={styles.subtitle}>
             Kérlek, ne hagyd, hogy unatkozzunk a repülőn! 😉
           </Text>
-        </View>
+        </Card>
 
         {/* Progress Bar */}
-        <View style={styles.progressContainer}>
+        <Card style={styles.progressContainer}>
           <View style={styles.progressHeader}>
             <Text style={styles.progressLabel}>Mennyi van hátra?</Text>
             <Text style={styles.progressPercentage}>
@@ -71,10 +72,10 @@ export default function DashboardScreen() {
               ]}
             />
           </View>
-        </View>
+        </Card>
 
         {/* Task Cards */}
-        <View style={styles.tasksContainer}>
+        <Card style={styles.tasksContainer}>
           <Text style={styles.sectionTitle}>Feladatok</Text>
 
           {/* Questions Card */}
@@ -161,7 +162,7 @@ export default function DashboardScreen() {
               </Text>
             </View>
           </TouchableOpacity>
-        </View>
+        </Card>
 
         {/* Bottom CTA */}
         <View style={styles.bottomCTA}>
@@ -213,15 +214,7 @@ const styles = StyleSheet.create({
     color: "#7D5260",
   },
   progressContainer: {
-    backgroundColor: "#FFF",
-    borderRadius: 16,
-    padding: 20,
     marginBottom: 30,
-    elevation: 2,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 2,
   },
   progressHeader: {
     flexDirection: "row",

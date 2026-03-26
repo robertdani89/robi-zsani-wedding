@@ -8,6 +8,7 @@ import {
   View,
 } from "react-native";
 
+import Card from "@/components/Card";
 import { StatusBar } from "expo-status-bar";
 import apiService from "@/services/api";
 import { useApp } from "@/context/AppContext";
@@ -86,59 +87,68 @@ export default function GiftScreen() {
         >
           <Text style={styles.backButtonText}>← Vissza</Text>
         </TouchableOpacity>
-        <Text style={styles.title}>Köszönjük!</Text>
-        <Text style={styles.subtitle}>Menj az ajándékadó géphez!</Text>
+        <Card style={styles.header}>
+          <Text style={styles.title}>Köszönjük!</Text>
+          <Text style={styles.subtitle}>Menj az ajándékadó géphez!</Text>
+        </Card>
 
-        <View style={styles.placeholderBox}>
-          <Text style={styles.placeholderText}>Kép helye (placeholder)</Text>
-        </View>
+        <Card style={styles.machine}>
+          <View style={styles.placeholderBox}>
+            <Text style={styles.placeholderText}>Kép helye (placeholder)</Text>
+          </View>
+        </Card>
 
-        <View style={styles.selectionCard}>
-          <Text style={styles.selectionTitle}>
-            Válaszd ki az ajándék típusát:
-          </Text>
-
-          <TouchableOpacity
-            style={styles.optionRow}
-            onPress={() => setSelectedGiftType("gift_for_man")}
-            activeOpacity={0.8}
-            disabled={isSubmitting}
-          >
-            <View
-              style={[
-                styles.radioOuter,
-                selectedGiftType === "gift_for_man" && styles.radioOuterActive,
-              ]}
-            >
-              {selectedGiftType === "gift_for_man" && (
-                <View style={styles.radioInner} />
-              )}
-            </View>
-            <Text style={styles.optionText}>Ajándék férfiaknak / fiúknak</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={styles.optionRow}
-            onPress={() => setSelectedGiftType("gift_for_ladies")}
-            activeOpacity={0.8}
-            disabled={isSubmitting}
-          >
-            <View
-              style={[
-                styles.radioOuter,
-                selectedGiftType === "gift_for_ladies" &&
-                  styles.radioOuterActive,
-              ]}
-            >
-              {selectedGiftType === "gift_for_ladies" && (
-                <View style={styles.radioInner} />
-              )}
-            </View>
-            <Text style={styles.optionText}>
-              Ajándék hölgyeknek / lányoknak
+        <Card style={styles.options}>
+          <View style={styles.selectionCard}>
+            <Text style={styles.selectionTitle}>
+              Válaszd ki az ajándék típusát:
             </Text>
-          </TouchableOpacity>
-        </View>
+
+            <TouchableOpacity
+              style={styles.optionRow}
+              onPress={() => setSelectedGiftType("gift_for_man")}
+              activeOpacity={0.8}
+              disabled={isSubmitting}
+            >
+              <View
+                style={[
+                  styles.radioOuter,
+                  selectedGiftType === "gift_for_man" &&
+                    styles.radioOuterActive,
+                ]}
+              >
+                {selectedGiftType === "gift_for_man" && (
+                  <View style={styles.radioInner} />
+                )}
+              </View>
+              <Text style={styles.optionText}>
+                Ajándék férfiaknak / fiúknak
+              </Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={styles.optionRow}
+              onPress={() => setSelectedGiftType("gift_for_ladies")}
+              activeOpacity={0.8}
+              disabled={isSubmitting}
+            >
+              <View
+                style={[
+                  styles.radioOuter,
+                  selectedGiftType === "gift_for_ladies" &&
+                    styles.radioOuterActive,
+                ]}
+              >
+                {selectedGiftType === "gift_for_ladies" && (
+                  <View style={styles.radioInner} />
+                )}
+              </View>
+              <Text style={styles.optionText}>
+                Ajándék hölgyeknek / lányoknak
+              </Text>
+            </TouchableOpacity>
+          </View>
+        </Card>
 
         <TouchableOpacity
           style={[
@@ -168,6 +178,15 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: "#D4526E",
     fontWeight: "600",
+  },
+  header: {
+    marginBottom: 30,
+  },
+  machine: {
+    marginBottom: 30,
+  },
+  options: {
+    marginBottom: 40,
   },
   container: {
     flex: 1,

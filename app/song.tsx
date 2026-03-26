@@ -304,7 +304,6 @@ export default function SongScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#FFF9F0",
   },
   scrollView: {
     flex: 1,
