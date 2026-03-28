@@ -12,6 +12,7 @@ import {
 } from "react-native";
 import { MAX_PHOTOS_ALLOWED, MIN_PHOTOS_REQUIRED } from "@/data/questions";
 
+import Card from "@/components/Card";
 import ConfirmationModal from "@/components/ConfirmationModal";
 import { Photo } from "@/types";
 import { StatusBar } from "expo-status-bar";
@@ -186,7 +187,7 @@ export default function PhotosScreen() {
         style={styles.scrollView}
         contentContainerStyle={styles.scrollContent}
       >
-        <View style={styles.header}>
+        <Card style={styles.header}>
           <TouchableOpacity
             onPress={() => router.back()}
             style={styles.backButton}
@@ -198,44 +199,46 @@ export default function PhotosScreen() {
           <Text style={styles.subtitle}>
             Oszd meg a szórakoztató pillanataidat az esküvőn
           </Text>
-        </View>
+        </Card>
 
-        <View style={styles.infoCard}>
-          <Text style={styles.infoText}>
-            📝 Minimum: {MIN_PHOTOS_REQUIRED} fotó
-          </Text>
-          <Text style={styles.infoText}>
-            ✅ Feltöltöttél eddig {state.photos.length} fotót
-          </Text>
-        </View>
+        <Card>
+          <View style={styles.infoCard}>
+            <Text style={styles.infoText}>
+              📝 Minimum: {MIN_PHOTOS_REQUIRED} fotó
+            </Text>
+            <Text style={styles.infoText}>
+              ✅ Feltöltöttél eddig {state.photos.length} fotót
+            </Text>
+          </View>
 
-        {/* Action Buttons */}
-        <View style={styles.actionButtons}>
-          <TouchableOpacity
-            style={[styles.actionButton, isLoading && styles.buttonDisabled]}
-            onPress={handleTakePhoto}
-            activeOpacity={0.7}
-            disabled={isLoading}
-          >
-            <Text style={styles.actionButtonIcon}>📷</Text>
-            <Text style={styles.actionButtonText}>Take Photo</Text>
-          </TouchableOpacity>
+          {/* Action Buttons */}
+          <View style={styles.actionButtons}>
+            <TouchableOpacity
+              style={[styles.actionButton, isLoading && styles.buttonDisabled]}
+              onPress={handleTakePhoto}
+              activeOpacity={0.7}
+              disabled={isLoading}
+            >
+              <Text style={styles.actionButtonIcon}>📷</Text>
+              <Text style={styles.actionButtonText}>Take Photo</Text>
+            </TouchableOpacity>
 
-          <TouchableOpacity
-            style={[styles.actionButton, isLoading && styles.buttonDisabled]}
-            onPress={handleUploadFromGallery}
-            activeOpacity={0.7}
-            disabled={isLoading}
-          >
-            <Text style={styles.actionButtonIcon}>🖼️</Text>
-            <Text style={styles.actionButtonText}>Gallériából</Text>
-          </TouchableOpacity>
-        </View>
+            <TouchableOpacity
+              style={[styles.actionButton, isLoading && styles.buttonDisabled]}
+              onPress={handleUploadFromGallery}
+              activeOpacity={0.7}
+              disabled={isLoading}
+            >
+              <Text style={styles.actionButtonIcon}>🖼️</Text>
+              <Text style={styles.actionButtonText}>Gallériából</Text>
+            </TouchableOpacity>
+          </View>
+        </Card>
 
         {/* Photo Grid */}
         {state.photos.length > 0 && (
           <View style={styles.photosSection}>
-            <Text style={styles.sectionTitle}>A te fotóid</Text>
+            <Card style={styles.sectionTitle}>A te fotóid</Card>
             <View style={styles.photoGrid}>
               {state.photos.map((photo) => (
                 <View key={photo.id} style={styles.photoContainer}>
@@ -269,11 +272,13 @@ export default function PhotosScreen() {
 
         {state.photos.length === 0 && (
           <View style={styles.emptyState}>
-            <Text style={styles.emptyStateEmoji}>📸</Text>
-            <Text style={styles.emptyStateText}>Még nincsenek fotók</Text>
-            <Text style={styles.emptyStateSubtext}>
-              Készíts egy fotót vagy tölts fel a galériádból, hogy elkezdhesd
-            </Text>
+            <Card>
+              <Text style={styles.emptyStateEmoji}>📸</Text>
+              <Text style={styles.emptyStateText}>Még nincsenek fotók</Text>
+              <Text style={styles.emptyStateSubtext}>
+                Készíts egy fotót vagy tölts fel a galériádból
+              </Text>
+            </Card>
           </View>
         )}
 
@@ -391,6 +396,7 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: "bold",
     color: "#333",
+    marginTop: 15,
     marginBottom: 15,
   },
   photoGrid: {
@@ -426,8 +432,8 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
   emptyState: {
+    marginTop: 50,
     alignItems: "center",
-    paddingVertical: 60,
   },
   emptyStateEmoji: {
     fontSize: 64,
@@ -443,7 +449,6 @@ const styles = StyleSheet.create({
     fontSize: 15,
     color: "#666",
     textAlign: "center",
-    paddingHorizontal: 40,
   },
   doneButton: {
     backgroundColor: "#D4526E",

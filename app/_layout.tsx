@@ -27,8 +27,7 @@ export default function RootLayout() {
             <Stack.Screen name="dashboard" />
             <Stack.Screen name="questions" />
             <Stack.Screen name="photos" />
-            <Stack.Screen name="review" />
-            <Stack.Screen name="completion" />
+            <Stack.Screen name="gift" />
           </Stack>
         </ThemeProvider>
       </BackgroundWithLeaves>

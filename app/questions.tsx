@@ -11,6 +11,7 @@ import {
 import { Answer, Question, QuestionType } from "@/types";
 import { useEffect, useState } from "react";
 
+import Card from "@/components/Card";
 import { StatusBar } from "expo-status-bar";
 import apiService from "@/services/api";
 import { useApp } from "@/context/AppContext";
@@ -78,7 +79,6 @@ export default function QuestionsScreen() {
   };
 
   const handleNext = async () => {
-    // Validate answer
     if (
       !currentAnswer ||
       (Array.isArray(currentAnswer) && currentAnswer.length === 0)
@@ -150,7 +150,7 @@ export default function QuestionsScreen() {
     switch (currentQuestion.type) {
       case QuestionType.SINGLE_CHOICE:
         return (
-          <View style={styles.optionsContainer}>
+          <Card style={styles.optionsContainer}>
             {currentQuestion.options?.map((option, index) => {
               const isSelected = currentAnswer === option;
               return (
@@ -177,7 +177,7 @@ export default function QuestionsScreen() {
                 </TouchableOpacity>
               );
             })}
-          </View>
+          </Card>
         );
 
       case QuestionType.MULTIPLE_CHOICE:
@@ -185,7 +185,7 @@ export default function QuestionsScreen() {
           ? currentAnswer
           : [];
         return (
-          <View style={styles.optionsContainer}>
+          <Card style={styles.optionsContainer}>
             {currentQuestion.options?.map((option, index) => {
               const isSelected = selectedOptions.includes(option);
               return (
@@ -212,21 +212,23 @@ export default function QuestionsScreen() {
                 </TouchableOpacity>
               );
             })}
-          </View>
+          </Card>
         );
 
       case QuestionType.FREE_TEXT:
         return (
-          <TextInput
-            style={styles.textInput}
-            placeholder="Type your answer here..."
-            placeholderTextColor="#999"
-            value={typeof currentAnswer === "string" ? currentAnswer : ""}
-            onChangeText={setCurrentAnswer}
-            multiline
-            numberOfLines={4}
-            textAlignVertical="top"
-          />
+          <Card>
+            <TextInput
+              style={styles.textInput}
+              placeholder="Type your answer here..."
+              placeholderTextColor="#999"
+              value={typeof currentAnswer === "string" ? currentAnswer : ""}
+              onChangeText={setCurrentAnswer}
+              multiline
+              numberOfLines={4}
+              textAlignVertical="top"
+            />
+          </Card>
         );
 
       default:
@@ -242,7 +244,7 @@ export default function QuestionsScreen() {
         style={styles.scrollView}
         contentContainerStyle={styles.scrollContent}
       >
-        <View style={styles.header}>
+        <Card style={styles.header}>
           <TouchableOpacity
             onPress={() => router.back()}
             style={styles.backButton}
@@ -255,15 +257,15 @@ export default function QuestionsScreen() {
               Kérdés {currentQuestionIndex + 1} / {questions.length}
             </Text>
           </View>
-        </View>
+        </Card>
 
-        <View style={styles.questionCard}>
+        <Card style={styles.questionCard}>
           <Text style={styles.questionText}>{currentQuestion.text}</Text>
 
           {currentQuestion.type === QuestionType.MULTIPLE_CHOICE && (
             <Text style={styles.hint}>Jelöld be az összes megfelelőt</Text>
           )}
-        </View>
+        </Card>
 
         {renderAnswerInput()}
 
@@ -302,7 +304,7 @@ export default function QuestionsScreen() {
           ) : (
             <Text style={styles.nextButtonText}>
               {currentQuestionIndex === questions.length - 1
-                ? "Befejezés"
+                ? "Kész ✓"
                 : "Következő"}
             </Text>
           )}
@@ -349,15 +351,7 @@ const styles = StyleSheet.create({
     fontWeight: "600",
   },
   questionCard: {
-    backgroundColor: "#FFF",
-    borderRadius: 16,
-    padding: 20,
     marginBottom: 25,
-    elevation: 2,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 2,
   },
   categoryLabel: {
     fontSize: 12,

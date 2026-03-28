@@ -83,7 +83,7 @@ export default function BackgroundWithLeaves({
         id: i,
         animatedValue: new Animated.Value(0),
         startX: Math.random() * SCREEN_WIDTH,
-        duration: 3000 + 1 * 5000,
+        duration: 3000 + 1 * 10000,
         delay: Math.random() * 5000,
         frameOffset: Math.floor(Math.random() * LEAF_IMAGES.length),
         horizontalDrift: (Math.random() - 0.5) * 100,
@@ -108,7 +108,7 @@ export default function BackgroundWithLeaves({
               duration: 0,
               useNativeDriver: true,
             }),
-          ])
+          ]),
         ).start();
       }, leaf.delay);
 

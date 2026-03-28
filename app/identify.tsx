@@ -80,7 +80,7 @@ export default function IdentifyScreen() {
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === "ios" ? "padding" : "height"}
-      style={[styles.text, styles.container]}
+      style={[styles.container]}
     >
       <StatusBar style="dark" />
 
@@ -119,7 +119,7 @@ export default function IdentifyScreen() {
           ]}
           onPress={handleContinue}
           activeOpacity={0.8}
-          disabled={!name.trim() || isLoading}
+          disabled={!name.trim() || name.trim().length < 3 || isLoading}
         >
           {isLoading ? (
             <ActivityIndicator color="#FFF" />
@@ -146,8 +146,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 30,
   },
   title: {
-    fontSize: 24,
-    fontWeight: "bold",
+    fontSize: 32,
     color: "#D4526E",
     marginBottom: 10,
   },
@@ -163,7 +162,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: "#333",
     marginBottom: 10,
-    fontWeight: "600",
   },
   input: {
     backgroundColor: "#FFF",

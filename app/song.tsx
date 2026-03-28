@@ -8,8 +8,9 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 
+import Card from "@/components/Card";
 import { Song } from "@/types";
 import { StatusBar } from "expo-status-bar";
 import apiService from "@/services/api";
@@ -31,7 +32,6 @@ export default function SongScreen() {
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState<SpotifySearchResult[]>([]);
   const [isSearching, setIsSearching] = useState(false);
-  const [isSelecting, setIsSelecting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   // Debounce search
@@ -61,7 +61,6 @@ export default function SongScreen() {
   const handleSelectSong = async (result: SpotifySearchResult) => {
     if (!state.guest) return;
 
-    setIsSelecting(true);
     setError(null);
     try {
       const savedSong = await apiService.selectSong({
@@ -74,7 +73,6 @@ export default function SongScreen() {
         guestId: state.guest.id,
       });
 
-      // Save locally
       const localSong: Song = {
         id: savedSong.id,
         spotifyId: savedSong.spotifyId,
@@ -87,19 +85,11 @@ export default function SongScreen() {
       };
 
       await setSong(localSong);
-      router.replace("/dashboard");
+      setSearchQuery("");
     } catch (err) {
       console.error("Selection error:", err);
       setError("Failed to save song. Please try again.");
-    } finally {
-      setIsSelecting(false);
     }
-  };
-
-  const handleChangeSong = () => {
-    // Clear current song selection UI but don't delete from server yet
-    setSearchQuery("");
-    setSearchResults([]);
   };
 
   return (
@@ -111,7 +101,7 @@ export default function SongScreen() {
         contentContainerStyle={styles.scrollContent}
         keyboardShouldPersistTaps="handled"
       >
-        <View style={styles.header}>
+        <Card style={styles.header}>
           <TouchableOpacity
             onPress={() => router.back()}
             style={styles.backButton}
@@ -120,24 +110,15 @@ export default function SongScreen() {
           </TouchableOpacity>
 
           <Text style={styles.title}>Válassz egy dalt 🎵</Text>
-          <Text style={styles.subtitle}>
-            Válassz egy dalt, amit szívesen hallanál az esküvői bulin!
-          </Text>
-        </View>
 
-        <View style={styles.infoCard}>
           <Text style={styles.infoText}>
-            🎶 Keresd meg a kedvenc dalodat alább
+            A mennyasszony ellenőrzi a választásokat 😉
           </Text>
-          <Text style={styles.infoText}>
-            A mennyasszony ellenorzi a választásokat, szóval csak jó dalokat
-            válassz! 😉
-          </Text>
-        </View>
+        </Card>
 
         {/* Current Selection */}
         {state.song && (
-          <View style={styles.currentSelection}>
+          <Card style={styles.currentSelection}>
             <Text style={styles.currentSelectionTitle}>A Te választásod</Text>
             <View style={styles.selectedSongCard}>
               {state.song.albumArt && (
@@ -157,18 +138,12 @@ export default function SongScreen() {
                   {state.song.album}
                 </Text>
               </View>
-              <TouchableOpacity
-                style={styles.changeButton}
-                onPress={handleChangeSong}
-              >
-                <Text style={styles.changeButtonText}>Change</Text>
-              </TouchableOpacity>
             </View>
-          </View>
+          </Card>
         )}
 
         {/* Search Section */}
-        <View style={styles.searchSection}>
+        <Card style={styles.searchSection}>
           <Text style={styles.sectionTitle}>
             {state.song ? "Keress egy másik dalt" : "Keresés dalra"}
           </Text>
@@ -192,7 +167,7 @@ export default function SongScreen() {
               </TouchableOpacity>
             )}
           </View>
-        </View>
+        </Card>
 
         {/* Error Message */}
         {error && (
@@ -213,7 +188,7 @@ export default function SongScreen() {
         {!isSearching && searchResults.length > 0 && (
           <View style={styles.resultsSection}>
             <Text style={styles.resultsTitle}>
-              {searchResults.length} songs found
+              {searchResults.length} dalt találtunk
             </Text>
             {searchResults.map((result) => (
               <TouchableOpacity
@@ -221,7 +196,6 @@ export default function SongScreen() {
                 style={styles.resultCard}
                 onPress={() => handleSelectSong(result)}
                 activeOpacity={0.7}
-                disabled={isSelecting}
               >
                 {result.albumArt ? (
                   <Image
@@ -245,7 +219,7 @@ export default function SongScreen() {
                   </Text>
                 </View>
                 <View style={styles.selectButton}>
-                  <Text style={styles.selectButtonText}>Select</Text>
+                  <Text style={styles.selectButtonText}>Ezt választom</Text>
                 </View>
               </TouchableOpacity>
             ))}
@@ -278,14 +252,6 @@ export default function SongScreen() {
             </View>
           )}
 
-        {/* Selecting Overlay */}
-        {isSelecting && (
-          <View style={styles.selectingOverlay}>
-            <ActivityIndicator size="large" color="#D4526E" />
-            <Text style={styles.selectingText}>Saving your selection...</Text>
-          </View>
-        )}
-
         {/* Done Button */}
         {state.song && (
           <TouchableOpacity
@@ -293,7 +259,7 @@ export default function SongScreen() {
             onPress={() => router.replace("/dashboard")}
             activeOpacity={0.8}
           >
-            <Text style={styles.doneButtonText}>Done ✓</Text>
+            <Text style={styles.doneButtonText}>Kész ✓</Text>
           </TouchableOpacity>
         )}
       </ScrollView>
@@ -336,15 +302,7 @@ const styles = StyleSheet.create({
     lineHeight: 22,
   },
   infoCard: {
-    backgroundColor: "#FFF",
-    borderRadius: 12,
-    padding: 16,
     marginBottom: 24,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
   },
   infoText: {
     fontSize: 14,

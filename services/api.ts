@@ -12,10 +12,12 @@ interface SpotifySearchResult {
 }
 
 const getBaseUrl = () => {
-  if (Platform.OS === "android") {
-    return "http://192.168.0.232:8096/api";
+  if (Platform.OS === "web") {
+    return "http://localhost:8096/api";
   }
-  return "http://localhost:8096/api";
+
+  return "https://homeharmonyhub.hu/api";
+  // return "http://192.168.0.232:8096/api";
 };
 
 const API_BASE_URL = getBaseUrl();

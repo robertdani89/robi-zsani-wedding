@@ -9,12 +9,16 @@ import {
 import Card from "@/components/Card";
 import { StatusBar } from "expo-status-bar";
 import { useApp } from "@/context/AppContext";
+import { useFonts } from "expo-font";
 import { useRouter } from "expo-router";
 
 export default function DashboardScreen() {
   const router = useRouter();
   const { state, getTaskStatus } = useApp();
   const taskStatus = getTaskStatus();
+  const [fontsLoaded] = useFonts({
+    GreatVibes: require("@/assets/GreatVibes-Regular.ttf"),
+  });
 
   const getStatusBadge = (completed: boolean, inProgress: boolean) => {
     if (completed) {
@@ -47,11 +51,13 @@ export default function DashboardScreen() {
         contentContainerStyle={styles.scrollContent}
       >
         <Card style={styles.header}>
-          <Text style={styles.greeting}>Szia, {state.guest?.name}! 👋</Text>
-          <Text style={styles.subtitle}>
+          <Text style={[styles.text, styles.greeting]}>
+            Szia, {state.guest?.name}! 👋
+          </Text>
+          <Text style={[styles.text, styles.subtitle]}>
             Nászutunkon minden választ elolvasunk
           </Text>
-          <Text style={styles.subtitle}>
+          <Text style={[styles.text, styles.subtitle]}>
             Kérlek, ne hagyd, hogy unatkozzunk a repülőn! 😉
           </Text>
         </Card>
@@ -188,6 +194,9 @@ export default function DashboardScreen() {
 }
 
 const styles = StyleSheet.create({
+  text: {
+    fontFamily: "GreatVibes",
+  },
   container: {
     flex: 1,
     backgroundColor: "transparent",
@@ -210,7 +219,7 @@ const styles = StyleSheet.create({
     marginBottom: 5,
   },
   subtitle: {
-    fontSize: 16,
+    fontSize: 20,
     color: "#7D5260",
   },
   progressContainer: {

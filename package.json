@@ -10,10 +10,7 @@
     "clear": "expo start --clear",
     "tunnel": "expo start --tunnel",
     "doctor": "expo-doctor",
-    "prebuild": "expo prebuild",
-    "build:ios": "eas build --platform ios",
-    "build:android": "eas build --platform android",
-    "build:all": "eas build --platform all"
+    "prebuild": "expo prebuild"
   },
   "dependencies": {
     "@react-native-async-storage/async-storage": "2.2.0",
