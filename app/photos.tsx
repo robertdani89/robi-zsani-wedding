@@ -36,8 +36,8 @@ export default function PhotosScreen() {
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (status !== "granted") {
       Alert.alert(
-        "Permission Required",
-        "Sorry, we need camera roll permissions to upload photos.",
+        "Engedély Szükséges",
+        "Bocsánat, szükségünk van a fotótár engedélyére a fotók feltöltéséhez.",
       );
       return false;
     }
@@ -85,8 +85,8 @@ export default function PhotosScreen() {
     const { status } = await ImagePicker.requestCameraPermissionsAsync();
     if (status !== "granted") {
       Alert.alert(
-        "Permission Required",
-        "Sorry, we need camera permissions to take photos.",
+        "Engedély Szükséges",
+        "Bocsánat, szükségünk van a kamera engedélyére a fotók készítéséhez.",
       );
       return;
     }
@@ -104,7 +104,10 @@ export default function PhotosScreen() {
         await uploadPhotoToServer(result.assets[0].uri);
       }
     } catch (error) {
-      Alert.alert("Error", "Failed to take photo. Please try again.");
+      Alert.alert(
+        "Hiba",
+        "Nem sikerült feltölteni a fotót. Kérlek próbáld újra.",
+      );
     } finally {
       setIsLoading(false);
     }
@@ -220,7 +223,7 @@ export default function PhotosScreen() {
               disabled={isLoading}
             >
               <Text style={styles.actionButtonIcon}>📷</Text>
-              <Text style={styles.actionButtonText}>Take Photo</Text>
+              <Text style={styles.actionButtonText}>Készíts fotót</Text>
             </TouchableOpacity>
 
             <TouchableOpacity
@@ -274,7 +277,9 @@ export default function PhotosScreen() {
           <View style={styles.emptyState}>
             <Card>
               <Text style={styles.emptyStateEmoji}>📸</Text>
-              <Text style={styles.emptyStateText}>Még nincsenek fotók</Text>
+              <Text style={styles.emptyStateText}>
+                Még nem töltöttél fel fotókat
+              </Text>
               <Text style={styles.emptyStateSubtext}>
                 Készíts egy fotót vagy tölts fel a galériádból
               </Text>

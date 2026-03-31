@@ -220,7 +220,7 @@ export default function QuestionsScreen() {
           <Card>
             <TextInput
               style={styles.textInput}
-              placeholder="Type your answer here..."
+              placeholder="Írd ide a válaszodat..."
               placeholderTextColor="#999"
               value={typeof currentAnswer === "string" ? currentAnswer : ""}
               onChangeText={setCurrentAnswer}
