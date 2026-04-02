@@ -11,6 +11,7 @@ import { useCallback, useEffect, useState } from "react";
 
 import { StatusBar } from "expo-status-bar";
 import apiService from "@/services/api";
+import { useLocalization } from "@/context/LocalizationContext";
 import { useRouter } from "expo-router";
 
 interface GuestSummary {
@@ -25,6 +26,7 @@ interface GuestSummary {
 
 export default function AdminScreen() {
   const router = useRouter();
+  const { locale, t } = useLocalization();
   const [guests, setGuests] = useState<GuestSummary[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isRefreshing, setIsRefreshing] = useState(false);
@@ -71,21 +73,24 @@ export default function AdminScreen() {
       <View style={styles.guestInfo}>
         <Text style={styles.guestName}>{item.name}</Text>
         <Text style={styles.guestDate}>
-          Joined: {new Date(item.createdAt).toLocaleDateString()}
+          {t("admin.joined")}:{" "}
+          {new Date(item.createdAt).toLocaleDateString(
+            locale === "hu" ? "hu-HU" : "en-US",
+          )}
         </Text>
       </View>
       <View style={styles.statsContainer}>
         <View style={styles.stat}>
           <Text style={styles.statNumber}>{item.answerCount}</Text>
-          <Text style={styles.statLabel}>Answers</Text>
+          <Text style={styles.statLabel}>{t("admin.answers")}</Text>
         </View>
         <View style={styles.stat}>
           <Text style={styles.statNumber}>{item.photoCount}</Text>
-          <Text style={styles.statLabel}>Photos</Text>
+          <Text style={styles.statLabel}>{t("admin.photos")}</Text>
         </View>
         <View style={styles.stat}>
           <Text style={styles.statNumber}>{item.hasSong ? "🎵" : "—"}</Text>
-          <Text style={styles.statLabel}>Song</Text>
+          <Text style={styles.statLabel}>{t("admin.song")}</Text>
         </View>
       </View>
       <Text style={styles.chevron}>›</Text>
@@ -96,7 +101,7 @@ export default function AdminScreen() {
     return (
       <View style={styles.loadingContainer}>
         <ActivityIndicator size="large" color="#D4526E" />
-        <Text style={styles.loadingText}>Loading guests...</Text>
+        <Text style={styles.loadingText}>{t("admin.loadingGuests")}</Text>
       </View>
     );
   }
@@ -106,9 +111,12 @@ export default function AdminScreen() {
       <StatusBar style="dark" />
 
       <View style={styles.header}>
-        <Text style={styles.title}>Admin Panel 🔐</Text>
+        <Text style={styles.title}>{t("admin.title")}</Text>
         <Text style={styles.subtitle}>
-          {guests.length} guest{guests.length !== 1 ? "s" : ""} registered
+          {t("admin.registeredGuests", {
+            count: guests.length,
+            suffix: guests.length !== 1 ? "s" : "",
+          })}
         </Text>
       </View>
 
@@ -118,7 +126,7 @@ export default function AdminScreen() {
           onPress={handleRefresh}
           activeOpacity={0.7}
         >
-          <Text style={styles.refreshButtonText}>🔄 Refresh</Text>
+          <Text style={styles.refreshButtonText}>{t("admin.refresh")}</Text>
         </TouchableOpacity>
 
         <TouchableOpacity
@@ -126,7 +134,7 @@ export default function AdminScreen() {
           onPress={handleLogout}
           activeOpacity={0.7}
         >
-          <Text style={styles.logoutButtonText}>Exit Admin</Text>
+          <Text style={styles.logoutButtonText}>{t("admin.exit")}</Text>
         </TouchableOpacity>
       </View>
 
@@ -146,9 +154,11 @@ export default function AdminScreen() {
         ListEmptyComponent={
           <View style={styles.emptyState}>
             <Text style={styles.emptyStateEmoji}>👥</Text>
-            <Text style={styles.emptyStateText}>No guests yet</Text>
+            <Text style={styles.emptyStateText}>
+              {t("admin.emptyGuestsTitle")}
+            </Text>
             <Text style={styles.emptyStateSubtext}>
-              Guests will appear here once they register
+              {t("admin.emptyGuestsSubtitle")}
             </Text>
           </View>
         }

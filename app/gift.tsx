@@ -12,6 +12,7 @@ import Card from "@/components/Card";
 import { StatusBar } from "expo-status-bar";
 import apiService from "@/services/api";
 import { useApp } from "@/context/AppContext";
+import { useLocalization } from "@/context/LocalizationContext";
 import { useRouter } from "expo-router";
 import { useState } from "react";
 
@@ -20,6 +21,7 @@ type GiftType = "gift_for_man" | "gift_for_ladies";
 export default function GiftScreen() {
   const router = useRouter();
   const { state, setGuest } = useApp();
+  const { t } = useLocalization();
   const [selectedGiftType, setSelectedGiftType] = useState<GiftType | null>(
     null,
   );
@@ -27,18 +29,15 @@ export default function GiftScreen() {
 
   const handleGiveMe = async () => {
     if (!state.guest) {
-      Alert.alert(
-        "Hiba",
-        "Nem található vendég adat. Kérlek azonosítsd magad.",
-      );
+      Alert.alert(t("gift.missingGuestTitle"), t("gift.missingGuestMessage"));
       router.replace("/identify");
       return;
     }
 
     if (!selectedGiftType) {
       Alert.alert(
-        "Választás szükséges",
-        "Kérlek válaszd ki az ajándék típusát.",
+        t("gift.choiceRequiredTitle"),
+        t("gift.choiceRequiredMessage"),
       );
       return;
     }
@@ -63,10 +62,7 @@ export default function GiftScreen() {
       router.replace("/dashboard");
     } catch (error) {
       console.error("Gift update error:", error);
-      Alert.alert(
-        "Mentési hiba",
-        "Nem sikerült elmenteni az ajándék adatait. Kérlek próbáld újra.",
-      );
+      Alert.alert(t("gift.saveErrorTitle"), t("gift.saveErrorMessage"));
     } finally {
       setIsSubmitting(false);
     }
@@ -85,23 +81,23 @@ export default function GiftScreen() {
           onPress={() => router.back()}
           style={styles.backButton}
         >
-          <Text style={styles.backButtonText}>← Vissza</Text>
+          <Text style={styles.backButtonText}>{t("common.back")}</Text>
         </TouchableOpacity>
         <Card style={styles.header}>
-          <Text style={styles.title}>Köszönjük!</Text>
-          <Text style={styles.subtitle}>Menj az ajándékadó géphez!</Text>
+          <Text style={styles.title}>{t("gift.title")}</Text>
+          <Text style={styles.subtitle}>{t("gift.subtitle")}</Text>
         </Card>
 
         <Card style={styles.machine}>
           <View style={styles.placeholderBox}>
-            <Text style={styles.placeholderText}>Kép helye (placeholder)</Text>
+            <Text style={styles.placeholderText}>{t("gift.placeholder")}</Text>
           </View>
         </Card>
 
         <Card style={styles.options}>
           <View style={styles.selectionCard}>
             <Text style={styles.selectionTitle}>
-              Válaszd ki az ajándék típusát:
+              {t("gift.selectionTitle")}
             </Text>
 
             <TouchableOpacity
@@ -121,9 +117,7 @@ export default function GiftScreen() {
                   <View style={styles.radioInner} />
                 )}
               </View>
-              <Text style={styles.optionText}>
-                Ajándék férfiaknak / fiúknak
-              </Text>
+              <Text style={styles.optionText}>{t("gift.forMen")}</Text>
             </TouchableOpacity>
 
             <TouchableOpacity
@@ -143,9 +137,7 @@ export default function GiftScreen() {
                   <View style={styles.radioInner} />
                 )}
               </View>
-              <Text style={styles.optionText}>
-                Ajándék hölgyeknek / lányoknak
-              </Text>
+              <Text style={styles.optionText}>{t("gift.forWomen")}</Text>
             </TouchableOpacity>
           </View>
         </Card>
@@ -162,7 +154,7 @@ export default function GiftScreen() {
           {isSubmitting ? (
             <ActivityIndicator color="#FFF" />
           ) : (
-            <Text style={styles.giveButtonText}>Add ide!</Text>
+            <Text style={styles.giveButtonText}>{t("gift.submit")}</Text>
           )}
         </TouchableOpacity>
       </ScrollView>

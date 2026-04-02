@@ -15,6 +15,7 @@ import { Song } from "@/types";
 import { StatusBar } from "expo-status-bar";
 import apiService from "@/services/api";
 import { useApp } from "@/context/AppContext";
+import { useLocalization } from "@/context/LocalizationContext";
 import { useRouter } from "expo-router";
 
 interface SpotifySearchResult {
@@ -29,6 +30,7 @@ interface SpotifySearchResult {
 export default function SongScreen() {
   const router = useRouter();
   const { state, setSong } = useApp();
+  const { t } = useLocalization();
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState<SpotifySearchResult[]>([]);
   const [isSearching, setIsSearching] = useState(false);
@@ -49,7 +51,7 @@ export default function SongScreen() {
         setSearchResults(results);
       } catch (err) {
         console.error("Search error:", err);
-        setError("Failed to search songs. Please try again.");
+        setError(t("song.searchFailed"));
       } finally {
         setIsSearching(false);
       }
@@ -88,7 +90,7 @@ export default function SongScreen() {
       setSearchQuery("");
     } catch (err) {
       console.error("Selection error:", err);
-      setError("Failed to save song. Please try again.");
+      setError(t("song.saveFailed"));
     }
   };
 
@@ -106,20 +108,20 @@ export default function SongScreen() {
             onPress={() => router.back()}
             style={styles.backButton}
           >
-            <Text style={styles.backButtonText}>← Vissza</Text>
+            <Text style={styles.backButtonText}>{t("common.back")}</Text>
           </TouchableOpacity>
 
-          <Text style={styles.title}>Válassz egy dalt 🎵</Text>
+          <Text style={styles.title}>{t("song.title")}</Text>
 
-          <Text style={styles.infoText}>
-            A mennyasszony ellenőrzi a választásokat 😉
-          </Text>
+          <Text style={styles.infoText}>{t("song.info")}</Text>
         </Card>
 
         {/* Current Selection */}
         {state.song && (
           <Card style={styles.currentSelection}>
-            <Text style={styles.currentSelectionTitle}>A Te választásod</Text>
+            <Text style={styles.currentSelectionTitle}>
+              {t("song.currentSelection")}
+            </Text>
             <View style={styles.selectedSongCard}>
               {state.song.albumArt && (
                 <Image
@@ -145,13 +147,13 @@ export default function SongScreen() {
         {/* Search Section */}
         <Card style={styles.searchSection}>
           <Text style={styles.sectionTitle}>
-            {state.song ? "Keress egy másik dalt" : "Keresés dalra"}
+            {state.song ? t("song.searchAnother") : t("song.search")}
           </Text>
           <View style={styles.searchInputContainer}>
             <Text style={styles.searchIcon}>🔍</Text>
             <TextInput
               style={styles.searchInput}
-              placeholder="Keresés dalokra vagy előadókra..."
+              placeholder={t("song.searchPlaceholder")}
               placeholderTextColor="#999"
               value={searchQuery}
               onChangeText={setSearchQuery}
@@ -180,7 +182,7 @@ export default function SongScreen() {
         {isSearching && (
           <View style={styles.loadingContainer}>
             <ActivityIndicator size="large" color="#D4526E" />
-            <Text style={styles.loadingText}>Searching...</Text>
+            <Text style={styles.loadingText}>{t("song.searching")}</Text>
           </View>
         )}
 
@@ -188,7 +190,7 @@ export default function SongScreen() {
         {!isSearching && searchResults.length > 0 && (
           <View style={styles.resultsSection}>
             <Text style={styles.resultsTitle}>
-              {searchResults.length} dalt találtunk
+              {t("song.foundCount", { count: searchResults.length })}
             </Text>
             {searchResults.map((result) => (
               <TouchableOpacity
@@ -219,7 +221,9 @@ export default function SongScreen() {
                   </Text>
                 </View>
                 <View style={styles.selectButton}>
-                  <Text style={styles.selectButtonText}>Ezt választom</Text>
+                  <Text style={styles.selectButtonText}>
+                    {t("song.select")}
+                  </Text>
                 </View>
               </TouchableOpacity>
             ))}
@@ -232,9 +236,11 @@ export default function SongScreen() {
           searchResults.length === 0 && (
             <View style={styles.emptyState}>
               <Text style={styles.emptyStateEmoji}>🎵</Text>
-              <Text style={styles.emptyStateText}>No songs found</Text>
+              <Text style={styles.emptyStateText}>
+                {t("song.emptyNotFoundTitle")}
+              </Text>
               <Text style={styles.emptyStateSubtext}>
-                Try a different search term
+                {t("song.emptyNotFoundSubtitle")}
               </Text>
             </View>
           )}
@@ -245,9 +251,11 @@ export default function SongScreen() {
           searchResults.length === 0 && (
             <View style={styles.emptyState}>
               <Text style={styles.emptyStateEmoji}>🎧</Text>
-              <Text style={styles.emptyStateText}>Kész vagy választani?</Text>
+              <Text style={styles.emptyStateText}>
+                {t("song.emptyInitialTitle")}
+              </Text>
               <Text style={styles.emptyStateSubtext}>
-                Írj be legalább 2 karaktert a kereséshez
+                {t("song.emptyInitialSubtitle")}
               </Text>
             </View>
           )}
@@ -259,7 +267,7 @@ export default function SongScreen() {
             onPress={() => router.replace("/dashboard")}
             activeOpacity={0.8}
           >
-            <Text style={styles.doneButtonText}>Kész ✓</Text>
+            <Text style={styles.doneButtonText}>{t("common.done")}</Text>
           </TouchableOpacity>
         )}
       </ScrollView>

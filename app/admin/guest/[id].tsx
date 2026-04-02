@@ -15,6 +15,7 @@ import { useLocalSearchParams, useRouter } from "expo-router";
 
 import { StatusBar } from "expo-status-bar";
 import apiService from "@/services/api";
+import { useLocalization } from "@/context/LocalizationContext";
 
 interface PhotoData {
   id: string;
@@ -27,6 +28,7 @@ const { width: screenWidth } = Dimensions.get("window");
 
 export default function GuestDetailScreen() {
   const router = useRouter();
+  const { locale, t } = useLocalization();
   const { id } = useLocalSearchParams<{ id: string }>();
   const [guest, setGuest] = useState<Guest | null>(null);
   const [answers, setAnswers] = useState<(Answer & { question?: Question })[]>(
@@ -75,7 +77,7 @@ export default function GuestDetailScreen() {
     return (
       <View style={styles.loadingContainer}>
         <ActivityIndicator size="large" color="#D4526E" />
-        <Text style={styles.loadingText}>Loading guest data...</Text>
+        <Text style={styles.loadingText}>{t("adminGuest.loading")}</Text>
       </View>
     );
   }
@@ -83,12 +85,12 @@ export default function GuestDetailScreen() {
   if (!guest) {
     return (
       <View style={styles.loadingContainer}>
-        <Text style={styles.errorText}>Guest not found</Text>
+        <Text style={styles.errorText}>{t("adminGuest.notFound")}</Text>
         <TouchableOpacity
           style={styles.backButtonAlt}
           onPress={() => router.back()}
         >
-          <Text style={styles.backButtonAltText}>Go Back</Text>
+          <Text style={styles.backButtonAltText}>{t("adminGuest.goBack")}</Text>
         </TouchableOpacity>
       </View>
     );
@@ -103,11 +105,14 @@ export default function GuestDetailScreen() {
           onPress={() => router.back()}
           style={styles.backButton}
         >
-          <Text style={styles.backButtonText}>← Back</Text>
+          <Text style={styles.backButtonText}>{t("common.back")}</Text>
         </TouchableOpacity>
         <Text style={styles.title}>{guest.name}</Text>
         <Text style={styles.subtitle}>
-          Joined: {new Date(guest.createdAt).toLocaleString()}
+          {t("admin.joined")}:{" "}
+          {new Date(guest.createdAt).toLocaleString(
+            locale === "hu" ? "hu-HU" : "en-US",
+          )}
         </Text>
       </View>
 
@@ -119,26 +124,26 @@ export default function GuestDetailScreen() {
         <View style={styles.statsCard}>
           <View style={styles.statItem}>
             <Text style={styles.statNumber}>{answers.length}</Text>
-            <Text style={styles.statLabel}>Answers</Text>
+            <Text style={styles.statLabel}>{t("admin.answers")}</Text>
           </View>
           <View style={styles.statDivider} />
           <View style={styles.statItem}>
             <Text style={styles.statNumber}>{photos.length}</Text>
-            <Text style={styles.statLabel}>Photos</Text>
+            <Text style={styles.statLabel}>{t("admin.photos")}</Text>
           </View>
           <View style={styles.statDivider} />
           <View style={styles.statItem}>
             <Text style={styles.statNumber}>{song ? "✓" : "—"}</Text>
-            <Text style={styles.statLabel}>Song</Text>
+            <Text style={styles.statLabel}>{t("adminGuest.statsSong")}</Text>
           </View>
         </View>
 
         {/* Song Section */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>🎵 Song Pick</Text>
+          <Text style={styles.sectionTitle}>{t("adminGuest.songPick")}</Text>
           {!song ? (
             <View style={styles.emptyCard}>
-              <Text style={styles.emptyText}>No song selected</Text>
+              <Text style={styles.emptyText}>{t("adminGuest.noSong")}</Text>
             </View>
           ) : (
             <View style={styles.songCard}>
@@ -165,22 +170,27 @@ export default function GuestDetailScreen() {
 
         {/* Answers Section */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>📝 Answers</Text>
+          <Text style={styles.sectionTitle}>
+            {t("adminGuest.answersSection")}
+          </Text>
           {answers.length === 0 ? (
             <View style={styles.emptyCard}>
-              <Text style={styles.emptyText}>No answers yet</Text>
+              <Text style={styles.emptyText}>{t("adminGuest.noAnswers")}</Text>
             </View>
           ) : (
             answers.map((answer, index) => (
               <View key={answer.id || index} style={styles.answerCard}>
                 <Text style={styles.questionText}>
-                  {answer.question?.text || `Question ${answer.questionId}`}
+                  {answer.question?.text ||
+                    t("adminGuest.questionFallback", { id: answer.questionId })}
                 </Text>
                 <Text style={styles.answerText}>
                   {formatAnswer(answer.value)}
                 </Text>
                 <Text style={styles.answerDate}>
-                  {new Date(answer.answeredAt).toLocaleString()}
+                  {new Date(answer.answeredAt).toLocaleString(
+                    locale === "hu" ? "hu-HU" : "en-US",
+                  )}
                 </Text>
               </View>
             ))
@@ -189,10 +199,12 @@ export default function GuestDetailScreen() {
 
         {/* Photos Section */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>📷 Photos</Text>
+          <Text style={styles.sectionTitle}>
+            {t("adminGuest.photosSection")}
+          </Text>
           {photos.length === 0 ? (
             <View style={styles.emptyCard}>
-              <Text style={styles.emptyText}>No photos uploaded</Text>
+              <Text style={styles.emptyText}>{t("adminGuest.noPhotos")}</Text>
             </View>
           ) : (
             <View style={styles.photoGrid}>

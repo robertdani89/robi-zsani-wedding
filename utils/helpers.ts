@@ -4,12 +4,20 @@
 
 import { Answer, Photo, Question } from "@/types";
 
+type Locale = "en" | "hu";
+
+const getLocaleTag = (locale: Locale): string =>
+  locale === "hu" ? "hu-HU" : "en-US";
+
 /**
  * Format date to readable string
  */
-export const formatDate = (dateString: string): string => {
+export const formatDate = (
+  dateString: string,
+  locale: Locale = "hu",
+): string => {
   const date = new Date(dateString);
-  return date.toLocaleDateString("en-US", {
+  return date.toLocaleDateString(getLocaleTag(locale), {
     year: "numeric",
     month: "long",
     day: "numeric",
@@ -19,9 +27,12 @@ export const formatDate = (dateString: string): string => {
 /**
  * Format time to readable string
  */
-export const formatTime = (dateString: string): string => {
+export const formatTime = (
+  dateString: string,
+  locale: Locale = "hu",
+): string => {
   const date = new Date(dateString);
-  return date.toLocaleTimeString("en-US", {
+  return date.toLocaleTimeString(getLocaleTag(locale), {
     hour: "2-digit",
     minute: "2-digit",
   });
@@ -44,7 +55,7 @@ export const calculateProgress = (
   answeredCount: number,
   totalQuestions: number,
   uploadedPhotos: number,
-  requiredPhotos: number
+  requiredPhotos: number,
 ): number => {
   const questionProgress = Math.min((answeredCount / totalQuestions) * 50, 50);
   const photoProgress = Math.min((uploadedPhotos / requiredPhotos) * 50, 50);
@@ -68,7 +79,7 @@ export const shuffleArray = <T>(array: T[]): T[] => {
  */
 export const findQuestionById = (
   questions: Question[],
-  questionId: string
+  questionId: string,
 ): Question | undefined => {
   return questions.find((q) => q.id === questionId);
 };
@@ -78,7 +89,7 @@ export const findQuestionById = (
  */
 export const areQuestionsComplete = (
   answers: Answer[],
-  minRequired: number
+  minRequired: number,
 ): boolean => {
   return answers.length >= minRequired;
 };
@@ -88,7 +99,7 @@ export const areQuestionsComplete = (
  */
 export const arePhotosComplete = (
   photos: Photo[],
-  minRequired: number
+  minRequired: number,
 ): boolean => {
   return photos.length >= minRequired;
 };
@@ -133,7 +144,7 @@ export const formatFileSize = (bytes: number): string => {
  */
 export const debounce = <T extends (...args: any[]) => any>(
   func: T,
-  wait: number
+  wait: number,
 ): ((...args: Parameters<T>) => void) => {
   let timeout: NodeJS.Timeout | null = null;
 

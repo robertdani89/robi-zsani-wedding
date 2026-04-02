@@ -15,11 +15,13 @@ import Card from "@/components/Card";
 import { StatusBar } from "expo-status-bar";
 import apiService from "@/services/api";
 import { useApp } from "@/context/AppContext";
+import { useLocalization } from "@/context/LocalizationContext";
 import { useRouter } from "expo-router";
 
 export default function QuestionsScreen() {
   const router = useRouter();
   const { state, addAnswer, getAssignedQuestions } = useApp();
+  const { t } = useLocalization();
   const [questions, setQuestions] = useState<Question[]>([]);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [currentAnswer, setCurrentAnswer] = useState<string | string[]>("");
@@ -28,7 +30,7 @@ export default function QuestionsScreen() {
   useEffect(() => {
     const assignedQuestions = getAssignedQuestions();
     if (assignedQuestions.length === 0) {
-      Alert.alert("Error", "No questions assigned");
+      Alert.alert(t("questions.errorTitle"), t("questions.noAssigned"));
       router.back();
       return;
     }
@@ -84,8 +86,8 @@ export default function QuestionsScreen() {
       (Array.isArray(currentAnswer) && currentAnswer.length === 0)
     ) {
       Alert.alert(
-        "Answer Required",
-        "Please provide an answer before continuing.",
+        t("questions.answerRequiredTitle"),
+        t("questions.answerRequiredMessage"),
       );
       return;
     }
@@ -116,16 +118,16 @@ export default function QuestionsScreen() {
         setCurrentQuestionIndex(currentQuestionIndex + 1);
       } else {
         Alert.alert(
-          "Köszönjük!",
-          "Minden kérdésre válaszoltál. Bármikor áttekintheted a válaszaidat.",
+          t("questions.thankYouTitle"),
+          t("questions.thankYouMessage"),
           [{ text: "OK", onPress: () => router.replace("/dashboard") }],
         );
       }
     } catch (error) {
       console.error("Error submitting answer:", error);
       Alert.alert(
-        "Hiba a beküldés során",
-        "Nem sikerült beküldeni a válaszodat. Kérlek, ellenőrizd a kapcsolatot és próbáld újra.",
+        t("questions.submitErrorTitle"),
+        t("questions.submitErrorMessage"),
       );
     } finally {
       setIsSubmitting(false);
@@ -220,7 +222,7 @@ export default function QuestionsScreen() {
           <Card>
             <TextInput
               style={styles.textInput}
-              placeholder="Írd ide a válaszodat..."
+              placeholder={t("questions.placeholder")}
               placeholderTextColor="#999"
               value={typeof currentAnswer === "string" ? currentAnswer : ""}
               onChangeText={setCurrentAnswer}
@@ -249,12 +251,15 @@ export default function QuestionsScreen() {
             onPress={() => router.back()}
             style={styles.backButton}
           >
-            <Text style={styles.backButtonText}>← Vissza</Text>
+            <Text style={styles.backButtonText}>{t("common.back")}</Text>
           </TouchableOpacity>
 
           <View style={styles.progressIndicator}>
             <Text style={styles.progressText}>
-              Kérdés {currentQuestionIndex + 1} / {questions.length}
+              {t("questions.progress", {
+                current: currentQuestionIndex + 1,
+                total: questions.length,
+              })}
             </Text>
           </View>
         </Card>
@@ -263,7 +268,7 @@ export default function QuestionsScreen() {
           <Text style={styles.questionText}>{currentQuestion.text}</Text>
 
           {currentQuestion.type === QuestionType.MULTIPLE_CHOICE && (
-            <Text style={styles.hint}>Jelöld be az összes megfelelőt</Text>
+            <Text style={styles.hint}>{t("questions.multiHint")}</Text>
           )}
         </Card>
 
@@ -276,7 +281,9 @@ export default function QuestionsScreen() {
               onPress={handlePrevious}
               activeOpacity={0.7}
             >
-              <Text style={styles.previousButtonText}>← Előző</Text>
+              <Text style={styles.previousButtonText}>
+                {t("questions.previous")}
+              </Text>
             </TouchableOpacity>
           )}
 
@@ -287,8 +294,8 @@ export default function QuestionsScreen() {
           >
             <Text style={styles.skipButtonText}>
               {currentQuestionIndex === questions.length - 1
-                ? "Később befejezem"
-                : "Kihagyás"}
+                ? t("questions.finishLater")
+                : t("questions.skip")}
             </Text>
           </TouchableOpacity>
         </View>
@@ -304,8 +311,8 @@ export default function QuestionsScreen() {
           ) : (
             <Text style={styles.nextButtonText}>
               {currentQuestionIndex === questions.length - 1
-                ? "Kész ✓"
-                : "Következő"}
+                ? t("questions.done")
+                : t("questions.next")}
             </Text>
           )}
         </TouchableOpacity>

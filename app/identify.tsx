@@ -17,6 +17,7 @@ import { StatusBar } from "expo-status-bar";
 import apiService from "@/services/api";
 import { useApp } from "@/context/AppContext";
 import { useFonts } from "expo-font";
+import { useLocalization } from "@/context/LocalizationContext";
 import { useRouter } from "expo-router";
 import { useState } from "react";
 
@@ -26,6 +27,7 @@ export default function IdentifyScreen() {
   const [name, setName] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
+  const { t } = useLocalization();
   const { setGuest, setAssignedQuestions } = useApp();
   const [fontsLoaded] = useFonts({
     GreatVibes: require("@/assets/GreatVibes-Regular.ttf"),
@@ -39,7 +41,10 @@ export default function IdentifyScreen() {
     const trimmedName = name.trim();
 
     if (!trimmedName) {
-      Alert.alert("Name Required", "Please enter your name to continue.");
+      Alert.alert(
+        t("identify.nameRequiredTitle"),
+        t("identify.nameRequiredMessage"),
+      );
       return;
     }
 
@@ -70,8 +75,8 @@ export default function IdentifyScreen() {
     } catch (error) {
       console.error("Registration error:", error);
       Alert.alert(
-        "Connection Error",
-        "Could not connect to the server. Please check your connection and try again.",
+        t("identify.connectionErrorTitle"),
+        t("identify.connectionErrorMessage"),
       );
     } finally {
       setIsLoading(false);
@@ -87,19 +92,19 @@ export default function IdentifyScreen() {
 
       <View style={styles.content}>
         <Card>
-          <Text style={[styles.text, styles.title]}>
-            Csodás, hogy itt vagy! 👋
-          </Text>
+          <Text style={[styles.text, styles.title]}>{t("identify.title")}</Text>
           <Text style={[styles.text, styles.subtitle]}>
-            Köszönjük, hogy velünk ünnepelsz!
+            {t("identify.subtitle")}
           </Text>
         </Card>
 
         <Card style={styles.inputContainer}>
-          <Text style={[styles.text, styles.label]}>Mi a neved?</Text>
+          <Text style={[styles.text, styles.label]}>
+            {t("identify.nameLabel")}
+          </Text>
           <TextInput
             style={[styles.text, styles.input]}
-            placeholder="Írd be kérlek a neved"
+            placeholder={t("identify.namePlaceholder")}
             placeholderTextColor="#999"
             value={name}
             onChangeText={setName}
@@ -108,13 +113,11 @@ export default function IdentifyScreen() {
             onSubmitEditing={handleContinue}
             editable={!isLoading}
           />
-          <Text style={[styles.text, styles.hint]}>
-            Ha szeretnéd, használhatsz becenevet is.
-          </Text>
+          <Text style={[styles.text, styles.hint]}>{t("identify.hint")}</Text>
         </Card>
 
         <Button
-          title="Kezdjük!"
+          title={t("welcome.start")}
           onPress={handleContinue}
           disabled={!name.trim() || name.trim().length < 3 || isLoading}
         />

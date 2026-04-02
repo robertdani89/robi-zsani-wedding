@@ -10,11 +10,13 @@ import Card from "@/components/Card";
 import { StatusBar } from "expo-status-bar";
 import { useApp } from "@/context/AppContext";
 import { useFonts } from "expo-font";
+import { useLocalization } from "@/context/LocalizationContext";
 import { useRouter } from "expo-router";
 
 export default function DashboardScreen() {
   const router = useRouter();
   const { state, getTaskStatus } = useApp();
+  const { t } = useLocalization();
   const taskStatus = getTaskStatus();
   const [fontsLoaded] = useFonts({
     GreatVibes: require("@/assets/GreatVibes-Regular.ttf"),
@@ -22,12 +24,24 @@ export default function DashboardScreen() {
 
   const getStatusBadge = (completed: boolean, inProgress: boolean) => {
     if (completed) {
-      return { text: "Completed ✓", color: "#4CAF50", bgColor: "#E8F5E9" };
+      return {
+        text: t("status.completed"),
+        color: "#4CAF50",
+        bgColor: "#E8F5E9",
+      };
     }
     if (inProgress) {
-      return { text: "In Progress", color: "#FF9800", bgColor: "#FFF3E0" };
+      return {
+        text: t("status.inProgress"),
+        color: "#FF9800",
+        bgColor: "#FFF3E0",
+      };
     }
-    return { text: "Not Started", color: "#9E9E9E", bgColor: "#F5F5F5" };
+    return {
+      text: t("status.notStarted"),
+      color: "#9E9E9E",
+      bgColor: "#F5F5F5",
+    };
   };
 
   const questionStatus = getStatusBadge(
@@ -52,20 +66,20 @@ export default function DashboardScreen() {
       >
         <Card style={styles.header}>
           <Text style={[styles.text, styles.greeting]}>
-            Szia, {state.guest?.name}! 👋
+            {t("dashboard.greeting", { name: state.guest?.name ?? "" })}
           </Text>
           <Text style={[styles.text, styles.subtitle]}>
-            Nászutunkon minden választ elolvasunk
+            {t("dashboard.subtitle1")}
           </Text>
           <Text style={[styles.text, styles.subtitle]}>
-            Kérlek, ne hagyd, hogy unatkozzunk a repülőn! 😉
+            {t("dashboard.subtitle2")}
           </Text>
         </Card>
 
         {/* Progress Bar */}
         <Card style={styles.progressContainer}>
           <View style={styles.progressHeader}>
-            <Text style={styles.progressLabel}>Mennyi van hátra?</Text>
+            <Text style={styles.progressLabel}>{t("dashboard.progress")}</Text>
             <Text style={styles.progressPercentage}>
               {taskStatus.progressPercentage}%
             </Text>
@@ -82,7 +96,7 @@ export default function DashboardScreen() {
 
         {/* Task Cards */}
         <Card style={styles.tasksContainer}>
-          <Text style={styles.sectionTitle}>Feladatok</Text>
+          <Text style={styles.sectionTitle}>{t("dashboard.tasks")}</Text>
 
           {/* Questions Card */}
           <TouchableOpacity
@@ -94,9 +108,11 @@ export default function DashboardScreen() {
               <Text style={styles.taskEmoji}>❓</Text>
             </View>
             <View style={styles.taskContent}>
-              <Text style={styles.taskTitle}>Kérdések</Text>
+              <Text style={styles.taskTitle}>{t("dashboard.questions")}</Text>
               <Text style={styles.taskDescription}>
-                {state.answers.length} / {4} kérdés kész
+                {t("dashboard.questionsProgress", {
+                  count: state.answers.length,
+                })}
               </Text>
             </View>
             <View
@@ -123,9 +139,9 @@ export default function DashboardScreen() {
               <Text style={styles.taskEmoji}>📸</Text>
             </View>
             <View style={styles.taskContent}>
-              <Text style={styles.taskTitle}>Fotók feltöltése</Text>
+              <Text style={styles.taskTitle}>{t("dashboard.photos")}</Text>
               <Text style={styles.taskDescription}>
-                {state.photos.length} / {1} minimum feltöltve
+                {t("dashboard.photosProgress", { count: state.photos.length })}
               </Text>
             </View>
             <View
@@ -150,11 +166,11 @@ export default function DashboardScreen() {
               <Text style={styles.taskEmoji}>🎵</Text>
             </View>
             <View style={styles.taskContent}>
-              <Text style={styles.taskTitle}>Válassz egy dalt</Text>
+              <Text style={styles.taskTitle}>{t("dashboard.song")}</Text>
               <Text style={styles.taskDescription}>
                 {state.song
-                  ? `Kiválasztva: ${state.song.name}`
-                  : "Válassz egy dalt a bulira"}
+                  ? t("dashboard.songSelected", { name: state.song.name })
+                  : t("dashboard.songNotSelected")}
               </Text>
             </View>
             <View
@@ -178,12 +194,14 @@ export default function DashboardScreen() {
               onPress={() => router.push("/gift")}
               activeOpacity={0.8}
             >
-              <Text style={styles.reviewButtonText}>Végeztem!</Text>
+              <Text style={styles.reviewButtonText}>
+                {t("dashboard.finish")}
+              </Text>
             </TouchableOpacity>
           ) : (
             <View style={styles.motivationBox}>
               <Text style={styles.motivationText}>
-                Fejezd be a feladatokat, hogy megkapd az ajándékodat! 🎁
+                {t("dashboard.motivation")}
               </Text>
             </View>
           )}

@@ -5,10 +5,12 @@ import Button from "@/components/Button";
 import Card from "@/components/Card";
 import { StatusBar } from "expo-status-bar";
 import { useFonts } from "expo-font";
+import { useLocalization } from "@/context/LocalizationContext";
 import { useRouter } from "expo-router";
 
 export default function WelcomeScreen() {
   const router = useRouter();
+  const { t, locale } = useLocalization();
   const [fontsLoaded] = useFonts({
     GreatVibes: require("@/assets/GreatVibes-Regular.ttf"),
   });
@@ -35,27 +37,25 @@ export default function WelcomeScreen() {
 
         <Card style={styles.weddingDate}>
           <Text style={[styles.text, styles.weddingDateText]}>
-            {WEDDING_DATE}
+            {locale === "hu" ? WEDDING_DATE : "May 2, 2026"}
           </Text>
         </Card>
 
         <View style={styles.messageContainer}>
           <Card>
             <Text style={[styles.text, styles.message]}>
-              Segíts nekünk szép emlékeket teremteni, és nyerj egy kis
-              ajándékot!
+              {t("welcome.message")}
             </Text>
           </Card>
 
           <Card style={styles.subMessageContainer}>
             <Text style={[styles.text, styles.subMessage]}>
-              Válaszolj néhány apró kérdésre, ossz meg fotókat, és légy részese
-              különleges napunknak!
+              {t("welcome.subMessage")}
             </Text>
           </Card>
         </View>
 
-        <Button title="Kezdjük!" onPress={handleGetStarted} />
+        <Button title={t("welcome.start")} onPress={handleGetStarted} />
       </View>
     </View>
   );

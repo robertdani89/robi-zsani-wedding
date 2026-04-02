@@ -18,12 +18,14 @@ import { Photo } from "@/types";
 import { StatusBar } from "expo-status-bar";
 import apiService from "@/services/api";
 import { useApp } from "@/context/AppContext";
+import { useLocalization } from "@/context/LocalizationContext";
 import { useRouter } from "expo-router";
 import { useState } from "react";
 
 export default function PhotosScreen() {
   const router = useRouter();
   const { state, addPhoto, removePhoto } = useApp();
+  const { t } = useLocalization();
   const [isLoading, setIsLoading] = useState(false);
   const [uploadingPhotoUri, setUploadingPhotoUri] = useState<string | null>(
     null,
@@ -35,10 +37,7 @@ export default function PhotosScreen() {
   const requestPermissions = async () => {
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (status !== "granted") {
-      Alert.alert(
-        "Engedély Szükséges",
-        "Bocsánat, szükségünk van a fotótár engedélyére a fotók feltöltéséhez.",
-      );
+      Alert.alert(t("photos.permissionTitle"), t("photos.galleryPermission"));
       return false;
     }
     return true;
@@ -64,8 +63,8 @@ export default function PhotosScreen() {
     } catch (error) {
       console.error("Upload error:", error);
       Alert.alert(
-        "Upload Failed",
-        "Could not upload the photo to the server. Please check your connection and try again.",
+        t("photos.uploadFailedTitle"),
+        t("photos.uploadFailedMessage"),
       );
       return false;
     } finally {
@@ -76,18 +75,15 @@ export default function PhotosScreen() {
   const handleTakePhoto = async () => {
     if (state.photos.length >= MAX_PHOTOS_ALLOWED) {
       Alert.alert(
-        "Limit Reached",
-        `You can only upload up to ${MAX_PHOTOS_ALLOWED} photos.`,
+        t("photos.limitTitle"),
+        t("photos.limitMessage", { count: MAX_PHOTOS_ALLOWED }),
       );
       return;
     }
 
     const { status } = await ImagePicker.requestCameraPermissionsAsync();
     if (status !== "granted") {
-      Alert.alert(
-        "Engedély Szükséges",
-        "Bocsánat, szükségünk van a kamera engedélyére a fotók készítéséhez.",
-      );
+      Alert.alert(t("photos.permissionTitle"), t("photos.cameraPermission"));
       return;
     }
 
@@ -104,10 +100,7 @@ export default function PhotosScreen() {
         await uploadPhotoToServer(result.assets[0].uri);
       }
     } catch (error) {
-      Alert.alert(
-        "Hiba",
-        "Nem sikerült feltölteni a fotót. Kérlek próbáld újra.",
-      );
+      Alert.alert(t("photos.errorTitle"), t("photos.uploadRetry"));
     } finally {
       setIsLoading(false);
     }
@@ -116,8 +109,8 @@ export default function PhotosScreen() {
   const handleUploadFromGallery = async () => {
     if (state.photos.length >= MAX_PHOTOS_ALLOWED) {
       Alert.alert(
-        "Limit Reached",
-        `You can only upload up to ${MAX_PHOTOS_ALLOWED} photos.`,
+        t("photos.limitTitle"),
+        t("photos.limitMessage", { count: MAX_PHOTOS_ALLOWED }),
       );
       return;
     }
@@ -138,7 +131,7 @@ export default function PhotosScreen() {
         await uploadPhotoToServer(result.assets[0].uri);
       }
     } catch (error) {
-      Alert.alert("Error", "Failed to upload photo. Please try again.");
+      Alert.alert(t("photos.errorTitle"), t("photos.uploadRetry"));
     } finally {
       setIsLoading(false);
     }
@@ -167,11 +160,11 @@ export default function PhotosScreen() {
     } catch (error) {
       console.error("Delete error:", error);
       Alert.alert(
-        "Delete Failed",
-        "Could not delete the photo. Please try again.",
+        t("photos.deleteFailedTitle"),
+        t("photos.deleteFailedMessage"),
       );
     } finally {
-      setIsDeleting(true);
+      setIsDeleting(false);
       setDeleteModalVisible(false);
       setPhotoToDelete(null);
     }
@@ -195,22 +188,20 @@ export default function PhotosScreen() {
             onPress={() => router.back()}
             style={styles.backButton}
           >
-            <Text style={styles.backButtonText}>← Vissza</Text>
+            <Text style={styles.backButtonText}>{t("common.back")}</Text>
           </TouchableOpacity>
 
-          <Text style={styles.title}>Fényképek feltöltése 📸</Text>
-          <Text style={styles.subtitle}>
-            Oszd meg a szórakoztató pillanataidat az esküvőn
-          </Text>
+          <Text style={styles.title}>{t("photos.title")}</Text>
+          <Text style={styles.subtitle}>{t("photos.subtitle")}</Text>
         </Card>
 
         <Card>
           <View style={styles.infoCard}>
             <Text style={styles.infoText}>
-              📝 Minimum: {MIN_PHOTOS_REQUIRED} fotó
+              {t("photos.minimum", { count: MIN_PHOTOS_REQUIRED })}
             </Text>
             <Text style={styles.infoText}>
-              ✅ Feltöltöttél eddig {state.photos.length} fotót
+              {t("photos.uploaded", { count: state.photos.length })}
             </Text>
           </View>
 
@@ -223,7 +214,9 @@ export default function PhotosScreen() {
               disabled={isLoading}
             >
               <Text style={styles.actionButtonIcon}>📷</Text>
-              <Text style={styles.actionButtonText}>Készíts fotót</Text>
+              <Text style={styles.actionButtonText}>
+                {t("photos.takePhoto")}
+              </Text>
             </TouchableOpacity>
 
             <TouchableOpacity
@@ -233,7 +226,9 @@ export default function PhotosScreen() {
               disabled={isLoading}
             >
               <Text style={styles.actionButtonIcon}>🖼️</Text>
-              <Text style={styles.actionButtonText}>Gallériából</Text>
+              <Text style={styles.actionButtonText}>
+                {t("photos.fromGallery")}
+              </Text>
             </TouchableOpacity>
           </View>
         </Card>
@@ -241,7 +236,7 @@ export default function PhotosScreen() {
         {/* Photo Grid */}
         {state.photos.length > 0 && (
           <View style={styles.photosSection}>
-            <Card style={styles.sectionTitle}>A te fotóid</Card>
+            <Card style={styles.sectionTitle}>{t("photos.yourPhotos")}</Card>
             <View style={styles.photoGrid}>
               {state.photos.map((photo) => (
                 <View key={photo.id} style={styles.photoContainer}>
@@ -268,7 +263,7 @@ export default function PhotosScreen() {
           <View style={styles.uploadingContainer}>
             <View style={styles.uploadingOverlay}>
               <ActivityIndicator size="large" color="#D4526E" />
-              <Text style={styles.uploadingText}>Feltöltés folyamatban...</Text>
+              <Text style={styles.uploadingText}>{t("photos.uploading")}</Text>
             </View>
           </View>
         )}
@@ -278,10 +273,10 @@ export default function PhotosScreen() {
             <Card>
               <Text style={styles.emptyStateEmoji}>📸</Text>
               <Text style={styles.emptyStateText}>
-                Még nem töltöttél fel fotókat
+                {t("photos.emptyTitle")}
               </Text>
               <Text style={styles.emptyStateSubtext}>
-                Készíts egy fotót vagy tölts fel a galériádból
+                {t("photos.emptySubtitle")}
               </Text>
             </Card>
           </View>
@@ -293,17 +288,17 @@ export default function PhotosScreen() {
             onPress={() => router.replace("/dashboard")}
             activeOpacity={0.8}
           >
-            <Text style={styles.doneButtonText}>Kész ✓</Text>
+            <Text style={styles.doneButtonText}>{t("common.done")}</Text>
           </TouchableOpacity>
         )}
       </ScrollView>
 
       <ConfirmationModal
         visible={deleteModalVisible}
-        title="Fotó törlése"
-        message="Biztosan el akarod távolítani ezt a fotót?"
-        confirmText={isDeleting ? "Törlés..." : "Törlés"}
-        cancelText="Mégse"
+        title={t("photos.deleteTitle")}
+        message={t("photos.deleteMessage")}
+        confirmText={isDeleting ? t("photos.deleting") : t("photos.delete")}
+        cancelText={t("common.cancel")}
         onConfirm={confirmDeletePhoto}
         onCancel={cancelDeletePhoto}
         confirmStyle="destructive"
