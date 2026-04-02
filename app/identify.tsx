@@ -10,6 +10,7 @@ import {
   View,
 } from "react-native";
 
+import Button from "@/components/Button";
 import Card from "@/components/Card";
 import { Guest } from "@/types";
 import { StatusBar } from "expo-status-bar";
@@ -112,21 +113,11 @@ export default function IdentifyScreen() {
           </Text>
         </Card>
 
-        <TouchableOpacity
-          style={[
-            styles.button,
-            (!name.trim() || isLoading) && styles.buttonDisabled,
-          ]}
+        <Button
+          title="Kezdjük!"
           onPress={handleContinue}
-          activeOpacity={0.8}
           disabled={!name.trim() || name.trim().length < 3 || isLoading}
-        >
-          {isLoading ? (
-            <ActivityIndicator color="#FFF" />
-          ) : (
-            <Text style={[styles.text, styles.buttonText]}>Kezdjük!</Text>
-          )}
-        </TouchableOpacity>
+        />
       </View>
     </KeyboardAvoidingView>
   );
@@ -177,24 +168,5 @@ const styles = StyleSheet.create({
     fontSize: 13,
     color: "#444",
     marginTop: 8,
-  },
-  button: {
-    backgroundColor: "#D4526E",
-    paddingVertical: 16,
-    borderRadius: 30,
-    alignItems: "center",
-    elevation: 3,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-  },
-  buttonDisabled: {
-    backgroundColor: "#DDD",
-    elevation: 0,
-  },
-  buttonText: {
-    color: "#FFF",
-    fontSize: 18,
   },
 });

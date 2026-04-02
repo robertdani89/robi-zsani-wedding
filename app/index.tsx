@@ -1,6 +1,7 @@
 import { COUPLE_NAMES, WEDDING_DATE } from "@/constants";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
+import Button from "@/components/Button";
 import Card from "@/components/Card";
 import { StatusBar } from "expo-status-bar";
 import { useFonts } from "expo-font";
@@ -54,11 +55,7 @@ export default function WelcomeScreen() {
           </Card>
         </View>
 
-        <TouchableOpacity onPress={handleGetStarted} activeOpacity={0.8}>
-          <Card>
-            <Text style={[styles.text, styles.buttonText]}>Kezdjük!</Text>
-          </Card>
-        </TouchableOpacity>
+        <Button title="Kezdjük!" onPress={handleGetStarted} />
       </View>
     </View>
   );

@@ -78,7 +78,7 @@ export default function BackgroundWithLeaves({
   const leavesRef = useRef<Leaf[]>([]);
 
   if (leavesRef.current.length === 0) {
-    for (let i = 0; i < 20; i++) {
+    for (let i = 0; i < 0; i++) {
       leavesRef.current.push({
         id: i,
         animatedValue: new Animated.Value(0),
