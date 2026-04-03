@@ -21,6 +21,7 @@ export const TRANSLATIONS = {
     "identify.connectionErrorTitle": "Connection Error",
     "identify.connectionErrorMessage":
       "Could not connect to the server. Please check your connection and try again.",
+    "identify.privacyPolicy": "View Privacy Policy",
     "dashboard.greeting": "Hi, {{name}}! 👋",
     "dashboard.subtitle1": "We'll read every answer on our honeymoon",
     "dashboard.subtitle2": "Please don't let us get bored on the flight! 😉",
@@ -33,6 +34,7 @@ export const TRANSLATIONS = {
     "dashboard.song": "Pick a song",
     "dashboard.songSelected": "Selected: {{name}}",
     "dashboard.songNotSelected": "Pick a party song",
+    "dashboard.settings": "Settings",
     "dashboard.finish": "I'm done!",
     "dashboard.motivation": "Finish the tasks to get your gift! 🎁",
     "status.completed": "Completed ✓",
@@ -105,6 +107,8 @@ export const TRANSLATIONS = {
     "gift.submit": "Give me!",
     "song.searchFailed": "Failed to search songs. Please try again.",
     "song.saveFailed": "Failed to save song. Please try again.",
+    "song.alreadySelected":
+      "This song was already picked. Please pick a new one.",
     "song.title": "Pick a song 🎵",
     "song.info": "The bride will review selections 😉",
     "song.currentSelection": "Your selection",
@@ -159,6 +163,7 @@ export const TRANSLATIONS = {
     "identify.connectionErrorTitle": "Kapcsolódási hiba",
     "identify.connectionErrorMessage":
       "Nem sikerült kapcsolódni a szerverhez. Kérlek ellenőrizd a kapcsolatot és próbáld újra.",
+    "identify.privacyPolicy": "Adatvédelmi szabályzat",
     "dashboard.greeting": "Szia, {{name}}! 👋",
     "dashboard.subtitle1": "Nászutunkon minden választ elolvasunk",
     "dashboard.subtitle2": "Kérlek, ne hagyd, hogy unatkozzunk a repülőn! 😉",
@@ -168,9 +173,10 @@ export const TRANSLATIONS = {
     "dashboard.questionsProgress": "{{count}} / 4 kérdés kész",
     "dashboard.photos": "Fotók feltöltése",
     "dashboard.photosProgress": "{{count}} / 1 minimum feltöltve",
-    "dashboard.song": "Válassz egy dalt",
+    "dashboard.song": "Válassz legalább egy dalt",
     "dashboard.songSelected": "Kiválasztva: {{name}}",
-    "dashboard.songNotSelected": "Válassz egy dalt a bulira",
+    "dashboard.songNotSelected": "Válassz legalább egy dalt",
+    "dashboard.settings": "Beállítások",
     "dashboard.finish": "Végeztem!",
     "dashboard.motivation":
       "Fejezd be a feladatokat, hogy megkapd az ajándékodat! 🎁",
@@ -245,7 +251,9 @@ export const TRANSLATIONS = {
     "gift.submit": "Add ide!",
     "song.searchFailed": "Nem sikerült dalt keresni. Kérlek próbáld újra.",
     "song.saveFailed": "Nem sikerült menteni a dalt. Kérlek próbáld újra.",
-    "song.title": "Válassz egy dalt 🎵",
+    "song.alreadySelected":
+      "Ezt a dalt már kiválasztottad. Kérlek válassz egy újat.",
+    "song.title": "Válassz daltokat 🎵",
     "song.info": "A menyasszony ellenőrzi a választásokat 😉",
     "song.currentSelection": "A te választásod",
     "song.searchAnother": "Keress egy másik dalt",

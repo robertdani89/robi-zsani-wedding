@@ -12,6 +12,7 @@ import {
 } from "react-native";
 import { MAX_PHOTOS_ALLOWED, MIN_PHOTOS_REQUIRED } from "@/data/questions";
 
+import Button from "@/components/Button";
 import Card from "@/components/Card";
 import ConfirmationModal from "@/components/ConfirmationModal";
 import { Photo } from "@/types";
@@ -236,7 +237,9 @@ export default function PhotosScreen() {
         {/* Photo Grid */}
         {state.photos.length > 0 && (
           <View style={styles.photosSection}>
-            <Card style={styles.sectionTitle}>{t("photos.yourPhotos")}</Card>
+            <Card style={styles.sectionTitle}>
+              <>{t("photos.yourPhotos")}</>
+            </Card>
             <View style={styles.photoGrid}>
               {state.photos.map((photo) => (
                 <View key={photo.id} style={styles.photoContainer}>
@@ -283,13 +286,10 @@ export default function PhotosScreen() {
         )}
 
         {state.photos.length >= MIN_PHOTOS_REQUIRED && (
-          <TouchableOpacity
-            style={styles.doneButton}
+          <Button
             onPress={() => router.replace("/dashboard")}
-            activeOpacity={0.8}
-          >
-            <Text style={styles.doneButtonText}>{t("common.done")}</Text>
-          </TouchableOpacity>
+            title={t("common.done")}
+          />
         )}
       </ScrollView>
 
@@ -449,23 +449,6 @@ const styles = StyleSheet.create({
     fontSize: 15,
     color: "#666",
     textAlign: "center",
-  },
-  doneButton: {
-    backgroundColor: "#D4526E",
-    paddingVertical: 16,
-    borderRadius: 30,
-    alignItems: "center",
-    elevation: 3,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-    marginTop: 15,
-  },
-  doneButtonText: {
-    color: "#FFF",
-    fontSize: 18,
-    fontWeight: "bold",
   },
   uploadingContainer: {
     marginVertical: 20,

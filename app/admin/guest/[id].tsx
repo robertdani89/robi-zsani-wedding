@@ -66,10 +66,29 @@ export default function GuestDetailScreen() {
     }
   };
 
-  const formatAnswer = (value: string | string[]): string => {
+  const formatAnswer = (
+    value: Answer["value"],
+    question?: Question,
+  ): string => {
+    const getOptionLabel = (index: number): string => {
+      if (!question?.options || !question.options[index]) {
+        return String(index);
+      }
+      return question.options[index][locale];
+    };
+
     if (Array.isArray(value)) {
-      return value.join(", ");
+      return value
+        .map((item) =>
+          typeof item === "number" ? getOptionLabel(item) : String(item),
+        )
+        .join(", ");
     }
+
+    if (typeof value === "number") {
+      return getOptionLabel(value);
+    }
+
     return value;
   };
 
@@ -185,7 +204,7 @@ export default function GuestDetailScreen() {
                     t("adminGuest.questionFallback", { id: answer.questionId })}
                 </Text>
                 <Text style={styles.answerText}>
-                  {formatAnswer(answer.value)}
+                  {formatAnswer(answer.value, answer.question)}
                 </Text>
                 <Text style={styles.answerDate}>
                   {new Date(answer.answeredAt).toLocaleString(

@@ -10,6 +10,7 @@ import {
 } from "react-native";
 import { useEffect, useState } from "react";
 
+import Button from "@/components/Button";
 import Card from "@/components/Card";
 import { Song } from "@/types";
 import { StatusBar } from "expo-status-bar";
@@ -31,6 +32,7 @@ export default function SongScreen() {
   const router = useRouter();
   const { state, setSong } = useApp();
   const { t } = useLocalization();
+  const selectedSongs = state.song;
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState<SpotifySearchResult[]>([]);
   const [isSearching, setIsSearching] = useState(false);
@@ -62,6 +64,14 @@ export default function SongScreen() {
 
   const handleSelectSong = async (result: SpotifySearchResult) => {
     if (!state.guest) return;
+
+    const isAlreadySelected = selectedSongs.some(
+      (song) => song.spotifyId === result.spotifyId,
+    );
+    if (isAlreadySelected) {
+      setError(t("song.alreadySelected"));
+      return;
+    }
 
     setError(null);
     try {
@@ -116,38 +126,42 @@ export default function SongScreen() {
           <Text style={styles.infoText}>{t("song.info")}</Text>
         </Card>
 
-        {/* Current Selection */}
-        {state.song && (
+        {/* Current Selections */}
+        {selectedSongs.length > 0 && (
           <Card style={styles.currentSelection}>
             <Text style={styles.currentSelectionTitle}>
               {t("song.currentSelection")}
             </Text>
-            <View style={styles.selectedSongCard}>
-              {state.song.albumArt && (
-                <Image
-                  source={{ uri: state.song.albumArt }}
-                  style={styles.selectedAlbumArt}
-                />
-              )}
-              <View style={styles.selectedSongInfo}>
-                <Text style={styles.selectedSongName} numberOfLines={1}>
-                  {state.song.name}
-                </Text>
-                <Text style={styles.selectedSongArtist} numberOfLines={1}>
-                  {state.song.artist}
-                </Text>
-                <Text style={styles.selectedSongAlbum} numberOfLines={1}>
-                  {state.song.album}
-                </Text>
+            {selectedSongs.map((song) => (
+              <View key={song.id} style={styles.selectedSongCard}>
+                {song.albumArt && (
+                  <Image
+                    source={{ uri: song.albumArt }}
+                    style={styles.selectedAlbumArt}
+                  />
+                )}
+                <View style={styles.selectedSongInfo}>
+                  <Text style={styles.selectedSongName} numberOfLines={1}>
+                    {song.name}
+                  </Text>
+                  <Text style={styles.selectedSongArtist} numberOfLines={1}>
+                    {song.artist}
+                  </Text>
+                  <Text style={styles.selectedSongAlbum} numberOfLines={1}>
+                    {song.album}
+                  </Text>
+                </View>
               </View>
-            </View>
+            ))}
           </Card>
         )}
 
         {/* Search Section */}
         <Card style={styles.searchSection}>
           <Text style={styles.sectionTitle}>
-            {state.song ? t("song.searchAnother") : t("song.search")}
+            {selectedSongs.length > 0
+              ? t("song.searchAnother")
+              : t("song.search")}
           </Text>
           <View style={styles.searchInputContainer}>
             <Text style={styles.searchIcon}>🔍</Text>
@@ -246,7 +260,7 @@ export default function SongScreen() {
           )}
 
         {/* Initial State */}
-        {!state.song &&
+        {selectedSongs.length === 0 &&
           searchQuery.length < 2 &&
           searchResults.length === 0 && (
             <View style={styles.emptyState}>
@@ -261,14 +275,11 @@ export default function SongScreen() {
           )}
 
         {/* Done Button */}
-        {state.song && (
-          <TouchableOpacity
-            style={styles.doneButton}
+        {selectedSongs.length > 0 && (
+          <Button
+            title={t("common.done")}
             onPress={() => router.replace("/dashboard")}
-            activeOpacity={0.8}
-          >
-            <Text style={styles.doneButtonText}>{t("common.done")}</Text>
-          </TouchableOpacity>
+          />
         )}
       </ScrollView>
     </View>
@@ -334,6 +345,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     borderWidth: 2,
     borderColor: "#4CAF50",
+    marginBottom: 12,
   },
   selectedAlbumArt: {
     width: 60,
@@ -527,17 +539,5 @@ const styles = StyleSheet.create({
     marginTop: 12,
     fontSize: 16,
     color: "#333",
-  },
-  doneButton: {
-    backgroundColor: "#D4526E",
-    borderRadius: 12,
-    paddingVertical: 16,
-    alignItems: "center",
-    marginTop: 24,
-  },
-  doneButtonText: {
-    fontSize: 18,
-    fontWeight: "bold",
-    color: "#FFF",
   },
 });

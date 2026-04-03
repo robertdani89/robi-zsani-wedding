@@ -2,7 +2,6 @@ import { DefaultTheme, ThemeProvider } from "@react-navigation/native";
 
 import { AppProvider } from "@/context/AppContext";
 import BackgroundWithLeaves from "@/components/BackgroundWithLeaves";
-import LanguageSwitcher from "@/components/LanguageSwitcher";
 import { LocalizationProvider } from "@/context/LocalizationContext";
 import { Stack } from "expo-router";
 
@@ -33,7 +32,6 @@ export default function RootLayout() {
               <Stack.Screen name="gift" />
             </Stack>
           </ThemeProvider>
-          <LanguageSwitcher />
         </BackgroundWithLeaves>
       </AppProvider>
     </LocalizationProvider>

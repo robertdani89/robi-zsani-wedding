@@ -2,11 +2,17 @@ import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 import { useLocalization } from "@/context/LocalizationContext";
 
-export default function LanguageSwitcher() {
+interface LanguageSwitcherProps {
+  floating?: boolean;
+}
+
+export default function LanguageSwitcher({
+  floating = true,
+}: LanguageSwitcherProps) {
   const { locale, setLocale } = useLocalization();
 
   return (
-    <View style={styles.wrapper}>
+    <View style={[styles.wrapper, !floating && styles.wrapperInline]}>
       <TouchableOpacity
         style={[styles.button, locale === "hu" && styles.buttonActive]}
         onPress={() => setLocale("hu")}
@@ -55,6 +61,12 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.2,
     shadowRadius: 4,
+  },
+  wrapperInline: {
+    position: "relative",
+    top: 0,
+    right: 0,
+    alignSelf: "flex-start",
   },
   button: {
     paddingHorizontal: 10,

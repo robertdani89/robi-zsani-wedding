@@ -11,6 +11,7 @@ import {
 import { Answer, Question, QuestionType } from "@/types";
 import { useEffect, useState } from "react";
 
+import Button from "@/components/Button";
 import Card from "@/components/Card";
 import { StatusBar } from "expo-status-bar";
 import apiService from "@/services/api";
@@ -21,11 +22,57 @@ import { useRouter } from "expo-router";
 export default function QuestionsScreen() {
   const router = useRouter();
   const { state, addAnswer, getAssignedQuestions } = useApp();
-  const { t } = useLocalization();
+  const { t, locale } = useLocalization();
   const [questions, setQuestions] = useState<Question[]>([]);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
-  const [currentAnswer, setCurrentAnswer] = useState<string | string[]>("");
+  const [currentAnswer, setCurrentAnswer] = useState<Answer["value"]>("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const getOptionIndex = (
+    question: Question,
+    optionValue: unknown,
+  ): number | null => {
+    if (typeof optionValue === "number") {
+      return optionValue;
+    }
+
+    if (typeof optionValue !== "string" || !question.options) {
+      return null;
+    }
+
+    const index = question.options.findIndex(
+      (option) =>
+        option[locale] === optionValue ||
+        option.en === optionValue ||
+        option.hu === optionValue,
+    );
+
+    return index >= 0 ? index : null;
+  };
+
+  const normalizeStoredAnswer = (
+    question: Question,
+    value: unknown,
+  ): Answer["value"] => {
+    if (question.type === QuestionType.FREE_TEXT) {
+      return typeof value === "string" ? value : "";
+    }
+
+    if (question.type === QuestionType.SINGLE_CHOICE) {
+      const index = getOptionIndex(question, value);
+      return index ?? "";
+    }
+
+    if (!Array.isArray(value)) {
+      return [];
+    }
+
+    const indices = value
+      .map((item) => getOptionIndex(question, item))
+      .filter((item): item is number => item !== null);
+
+    return Array.from(new Set(indices));
+  };
 
   useEffect(() => {
     const assignedQuestions = getAssignedQuestions();
@@ -41,7 +88,9 @@ export default function QuestionsScreen() {
       (a) => a.questionId === assignedQuestions[0].id,
     );
     if (existingAnswer) {
-      setCurrentAnswer(existingAnswer.value);
+      setCurrentAnswer(
+        normalizeStoredAnswer(assignedQuestions[0], existingAnswer.value),
+      );
     }
   }, []);
 
@@ -52,7 +101,9 @@ export default function QuestionsScreen() {
         (a) => a.questionId === currentQuestion.id,
       );
       if (existingAnswer) {
-        setCurrentAnswer(existingAnswer.value);
+        setCurrentAnswer(
+          normalizeStoredAnswer(currentQuestion, existingAnswer.value),
+        );
       } else {
         setCurrentAnswer(
           currentQuestion.type === QuestionType.MULTIPLE_CHOICE ? [] : "",
@@ -67,24 +118,34 @@ export default function QuestionsScreen() {
 
   const currentQuestion = questions[currentQuestionIndex];
 
-  const handleSingleChoice = (option: string) => {
-    setCurrentAnswer(option);
+  const handleSingleChoice = (optionIndex: number) => {
+    setCurrentAnswer(optionIndex);
   };
 
-  const handleMultipleChoice = (option: string) => {
-    const currentAnswers = Array.isArray(currentAnswer) ? currentAnswer : [];
-    if (currentAnswers.includes(option)) {
-      setCurrentAnswer(currentAnswers.filter((a) => a !== option));
+  const handleMultipleChoice = (optionIndex: number) => {
+    const currentAnswers = Array.isArray(currentAnswer)
+      ? currentAnswer.filter((value): value is number => typeof value === "number")
+      : [];
+
+    if (currentAnswers.includes(optionIndex)) {
+      setCurrentAnswer(currentAnswers.filter((a) => a !== optionIndex));
     } else {
-      setCurrentAnswer([...currentAnswers, option]);
+      setCurrentAnswer([...currentAnswers, optionIndex]);
     }
   };
 
   const handleNext = async () => {
-    if (
-      !currentAnswer ||
-      (Array.isArray(currentAnswer) && currentAnswer.length === 0)
-    ) {
+    const isSingleChoiceEmpty =
+      currentQuestion.type === QuestionType.SINGLE_CHOICE &&
+      typeof currentAnswer !== "number";
+    const isMultipleChoiceEmpty =
+      currentQuestion.type === QuestionType.MULTIPLE_CHOICE &&
+      (!Array.isArray(currentAnswer) || currentAnswer.length === 0);
+    const isFreeTextEmpty =
+      currentQuestion.type === QuestionType.FREE_TEXT &&
+      (typeof currentAnswer !== "string" || currentAnswer.trim().length === 0);
+
+    if (isSingleChoiceEmpty || isMultipleChoiceEmpty || isFreeTextEmpty) {
       Alert.alert(
         t("questions.answerRequiredTitle"),
         t("questions.answerRequiredMessage"),
@@ -154,7 +215,7 @@ export default function QuestionsScreen() {
         return (
           <Card style={styles.optionsContainer}>
             {currentQuestion.options?.map((option, index) => {
-              const isSelected = currentAnswer === option;
+              const isSelected = currentAnswer === index;
               return (
                 <TouchableOpacity
                   key={index}
@@ -162,7 +223,7 @@ export default function QuestionsScreen() {
                     styles.optionButton,
                     isSelected && styles.optionButtonSelected,
                   ]}
-                  onPress={() => handleSingleChoice(option)}
+                  onPress={() => handleSingleChoice(index)}
                   activeOpacity={0.7}
                 >
                   <View style={styles.radioOuter}>
@@ -174,7 +235,7 @@ export default function QuestionsScreen() {
                       isSelected && styles.optionTextSelected,
                     ]}
                   >
-                    {option}
+                    {option[locale]}
                   </Text>
                 </TouchableOpacity>
               );
@@ -184,12 +245,12 @@ export default function QuestionsScreen() {
 
       case QuestionType.MULTIPLE_CHOICE:
         const selectedOptions = Array.isArray(currentAnswer)
-          ? currentAnswer
+          ? currentAnswer.filter((value): value is number => typeof value === "number")
           : [];
         return (
           <Card style={styles.optionsContainer}>
             {currentQuestion.options?.map((option, index) => {
-              const isSelected = selectedOptions.includes(option);
+              const isSelected = selectedOptions.includes(index);
               return (
                 <TouchableOpacity
                   key={index}
@@ -197,7 +258,7 @@ export default function QuestionsScreen() {
                     styles.optionButton,
                     isSelected && styles.optionButtonSelected,
                   ]}
-                  onPress={() => handleMultipleChoice(option)}
+                  onPress={() => handleMultipleChoice(index)}
                   activeOpacity={0.7}
                 >
                   <View style={styles.checkboxOuter}>
@@ -209,7 +270,7 @@ export default function QuestionsScreen() {
                       isSelected && styles.optionTextSelected,
                     ]}
                   >
-                    {option}
+                    {option[locale]}
                   </Text>
                 </TouchableOpacity>
               );
@@ -265,7 +326,9 @@ export default function QuestionsScreen() {
         </Card>
 
         <Card style={styles.questionCard}>
-          <Text style={styles.questionText}>{currentQuestion.text}</Text>
+          <Text style={styles.questionText}>
+            {currentQuestion.text[locale]}
+          </Text>
 
           {currentQuestion.type === QuestionType.MULTIPLE_CHOICE && (
             <Text style={styles.hint}>{t("questions.multiHint")}</Text>
@@ -300,22 +363,19 @@ export default function QuestionsScreen() {
           </TouchableOpacity>
         </View>
 
-        <TouchableOpacity
-          style={[styles.nextButton, isSubmitting && styles.nextButtonDisabled]}
-          onPress={handleNext}
-          activeOpacity={0.8}
-          disabled={isSubmitting}
-        >
-          {isSubmitting ? (
-            <ActivityIndicator color="#FFF" />
-          ) : (
-            <Text style={styles.nextButtonText}>
-              {currentQuestionIndex === questions.length - 1
+        {isSubmitting ? (
+          <ActivityIndicator color="#FFF" />
+        ) : (
+          <Button
+            title={
+              currentQuestionIndex === questions.length - 1
                 ? t("questions.done")
-                : t("questions.next")}
-            </Text>
-          )}
-        </TouchableOpacity>
+                : t("questions.next")
+            }
+            onPress={handleNext}
+            disabled={isSubmitting}
+          />
+        )}
       </ScrollView>
     </View>
   );
@@ -469,25 +529,5 @@ const styles = StyleSheet.create({
     color: "#999",
     fontSize: 16,
     fontWeight: "600",
-  },
-  nextButton: {
-    backgroundColor: "#D4526E",
-    paddingVertical: 16,
-    borderRadius: 30,
-    alignItems: "center",
-    elevation: 3,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-  },
-  nextButtonDisabled: {
-    backgroundColor: "#DDD",
-    elevation: 0,
-  },
-  nextButtonText: {
-    color: "#FFF",
-    fontSize: 18,
-    fontWeight: "bold",
   },
 });

@@ -47,7 +47,7 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     guest: null,
     answers: [],
     photos: [],
-    song: null,
+    song: [],
     completedQuestions: new Set(),
   });
 
@@ -75,7 +75,13 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
       const answers = answersData ? JSON.parse(answersData) : [];
       const photos = photosData ? JSON.parse(photosData) : [];
       const questions = questionsData ? JSON.parse(questionsData) : [];
-      const song = songData ? JSON.parse(songData) : null;
+      const parsedSong = songData ? JSON.parse(songData) : [];
+      // Backward compatibility: migrate persisted single-song value to list.
+      const song = Array.isArray(parsedSong)
+        ? parsedSong
+        : parsedSong
+          ? [parsedSong]
+          : [];
 
       setState({
         guest,
@@ -160,11 +166,16 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
   const setSong = async (song: Song | null) => {
     try {
       if (song) {
-        await AsyncStorage.setItem(STORAGE_KEYS.SONG, JSON.stringify(song));
+        const updatedSongs = [...state.song, song];
+        await AsyncStorage.setItem(
+          STORAGE_KEYS.SONG,
+          JSON.stringify(updatedSongs),
+        );
+        setState((prev) => ({ ...prev, song: updatedSongs }));
       } else {
         await AsyncStorage.removeItem(STORAGE_KEYS.SONG);
+        setState((prev) => ({ ...prev, song: [] }));
       }
-      setState((prev) => ({ ...prev, song }));
     } catch (error) {
       console.error("Error saving song:", error);
     }
@@ -173,7 +184,7 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
   const getTaskStatus = (): TaskStatus => {
     const questionsCompleted = state.answers.length >= MIN_QUESTIONS_TO_ANSWER;
     const photosUploaded = state.photos.length >= MIN_PHOTOS_REQUIRED;
-    const songSelected = state.song !== null;
+    const songSelected = state.song.length > 0;
     const allTasksCompleted =
       questionsCompleted && photosUploaded && songSelected;
 
@@ -229,7 +240,7 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
         guest: null,
         answers: [],
         photos: [],
-        song: null,
+        song: [],
         completedQuestions: new Set(),
       });
       setAssignedQuestionsState([]);

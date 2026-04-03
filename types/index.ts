@@ -14,18 +14,23 @@ export enum QuestionType {
   FREE_TEXT = "free_text",
 }
 
+export interface LocalizedString {
+  en: string;
+  hu: string;
+}
+
 export interface Question {
   id: string;
-  text: string;
+  text: LocalizedString;
   type: QuestionType;
-  options?: string[];
+  options?: LocalizedString[];
 }
 
 export interface Answer {
   id: string;
   guestId: string;
   questionId: string;
-  value: string | string[];
+  value: string | number | number[];
   answeredAt: string;
 }
 
@@ -51,7 +56,7 @@ export interface AppState {
   guest: Guest | null;
   answers: Answer[];
   photos: Photo[];
-  song: Song | null;
+  song: Song[];
   completedQuestions: Set<string>;
 }
 

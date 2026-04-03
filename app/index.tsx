@@ -3,6 +3,7 @@ import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 import Button from "@/components/Button";
 import Card from "@/components/Card";
+import LanguageSwitcher from "@/components/LanguageSwitcher";
 import { StatusBar } from "expo-status-bar";
 import { useFonts } from "expo-font";
 import { useLocalization } from "@/context/LocalizationContext";
@@ -26,6 +27,7 @@ export default function WelcomeScreen() {
   return (
     <View style={styles.container}>
       <StatusBar style="dark" />
+      <LanguageSwitcher />
       <View style={styles.content}>
         <Card>
           <Text style={[styles.text, styles.coupleNames]}>{COUPLE_NAMES}</Text>

@@ -2,6 +2,7 @@ import {
   ActivityIndicator,
   Alert,
   KeyboardAvoidingView,
+  Linking,
   Platform,
   StyleSheet,
   Text,
@@ -13,6 +14,7 @@ import {
 import Button from "@/components/Button";
 import Card from "@/components/Card";
 import { Guest } from "@/types";
+import LanguageSwitcher from "@/components/LanguageSwitcher";
 import { StatusBar } from "expo-status-bar";
 import apiService from "@/services/api";
 import { useApp } from "@/context/AppContext";
@@ -89,6 +91,7 @@ export default function IdentifyScreen() {
       style={[styles.container]}
     >
       <StatusBar style="dark" />
+      <LanguageSwitcher />
 
       <View style={styles.content}>
         <Card>
@@ -115,6 +118,19 @@ export default function IdentifyScreen() {
           />
           <Text style={[styles.text, styles.hint]}>{t("identify.hint")}</Text>
         </Card>
+
+        <TouchableOpacity
+          onPress={() =>
+            Linking.openURL(
+              "https://robertdani89.github.io/robi-zsani-wedding/",
+            )
+          }
+          activeOpacity={0.7}
+        >
+          <Text style={[styles.privacyPolicyLink]}>
+            {t("identify.privacyPolicy")}
+          </Text>
+        </TouchableOpacity>
 
         <Button
           title={t("welcome.start")}
@@ -150,7 +166,7 @@ const styles = StyleSheet.create({
   },
   inputContainer: {
     marginTop: 40,
-    marginBottom: 40,
+    marginBottom: 10,
   },
   label: {
     fontSize: 16,
@@ -171,5 +187,11 @@ const styles = StyleSheet.create({
     fontSize: 13,
     color: "#444",
     marginTop: 8,
+  },
+  privacyPolicyLink: {
+    fontSize: 14,
+    color: "#000",
+    marginBottom: 10,
+    textDecorationLine: "underline",
   },
 });

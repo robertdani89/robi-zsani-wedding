@@ -8,6 +8,7 @@ import {
   View,
 } from "react-native";
 
+import Button from "@/components/Button";
 import Card from "@/components/Card";
 import { StatusBar } from "expo-status-bar";
 import apiService from "@/services/api";
@@ -77,13 +78,13 @@ export default function GiftScreen() {
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
-        <TouchableOpacity
-          onPress={() => router.back()}
-          style={styles.backButton}
-        >
-          <Text style={styles.backButtonText}>{t("common.back")}</Text>
-        </TouchableOpacity>
         <Card style={styles.header}>
+          <TouchableOpacity
+            onPress={() => router.back()}
+            style={styles.backButton}
+          >
+            <Text style={styles.backButtonText}>{t("common.back")}</Text>
+          </TouchableOpacity>
           <Text style={styles.title}>{t("gift.title")}</Text>
           <Text style={styles.subtitle}>{t("gift.subtitle")}</Text>
         </Card>
@@ -142,21 +143,11 @@ export default function GiftScreen() {
           </View>
         </Card>
 
-        <TouchableOpacity
-          style={[
-            styles.giveButton,
-            (!selectedGiftType || isSubmitting) && styles.giveButtonDisabled,
-          ]}
+        <Button
+          title={t("gift.submit")}
           onPress={handleGiveMe}
-          activeOpacity={0.85}
           disabled={!selectedGiftType || isSubmitting}
-        >
-          {isSubmitting ? (
-            <ActivityIndicator color="#FFF" />
-          ) : (
-            <Text style={styles.giveButtonText}>{t("gift.submit")}</Text>
-          )}
-        </TouchableOpacity>
+        />
       </ScrollView>
     </View>
   );

@@ -1,4 +1,6 @@
 import {
+  Linking,
+  Modal,
   ScrollView,
   StyleSheet,
   Text,
@@ -6,18 +8,24 @@ import {
   View,
 } from "react-native";
 
+import Button from "@/components/Button";
 import Card from "@/components/Card";
+import LanguageSwitcher from "@/components/LanguageSwitcher";
 import { StatusBar } from "expo-status-bar";
 import { useApp } from "@/context/AppContext";
 import { useFonts } from "expo-font";
 import { useLocalization } from "@/context/LocalizationContext";
 import { useRouter } from "expo-router";
+import { useState } from "react";
 
 export default function DashboardScreen() {
   const router = useRouter();
   const { state, getTaskStatus } = useApp();
   const { t } = useLocalization();
   const taskStatus = getTaskStatus();
+  const [settingsVisible, setSettingsVisible] = useState(false);
+  const latestSelectedSong =
+    state.song.length > 0 ? state.song[state.song.length - 1] : null;
   const [fontsLoaded] = useFonts({
     GreatVibes: require("@/assets/GreatVibes-Regular.ttf"),
   });
@@ -65,9 +73,20 @@ export default function DashboardScreen() {
         contentContainerStyle={styles.scrollContent}
       >
         <Card style={styles.header}>
-          <Text style={[styles.text, styles.greeting]}>
-            {t("dashboard.greeting", { name: state.guest?.name ?? "" })}
-          </Text>
+          <View style={styles.headerTopRow}>
+            <Text style={[styles.text, styles.greeting]}>
+              {t("dashboard.greeting", { name: state.guest?.name ?? "" })}
+            </Text>
+
+            <TouchableOpacity
+              style={styles.settingsButton}
+              onPress={() => setSettingsVisible(true)}
+              activeOpacity={0.8}
+            >
+              <Text style={styles.settingsButtonText}>⚙</Text>
+            </TouchableOpacity>
+          </View>
+
           <Text style={[styles.text, styles.subtitle]}>
             {t("dashboard.subtitle1")}
           </Text>
@@ -168,8 +187,10 @@ export default function DashboardScreen() {
             <View style={styles.taskContent}>
               <Text style={styles.taskTitle}>{t("dashboard.song")}</Text>
               <Text style={styles.taskDescription}>
-                {state.song
-                  ? t("dashboard.songSelected", { name: state.song.name })
+                {latestSelectedSong
+                  ? t("dashboard.songSelected", {
+                      name: latestSelectedSong.name,
+                    })
                   : t("dashboard.songNotSelected")}
               </Text>
             </View>
@@ -186,27 +207,53 @@ export default function DashboardScreen() {
           </TouchableOpacity>
         </Card>
 
-        {/* Bottom CTA */}
-        <View style={styles.bottomCTA}>
-          {taskStatus.allTasksCompleted ? (
+        <Button
+          title={
+            taskStatus.allTasksCompleted
+              ? t("dashboard.finish")
+              : t("dashboard.motivation")
+          }
+          onPress={() => router.push("/gift")}
+          disabled={!taskStatus.allTasksCompleted}
+        />
+      </ScrollView>
+
+      <Modal
+        visible={settingsVisible}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setSettingsVisible(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <Card style={styles.settingsModalCard}>
+            <Text style={styles.settingsModalTitle}>
+              {t("dashboard.settings")}
+            </Text>
+            <Text style={styles.settingsModalLabel}>{t("lang.switcher")}</Text>
+            <LanguageSwitcher floating={false} />
+
             <TouchableOpacity
-              style={styles.reviewButton}
-              onPress={() => router.push("/gift")}
-              activeOpacity={0.8}
+              onPress={() =>
+                Linking.openURL(
+                  "https://robertdani89.github.io/robi-zsani-wedding/",
+                )
+              }
+              activeOpacity={0.7}
             >
-              <Text style={styles.reviewButtonText}>
-                {t("dashboard.finish")}
+              <Text style={styles.privacyPolicyLink}>
+                {t("identify.privacyPolicy")}
               </Text>
             </TouchableOpacity>
-          ) : (
-            <View style={styles.motivationBox}>
-              <Text style={styles.motivationText}>
-                {t("dashboard.motivation")}
-              </Text>
+
+            <View style={styles.settingsActions}>
+              <Button
+                title={t("common.done")}
+                onPress={() => setSettingsVisible(false)}
+              />
             </View>
-          )}
+          </Card>
         </View>
-      </ScrollView>
+      </Modal>
     </View>
   );
 }
@@ -229,6 +276,25 @@ const styles = StyleSheet.create({
   },
   header: {
     marginBottom: 30,
+  },
+  headerTopRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginBottom: 6,
+  },
+  settingsButton: {
+    width: 34,
+    height: 34,
+    borderRadius: 17,
+    backgroundColor: "rgba(255,255,255,0.75)",
+    alignItems: "center",
+    justifyContent: "center",
+    borderWidth: 1,
+    borderColor: "#D9C4A0",
+  },
+  settingsButtonText: {
+    fontSize: 18,
+    color: "#7D5260",
   },
   greeting: {
     fontSize: 32,
@@ -326,37 +392,34 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: "600",
   },
-  bottomCTA: {
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: "rgba(0,0,0,0.3)",
+    justifyContent: "center",
+    paddingHorizontal: 24,
+  },
+  settingsModalCard: {
+    alignSelf: "stretch",
+  },
+  settingsModalTitle: {
+    fontSize: 22,
+    fontWeight: "700",
+    color: "#333",
+    marginBottom: 16,
+  },
+  settingsModalLabel: {
+    fontSize: 14,
+    color: "#666",
+    marginBottom: 10,
+  },
+  settingsActions: {
     marginTop: 20,
   },
-  reviewButton: {
-    backgroundColor: "#D4526E",
-    paddingVertical: 18,
-    borderRadius: 30,
-    alignItems: "center",
-    elevation: 3,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-  },
-  reviewButtonText: {
-    color: "#FFF",
-    fontSize: 18,
-    fontWeight: "bold",
-  },
-  motivationBox: {
-    backgroundColor: "#FFF",
-    borderRadius: 16,
-    padding: 20,
-    borderWidth: 2,
-    borderColor: "#FFD1DC",
-    borderStyle: "dashed",
-  },
-  motivationText: {
-    fontSize: 16,
-    color: "#7D5260",
-    textAlign: "center",
-    fontWeight: "600",
+  privacyPolicyLink: {
+    fontSize: 14,
+    color: "#000",
+    marginTop: 10,
+    marginBottom: 10,
+    textDecorationLine: "underline",
   },
 });

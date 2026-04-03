@@ -59,31 +59,85 @@ const isServerReachable = async (): Promise<boolean> => {
 export const QUESTIONS: Question[] = [
   {
     id: "q1",
-    text: "Milyen kirándulásra jönnél velünk szívesen?",
+    text: {
+      en: "What kind of trip would you like to join us on?",
+      hu: "Milyen kirándulásra jönnél velünk szívesen?",
+    },
     type: QuestionType.MULTIPLE_CHOICE,
     options: [
-      "Strandolás",
-      "Hegyi visszavonulás",
-      "Biciklis túra",
-      "Borkóstoló kúra",
+      {
+        en: "Beach",
+        hu: "Strandolás",
+      },
+      {
+        en: "Mountain retreat",
+        hu: "Hegyi visszavonulás",
+      },
+      {
+        en: "Biking tour",
+        hu: "Biciklis túra",
+      },
+      {
+        en: "Wine tasting tour",
+        hu: "Borkóstoló kúra",
+      },
     ],
   },
   {
     id: "q2",
-    text: "Milyen esti programra csatlakoznál hozzánk szívesen?",
+    text: {
+      en: "What kind of evening program would you like to join us for?",
+      hu: "Milyen esti programra csatlakoznál hozzánk szívesen?",
+    },
     type: QuestionType.MULTIPLE_CHOICE,
-    options: ["Társasjáték est", "Filmnézés", "Színház", "Koncert"],
+    options: [
+      {
+        en: "Board game night",
+        hu: "Társasjáték est",
+      },
+      {
+        en: "Movie night",
+        hu: "Filmnézés",
+      },
+      {
+        en: "Theater",
+        hu: "Színház",
+      },
+      {
+        en: "Concert",
+        hu: "Koncert",
+      },
+    ],
   },
   {
     id: "q3",
-    text: "Fiút vagy lányt tippelnél nekünk első babára?",
+    text: {
+      en: "Would you guess a boy or a girl for our first baby?",
+      hu: "Fiút vagy lányt tippelnél nekünk első babára?",
+    },
     type: QuestionType.SINGLE_CHOICE,
-    options: ["Fiú", "Lány", "Maradjatok a kutyáknál!"],
+    options: [
+      {
+        en: "Boy",
+        hu: "Fiú",
+      },
+      {
+        en: "Girl",
+        hu: "Lány",
+      },
+      {
+        en: "Stick with the dogs!",
+        hu: "Maradjatok a kutyáknál!",
+      },
+    ],
   },
 
   {
     id: "q4",
-    text: "Ossz meg velünk egy jó tanácsot a házassághoz vagy a szülői léthez!",
+    text: {
+      en: "Share a piece of advice for marriage or parenthood!",
+      hu: "Ossz meg velünk egy jó tanácsot a házassághoz vagy a szülői léthez!",
+    },
     type: QuestionType.FREE_TEXT,
   },
 ];
@@ -154,7 +208,7 @@ class MockApiService {
   async submitAnswer(
     guestId: string,
     questionId: string,
-    value: string | string[],
+    value: Answer["value"],
   ): Promise<Answer> {
     await this.delay();
     this.answers = this.answers.filter(
@@ -399,7 +453,7 @@ class ApiService {
   async submitAnswer(
     guestId: string,
     questionId: string,
-    value: string | string[],
+    value: Answer["value"],
   ): Promise<Answer> {
     return this.fetch<Answer>("/answers", {
       method: "POST",
@@ -627,7 +681,7 @@ class SmartApiService {
   async submitAnswer(
     guestId: string,
     questionId: string,
-    value: string | string[],
+    value: Answer["value"],
   ): Promise<Answer> {
     const service = await this.getService();
     return service.submitAnswer(guestId, questionId, value);
