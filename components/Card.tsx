@@ -45,6 +45,6 @@ const styles = StyleSheet.create({
     overflow: "hidden",
   },
   content: {
-    padding: 20,
+    padding: 15,
   },
 });

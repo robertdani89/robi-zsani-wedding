@@ -6,6 +6,7 @@ import {
   Text,
   TouchableOpacity,
   View,
+  useWindowDimensions,
 } from "react-native";
 
 import Button from "@/components/Button";
@@ -23,6 +24,8 @@ export default function DashboardScreen() {
   const { state, getTaskStatus } = useApp();
   const { t } = useLocalization();
   const taskStatus = getTaskStatus();
+  const { width } = useWindowDimensions();
+  const isSmallScreen = width < 380;
   const [settingsVisible, setSettingsVisible] = useState(false);
   const latestSelectedSong =
     state.song.length > 0 ? state.song[state.song.length - 1] : null;
@@ -130,25 +133,32 @@ export default function DashboardScreen() {
 
             {/* Questions Card */}
             <TouchableOpacity
-              style={styles.taskCard}
+              style={[styles.taskCard, isSmallScreen && styles.taskCardSmall]}
               onPress={() => router.push("/questions")}
               activeOpacity={0.7}
             >
-              <View style={styles.taskIcon}>
-                <Text style={styles.taskEmoji}>❓</Text>
-              </View>
-              <View style={styles.taskContent}>
-                <Text style={styles.taskTitle}>{t("dashboard.questions")}</Text>
-                <Text style={styles.taskDescription}>
-                  {t("dashboard.questionsProgress", {
-                    count: state.answers.length,
-                  })}
-                </Text>
+              <View
+                style={[styles.taskInfo, isSmallScreen && styles.taskInfoSmall]}
+              >
+                <View style={styles.taskIcon}>
+                  <Text style={styles.taskEmoji}>❓</Text>
+                </View>
+                <View style={styles.taskContent}>
+                  <Text style={styles.taskTitle}>
+                    {t("dashboard.questions")}
+                  </Text>
+                  <Text style={styles.taskDescription}>
+                    {t("dashboard.questionsProgress", {
+                      count: state.answers.length,
+                    })}
+                  </Text>
+                </View>
               </View>
               <View
                 style={[
                   styles.statusBadge,
                   { backgroundColor: questionStatus.bgColor },
+                  isSmallScreen && styles.statusBadgeSmall,
                 ]}
               >
                 <Text
@@ -161,25 +171,30 @@ export default function DashboardScreen() {
 
             {/* Photos Card */}
             <TouchableOpacity
-              style={styles.taskCard}
+              style={[styles.taskCard, isSmallScreen && styles.taskCardSmall]}
               onPress={() => router.push("/photos")}
               activeOpacity={0.7}
             >
-              <View style={styles.taskIcon}>
-                <Text style={styles.taskEmoji}>📸</Text>
-              </View>
-              <View style={styles.taskContent}>
-                <Text style={styles.taskTitle}>{t("dashboard.photos")}</Text>
-                <Text style={styles.taskDescription}>
-                  {t("dashboard.photosProgress", {
-                    count: state.photos.length,
-                  })}
-                </Text>
+              <View
+                style={[styles.taskInfo, isSmallScreen && styles.taskInfoSmall]}
+              >
+                <View style={styles.taskIcon}>
+                  <Text style={styles.taskEmoji}>📸</Text>
+                </View>
+                <View style={styles.taskContent}>
+                  <Text style={styles.taskTitle}>{t("dashboard.photos")}</Text>
+                  <Text style={styles.taskDescription}>
+                    {t("dashboard.photosProgress", {
+                      count: state.photos.length,
+                    })}
+                  </Text>
+                </View>
               </View>
               <View
                 style={[
                   styles.statusBadge,
                   { backgroundColor: photoStatus.bgColor },
+                  isSmallScreen && styles.statusBadgeSmall,
                 ]}
               >
                 <Text style={[styles.statusText, { color: photoStatus.color }]}>
@@ -190,27 +205,32 @@ export default function DashboardScreen() {
 
             {/* Song Card */}
             <TouchableOpacity
-              style={styles.taskCard}
+              style={[styles.taskCard, isSmallScreen && styles.taskCardSmall]}
               onPress={() => router.push("/song")}
               activeOpacity={0.7}
             >
-              <View style={styles.taskIcon}>
-                <Text style={styles.taskEmoji}>🎵</Text>
-              </View>
-              <View style={styles.taskContent}>
-                <Text style={styles.taskTitle}>{t("dashboard.song")}</Text>
-                <Text style={styles.taskDescription}>
-                  {latestSelectedSong
-                    ? t("dashboard.songSelected", {
-                        name: latestSelectedSong.name,
-                      })
-                    : t("dashboard.songNotSelected")}
-                </Text>
+              <View
+                style={[styles.taskInfo, isSmallScreen && styles.taskInfoSmall]}
+              >
+                <View style={styles.taskIcon}>
+                  <Text style={styles.taskEmoji}>🎵</Text>
+                </View>
+                <View style={styles.taskContent}>
+                  <Text style={styles.taskTitle}>{t("dashboard.song")}</Text>
+                  <Text style={styles.taskDescription}>
+                    {latestSelectedSong
+                      ? t("dashboard.songSelected", {
+                          name: latestSelectedSong.name,
+                        })
+                      : t("dashboard.songNotSelected")}
+                  </Text>
+                </View>
               </View>
               <View
                 style={[
                   styles.statusBadge,
                   { backgroundColor: songStatus.bgColor },
+                  isSmallScreen && styles.statusBadgeSmall,
                 ]}
               >
                 <Text style={[styles.statusText, { color: songStatus.color }]}>
@@ -236,35 +256,43 @@ export default function DashboardScreen() {
           <Card style={styles.completedContainer}>
             {/* Show photos and songs still available after completion */}
             <TouchableOpacity
-              style={styles.taskCard}
+              style={[styles.taskCard, isSmallScreen && styles.taskCardSmall]}
               onPress={() => router.push("/photos")}
               activeOpacity={0.7}
             >
-              <View style={styles.taskIcon}>
-                <Text style={styles.taskEmoji}>📸</Text>
-              </View>
-              <View style={styles.taskContent}>
-                <Text style={styles.taskTitle}>{t("dashboard.photos")}</Text>
+              <View
+                style={[styles.taskInfo, isSmallScreen && styles.taskInfoSmall]}
+              >
+                <View style={styles.taskIcon}>
+                  <Text style={styles.taskEmoji}>📸</Text>
+                </View>
+                <View style={styles.taskContent}>
+                  <Text style={styles.taskTitle}>{t("dashboard.photos")}</Text>
+                </View>
               </View>
             </TouchableOpacity>
 
             <TouchableOpacity
-              style={styles.taskCard}
+              style={[styles.taskCard, isSmallScreen && styles.taskCardSmall]}
               onPress={() => router.push("/song")}
               activeOpacity={0.7}
             >
-              <View style={styles.taskIcon}>
-                <Text style={styles.taskEmoji}>🎵</Text>
-              </View>
-              <View style={styles.taskContent}>
-                <Text style={styles.taskTitle}>{t("dashboard.song")}</Text>
-                <Text style={styles.taskDescription}>
-                  {latestSelectedSong
-                    ? t("dashboard.songSelected", {
-                        name: latestSelectedSong.name,
-                      })
-                    : t("dashboard.songNotSelected")}
-                </Text>
+              <View
+                style={[styles.taskInfo, isSmallScreen && styles.taskInfoSmall]}
+              >
+                <View style={styles.taskIcon}>
+                  <Text style={styles.taskEmoji}>🎵</Text>
+                </View>
+                <View style={styles.taskContent}>
+                  <Text style={styles.taskTitle}>{t("dashboard.song")}</Text>
+                  <Text style={styles.taskDescription}>
+                    {latestSelectedSong
+                      ? t("dashboard.songSelected", {
+                          name: latestSelectedSong.name,
+                        })
+                      : t("dashboard.songNotSelected")}
+                  </Text>
+                </View>
               </View>
             </TouchableOpacity>
           </Card>
@@ -401,7 +429,7 @@ const styles = StyleSheet.create({
   taskCard: {
     backgroundColor: "#FFF",
     borderRadius: 16,
-    padding: 20,
+    padding: 10,
     marginBottom: 15,
     flexDirection: "row",
     alignItems: "center",
@@ -410,6 +438,19 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.1,
     shadowRadius: 2,
+  },
+  taskCardSmall: {
+    flexDirection: "column",
+    alignItems: "flex-start",
+  },
+  taskInfo: {
+    flex: 1,
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  taskInfoSmall: {
+    width: "100%",
+    alignItems: "flex-start",
   },
   taskIcon: {
     width: 50,
@@ -440,6 +481,10 @@ const styles = StyleSheet.create({
     paddingVertical: 6,
     paddingHorizontal: 12,
     borderRadius: 12,
+  },
+  statusBadgeSmall: {
+    marginTop: 12,
+    alignSelf: "flex-start",
   },
   statusText: {
     fontSize: 12,
