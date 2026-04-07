@@ -166,8 +166,10 @@ export default function PuzzleScreen() {
       .forEach((tile) => {
         const currentIndex = board.indexOf(tile);
         const { x, y } = getTileCoordinates(currentIndex, tileSize);
+        const tilePosition = getTilePositionValue(tile);
 
-        Animated.spring(getTilePositionValue(tile), {
+        tilePosition.stopAnimation();
+        Animated.spring(tilePosition, {
           toValue: { x, y },
           useNativeDriver: false,
           speed: 18,
@@ -176,47 +178,51 @@ export default function PuzzleScreen() {
       });
   }, [board, getTilePositionValue, tileSize]);
 
-  const handleTilePress = (pressedIndex: number) => {
-    if (isSolved) {
-      return;
-    }
+  const handleTilePress = useCallback(
+    (tile: number) => {
+      if (isSolved || tile === EMPTY_TILE) {
+        return;
+      }
 
-    const emptyIndex = board.indexOf(EMPTY_TILE);
+      setBoard((currentBoard) => {
+        const pressedIndex = currentBoard.indexOf(tile);
+        const emptyIndex = currentBoard.indexOf(EMPTY_TILE);
 
-    if (!areAdjacent(pressedIndex, emptyIndex)) {
-      return;
-    }
+        if (pressedIndex === -1 || !areAdjacent(pressedIndex, emptyIndex)) {
+          return currentBoard;
+        }
 
-    const movingTile = board[pressedIndex];
-    const movingTileScale = getTileScaleValue(movingTile);
+        const movingTileScale = getTileScaleValue(tile);
+        movingTileScale.stopAnimation();
 
-    const nextBoard = [...board];
-    [nextBoard[pressedIndex], nextBoard[emptyIndex]] = [
-      nextBoard[emptyIndex],
-      nextBoard[pressedIndex],
-    ];
+        const nextBoard = [...currentBoard];
+        [nextBoard[pressedIndex], nextBoard[emptyIndex]] = [
+          nextBoard[emptyIndex],
+          nextBoard[pressedIndex],
+        ];
 
-    Animated.sequence([
-      Animated.timing(movingTileScale, {
-        toValue: 1.08,
-        duration: 90,
-        useNativeDriver: true,
-      }),
-      Animated.spring(movingTileScale, {
-        toValue: 1,
-        friction: 4,
-        tension: 140,
-        useNativeDriver: true,
-      }),
-    ]).start();
+        Animated.sequence([
+          Animated.timing(movingTileScale, {
+            toValue: 1.08,
+            duration: 90,
+            useNativeDriver: true,
+          }),
+          Animated.spring(movingTileScale, {
+            toValue: 1,
+            friction: 4,
+            tension: 140,
+            useNativeDriver: true,
+          }),
+        ]).start();
 
-    setBoard(nextBoard);
-    setMoves((prev) => prev + 1);
+        setMoves((prev) => prev + 1);
+        setIsSolved(isSolvedBoard(nextBoard));
 
-    if (isSolvedBoard(nextBoard)) {
-      setIsSolved(true);
-    }
-  };
+        return nextBoard;
+      });
+    },
+    [getTileScaleValue, isSolved],
+  );
 
   const nextPhoto = () => {
     if (puzzlePhotos.length <= 1) {
@@ -256,7 +262,6 @@ export default function PuzzleScreen() {
         {createSolvedBoard()
           .slice(0, EMPTY_TILE)
           .map((tile) => {
-            const currentIndex = board.indexOf(tile);
             const imageRow = Math.floor(tile / GRID_SIZE);
             const imageColumn = tile % GRID_SIZE;
             const animatedPosition = getTilePositionValue(tile);
@@ -270,32 +275,37 @@ export default function PuzzleScreen() {
                   {
                     width: tileSize,
                     height: tileSize,
-                    transform: [
-                      ...animatedPosition.getTranslateTransform(),
-                      { scale: animatedScale },
-                    ],
+                    left: animatedPosition.x,
+                    top: animatedPosition.y,
                   },
                 ]}
               >
-                <TouchableOpacity
-                  onPress={() => handleTilePress(currentIndex)}
-                  activeOpacity={0.85}
-                  style={styles.touchableTile}
+                <Animated.View
+                  style={[
+                    styles.animatedTileContent,
+                    { transform: [{ scale: animatedScale }] },
+                  ]}
                 >
-                  <View style={styles.tileInner}>
-                    <Image
-                      source={{ uri: selectedPhoto.displayUrl }}
-                      style={{
-                        position: "absolute",
-                        width: boardSize,
-                        height: boardSize,
-                        left: -imageColumn * tileSize,
-                        top: -imageRow * tileSize,
-                      }}
-                      resizeMode="cover"
-                    />
-                  </View>
-                </TouchableOpacity>
+                  <TouchableOpacity
+                    onPress={() => handleTilePress(tile)}
+                    activeOpacity={0.85}
+                    style={styles.touchableTile}
+                  >
+                    <View style={styles.tileInner}>
+                      <Image
+                        source={{ uri: selectedPhoto.displayUrl }}
+                        style={{
+                          position: "absolute",
+                          width: boardSize,
+                          height: boardSize,
+                          left: -imageColumn * tileSize,
+                          top: -imageRow * tileSize,
+                        }}
+                        resizeMode="cover"
+                      />
+                    </View>
+                  </TouchableOpacity>
+                </Animated.View>
               </Animated.View>
             );
           })}
@@ -356,8 +366,8 @@ export default function PuzzleScreen() {
         ) : (
           <>
             <Card style={styles.infoCard}>
-              <Text style={styles.infoLabel}>{t("puzzle.usePhotoFrom")}</Text>
-              <Text style={styles.infoTitle}>{PUZZLE_COLLECTION_NAME}</Text>
+              {/* <Text style={styles.infoLabel}>{t("puzzle.usePhotoFrom")}</Text>
+              <Text style={styles.infoTitle}>{PUZZLE_COLLECTION_NAME}</Text> */}
               <Text style={styles.movesText}>
                 {t("puzzle.moves", { count: moves })}
               </Text>
@@ -515,6 +525,9 @@ const styles = StyleSheet.create({
     left: 0,
     top: 0,
     padding: 1,
+  },
+  animatedTileContent: {
+    flex: 1,
   },
   touchableTile: {
     flex: 1,

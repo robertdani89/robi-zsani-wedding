@@ -5,11 +5,14 @@ import Button from "@/components/Button";
 import Card from "@/components/Card";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
 import { StatusBar } from "expo-status-bar";
+import apiService from "@/services/api";
 import { useApp } from "@/context/AppContext";
-import { useFonts } from "expo-font";
 import { useEffect } from "react";
+import { useFonts } from "expo-font";
 import { useLocalization } from "@/context/LocalizationContext";
 import { useRouter } from "expo-router";
+
+apiService; // initialize API service to set up base URL and interceptors
 
 export default function WelcomeScreen() {
   const router = useRouter();
