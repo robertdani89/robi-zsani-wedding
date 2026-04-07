@@ -1,22 +1,35 @@
 import { COUPLE_NAMES, WEDDING_DATE } from "@/constants";
-import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { ScrollView, StyleSheet, Text, View } from "react-native";
 
 import Button from "@/components/Button";
 import Card from "@/components/Card";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
 import { StatusBar } from "expo-status-bar";
+import { useApp } from "@/context/AppContext";
 import { useFonts } from "expo-font";
+import { useEffect } from "react";
 import { useLocalization } from "@/context/LocalizationContext";
 import { useRouter } from "expo-router";
 
 export default function WelcomeScreen() {
   const router = useRouter();
+  const { state, isHydrated } = useApp();
   const { t, locale } = useLocalization();
   const [fontsLoaded] = useFonts({
     GreatVibes: require("@/assets/GreatVibes-Regular.ttf"),
   });
 
-  if (!fontsLoaded) {
+  useEffect(() => {
+    if (!isHydrated) {
+      return;
+    }
+
+    if (state.guest) {
+      router.replace("/dashboard");
+    }
+  }, [isHydrated, router, state.guest]);
+
+  if (!fontsLoaded || !isHydrated) {
     return null;
   }
 
@@ -25,41 +38,42 @@ export default function WelcomeScreen() {
   };
 
   return (
-    <View style={styles.container}>
-      <StatusBar style="dark" />
+    <ScrollView>
       <LanguageSwitcher />
-      <View style={styles.content}>
-        <Card>
-          <Text style={[styles.text, styles.coupleNames]}>{COUPLE_NAMES}</Text>
-        </Card>
-
-        <View style={styles.heartContainer}>
-          <Text style={[styles.text, styles.heart]}>💕</Text>
-        </View>
-
-        <Card style={styles.weddingDate}>
-          <Text style={[styles.text, styles.weddingDateText]}>
-            {locale === "hu" ? WEDDING_DATE : "May 2, 2026"}
-          </Text>
-        </Card>
-
-        <View style={styles.messageContainer}>
+      <View style={styles.container}>
+        <StatusBar style="dark" />
+        <View style={styles.content}>
           <Card>
-            <Text style={[styles.text, styles.message]}>
-              {t("welcome.message")}
+            <Text style={[styles.text, styles.coupleNames]}>
+              {COUPLE_NAMES}
+            </Text>
+            <Text style={[styles.text, styles.weddingDateText]}>
+              {locale === "hu" ? WEDDING_DATE : "May 2, 2026"}
             </Text>
           </Card>
 
-          <Card style={styles.subMessageContainer}>
-            <Text style={[styles.text, styles.subMessage]}>
-              {t("welcome.subMessage")}
-            </Text>
-          </Card>
+          <View style={styles.heartContainer}>
+            <Text style={[styles.text, styles.heart]}>💕</Text>
+          </View>
+
+          <View style={styles.messageContainer}>
+            <Card>
+              <Text style={[styles.text, styles.message]}>
+                {t("welcome.message")}
+              </Text>
+            </Card>
+
+            <Card style={styles.subMessageContainer}>
+              <Text style={[styles.text, styles.subMessage]}>
+                {t("welcome.subMessage")}
+              </Text>
+            </Card>
+          </View>
+
+          <Button title={t("welcome.start")} onPress={handleGetStarted} />
         </View>
-
-        <Button title={t("welcome.start")} onPress={handleGetStarted} />
       </View>
-    </View>
+    </ScrollView>
   );
 }
 
@@ -67,6 +81,8 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "transparent",
+    marginTop: 50,
+    marginBottom: 50,
   },
   content: {
     flex: 1,
@@ -89,15 +105,11 @@ const styles = StyleSheet.create({
   heart: {
     fontSize: 36,
   },
-  weddingDate: {
-    marginTop: 10,
-  },
   weddingDateText: {
     fontSize: 24,
     textAlign: "center",
   },
   messageContainer: {
-    marginTop: 40,
     marginBottom: 50,
   },
   message: {

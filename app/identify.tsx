@@ -150,6 +150,9 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "transparent",
   },
+  LanguageSwitcher: {
+    marginTop: 50,
+  },
   content: {
     flex: 1,
     justifyContent: "center",

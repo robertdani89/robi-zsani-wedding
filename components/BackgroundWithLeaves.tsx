@@ -1,4 +1,12 @@
-import { Animated, Dimensions, Image, StyleSheet, View } from "react-native";
+import {
+  Animated,
+  AppState,
+  AppStateStatus,
+  Dimensions,
+  Image,
+  StyleSheet,
+  View,
+} from "react-native";
 import React, { useEffect, useRef, useState } from "react";
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get("window");
@@ -75,52 +83,111 @@ export default function BackgroundWithLeaves({
 }: {
   children: React.ReactNode;
 }) {
-  const leavesRef = useRef<Leaf[]>([]);
-
-  if (leavesRef.current.length === 0) {
-    for (let i = 0; i < 0; i++) {
-      leavesRef.current.push({
-        id: i,
-        animatedValue: new Animated.Value(0),
-        startX: Math.random() * SCREEN_WIDTH,
-        duration: 3000 + 1 * 10000,
-        delay: Math.random() * 5000,
-        frameOffset: Math.floor(Math.random() * LEAF_IMAGES.length),
-        horizontalDrift: (Math.random() - 0.5) * 100,
-      });
-    }
-  }
+  const [leaves, setLeaves] = useState<Leaf[]>([]);
+  const nextLeafIdRef = useRef(0);
+  const spawnTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const activeAnimationsRef = useRef<Map<number, Animated.CompositeAnimation>>(
+    new Map(),
+  );
+  const isRunningRef = useRef(false);
+  const isMountedRef = useRef(true);
+  const appStateRef = useRef(AppState.currentState);
 
   useEffect(() => {
-    const timeouts: NodeJS.Timeout[] = [];
+    const removeLeaf = (leafId: number) => {
+      if (!isMountedRef.current) {
+        return;
+      }
+      setLeaves((prev) => prev.filter((leaf) => leaf.id !== leafId));
+    };
 
-    leavesRef.current.forEach((leaf) => {
-      const timeout = setTimeout(() => {
-        Animated.loop(
-          Animated.sequence([
-            Animated.timing(leaf.animatedValue, {
-              toValue: 1,
-              duration: leaf.duration,
-              useNativeDriver: true,
-            }),
-            Animated.timing(leaf.animatedValue, {
-              toValue: 0,
-              duration: 0,
-              useNativeDriver: true,
-            }),
-          ]),
-        ).start();
-      }, leaf.delay);
-
-      timeouts.push(timeout);
+    const createLeaf = (): Leaf => ({
+      id: nextLeafIdRef.current++,
+      animatedValue: new Animated.Value(0),
+      startX: Math.random() * SCREEN_WIDTH,
+      duration: 6000 + Math.random() * 7000,
+      delay: Math.random() * 1400,
+      frameOffset: Math.floor(Math.random() * LEAF_IMAGES.length),
+      horizontalDrift: (Math.random() - 0.5) * 120,
     });
 
+    const scheduleNextLeaf = () => {
+      if (!isRunningRef.current) {
+        return;
+      }
+
+      const spawnDelay = 350 + Math.random() * 750;
+      spawnTimeoutRef.current = setTimeout(() => {
+        const leaf = createLeaf();
+        setLeaves((prev) => [...prev, leaf]);
+
+        const animation = Animated.sequence([
+          Animated.delay(leaf.delay),
+          Animated.timing(leaf.animatedValue, {
+            toValue: 1,
+            duration: leaf.duration,
+            useNativeDriver: true,
+          }),
+        ]);
+
+        activeAnimationsRef.current.set(leaf.id, animation);
+        animation.start(({ finished }) => {
+          activeAnimationsRef.current.delete(leaf.id);
+          if (finished) {
+            removeLeaf(leaf.id);
+          }
+        });
+
+        scheduleNextLeaf();
+      }, spawnDelay);
+    };
+
+    const stopAllLeafAnimations = () => {
+      isRunningRef.current = false;
+
+      if (spawnTimeoutRef.current) {
+        clearTimeout(spawnTimeoutRef.current);
+        spawnTimeoutRef.current = null;
+      }
+
+      activeAnimationsRef.current.forEach((animation) => animation.stop());
+      activeAnimationsRef.current.clear();
+
+      setLeaves([]);
+    };
+
+    const startLeafAnimations = () => {
+      if (isRunningRef.current) {
+        return;
+      }
+      isRunningRef.current = true;
+      scheduleNextLeaf();
+    };
+
+    const handleAppStateChange = (nextAppState: AppStateStatus) => {
+      const wasInBackground =
+        appStateRef.current === "inactive" ||
+        appStateRef.current === "background";
+
+      if (wasInBackground && nextAppState === "active") {
+        stopAllLeafAnimations();
+        startLeafAnimations();
+      }
+
+      appStateRef.current = nextAppState;
+    };
+
+    startLeafAnimations();
+
+    const appStateSubscription = AppState.addEventListener(
+      "change",
+      handleAppStateChange,
+    );
+
     return () => {
-      timeouts.forEach((timeout) => clearTimeout(timeout));
-      leavesRef.current.forEach((leaf) => {
-        leaf.animatedValue.stopAnimation();
-        leaf.animatedValue.setValue(0);
-      });
+      isMountedRef.current = false;
+      appStateSubscription.remove();
+      stopAllLeafAnimations();
     };
   }, []);
 
@@ -132,7 +199,7 @@ export default function BackgroundWithLeaves({
         resizeMode="cover"
       />
       <View style={styles.leavesContainer}>
-        {leavesRef.current.map((leaf) => (
+        {leaves.map((leaf) => (
           <AnimatedLeaf key={leaf.id} leaf={leaf} />
         ))}
       </View>

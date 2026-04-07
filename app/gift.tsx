@@ -23,6 +23,7 @@ export default function GiftScreen() {
   const router = useRouter();
   const { state, setGuest } = useApp();
   const { t } = useLocalization();
+  const isGiftGiven = !!state.guest?.gotGiftAt;
   const [selectedGiftType, setSelectedGiftType] = useState<GiftType | null>(
     null,
   );
@@ -85,69 +86,83 @@ export default function GiftScreen() {
           >
             <Text style={styles.backButtonText}>{t("common.back")}</Text>
           </TouchableOpacity>
-          <Text style={styles.title}>{t("gift.title")}</Text>
-          <Text style={styles.subtitle}>{t("gift.subtitle")}</Text>
+          <Text style={styles.title}>
+            {isGiftGiven ? t("dashboard.completedSubtitle1") : t("gift.title")}
+          </Text>
+          <Text style={styles.subtitle}>
+            {isGiftGiven
+              ? t("dashboard.completedSubtitle2")
+              : t("gift.subtitle")}
+          </Text>
         </Card>
 
-        <Card style={styles.machine}>
-          <View style={styles.placeholderBox}>
-            <Text style={styles.placeholderText}>{t("gift.placeholder")}</Text>
-          </View>
-        </Card>
+        {!isGiftGiven && (
+          <Card style={styles.machine}>
+            <View style={styles.placeholderBox}>
+              <Text style={styles.placeholderText}>
+                {t("gift.placeholder")}
+              </Text>
+            </View>
+          </Card>
+        )}
 
-        <Card style={styles.options}>
-          <View style={styles.selectionCard}>
-            <Text style={styles.selectionTitle}>
-              {t("gift.selectionTitle")}
-            </Text>
+        {!isGiftGiven && (
+          <Card style={styles.options}>
+            <View style={styles.selectionCard}>
+              <Text style={styles.selectionTitle}>
+                {t("gift.selectionTitle")}
+              </Text>
 
-            <TouchableOpacity
-              style={styles.optionRow}
-              onPress={() => setSelectedGiftType("gift_for_man")}
-              activeOpacity={0.8}
-              disabled={isSubmitting}
-            >
-              <View
-                style={[
-                  styles.radioOuter,
-                  selectedGiftType === "gift_for_man" &&
-                    styles.radioOuterActive,
-                ]}
+              <TouchableOpacity
+                style={styles.optionRow}
+                onPress={() => setSelectedGiftType("gift_for_man")}
+                activeOpacity={0.8}
+                disabled={isSubmitting}
               >
-                {selectedGiftType === "gift_for_man" && (
-                  <View style={styles.radioInner} />
-                )}
-              </View>
-              <Text style={styles.optionText}>{t("gift.forMen")}</Text>
-            </TouchableOpacity>
+                <View
+                  style={[
+                    styles.radioOuter,
+                    selectedGiftType === "gift_for_man" &&
+                      styles.radioOuterActive,
+                  ]}
+                >
+                  {selectedGiftType === "gift_for_man" && (
+                    <View style={styles.radioInner} />
+                  )}
+                </View>
+                <Text style={styles.optionText}>{t("gift.forMen")}</Text>
+              </TouchableOpacity>
 
-            <TouchableOpacity
-              style={styles.optionRow}
-              onPress={() => setSelectedGiftType("gift_for_ladies")}
-              activeOpacity={0.8}
-              disabled={isSubmitting}
-            >
-              <View
-                style={[
-                  styles.radioOuter,
-                  selectedGiftType === "gift_for_ladies" &&
-                    styles.radioOuterActive,
-                ]}
+              <TouchableOpacity
+                style={styles.optionRow}
+                onPress={() => setSelectedGiftType("gift_for_ladies")}
+                activeOpacity={0.8}
+                disabled={isSubmitting}
               >
-                {selectedGiftType === "gift_for_ladies" && (
-                  <View style={styles.radioInner} />
-                )}
-              </View>
-              <Text style={styles.optionText}>{t("gift.forWomen")}</Text>
-            </TouchableOpacity>
-          </View>
-        </Card>
+                <View
+                  style={[
+                    styles.radioOuter,
+                    selectedGiftType === "gift_for_ladies" &&
+                      styles.radioOuterActive,
+                  ]}
+                >
+                  {selectedGiftType === "gift_for_ladies" && (
+                    <View style={styles.radioInner} />
+                  )}
+                </View>
+                <Text style={styles.optionText}>{t("gift.forWomen")}</Text>
+              </TouchableOpacity>
+            </View>
+          </Card>
+        )}
 
-        <Button
-          title={t("gift.submit")}
-          onPress={handleGiveMe}
-          disabled={!selectedGiftType || isSubmitting}
-        />
+        {!isGiftGiven && (
+          <Button
+            title={t("gift.submit")}
+            onPress={handleGiveMe}
+            disabled={!selectedGiftType || isSubmitting}
+          />
+        )}
       </ScrollView>
     </View>
   );

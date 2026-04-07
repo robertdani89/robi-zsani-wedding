@@ -49,7 +49,7 @@ export default function LanguageSwitcher({
 const styles = StyleSheet.create({
   wrapper: {
     position: "absolute",
-    top: 50,
+    top: 30,
     right: 16,
     flexDirection: "row",
     backgroundColor: "rgba(255,255,255,0.92)",

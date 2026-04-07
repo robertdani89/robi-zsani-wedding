@@ -25,6 +25,9 @@ export const TRANSLATIONS = {
     "dashboard.greeting": "Hi, {{name}}! 👋",
     "dashboard.subtitle1": "We'll read every answer on our honeymoon",
     "dashboard.subtitle2": "Please don't let us get bored on the flight! 😉",
+    "dashboard.completedSubtitle1": "Thank you!",
+    "dashboard.completedSubtitle2":
+      "You can still upload photos and request songs",
     "dashboard.progress": "How much is left?",
     "dashboard.tasks": "Tasks",
     "dashboard.questions": "Questions",
@@ -167,6 +170,9 @@ export const TRANSLATIONS = {
     "dashboard.greeting": "Szia, {{name}}! 👋",
     "dashboard.subtitle1": "Nászutunkon minden választ elolvasunk",
     "dashboard.subtitle2": "Kérlek, ne hagyd, hogy unatkozzunk a repülőn! 😉",
+    "dashboard.completedSubtitle1": "Köszönjük!",
+    "dashboard.completedSubtitle2":
+      "Továbbra is tölthetsz fel fotókat és kérhetsz dalokat",
     "dashboard.progress": "Mennyi van hátra?",
     "dashboard.tasks": "Feladatok",
     "dashboard.questions": "Kérdések",

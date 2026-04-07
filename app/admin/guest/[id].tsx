@@ -200,7 +200,7 @@ export default function GuestDetailScreen() {
             answers.map((answer, index) => (
               <View key={answer.id || index} style={styles.answerCard}>
                 <Text style={styles.questionText}>
-                  {answer.question?.text ||
+                  {answer.question?.text[locale] ||
                     t("adminGuest.questionFallback", { id: answer.questionId })}
                 </Text>
                 <Text style={styles.answerText}>

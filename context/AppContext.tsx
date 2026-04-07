@@ -20,6 +20,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 
 interface AppContextType {
   state: AppState;
+  isHydrated: boolean;
   setGuest: (guest: Guest) => Promise<void>;
   addAnswer: (answer: Answer) => Promise<void>;
   addPhoto: (photo: Photo) => Promise<void>;
@@ -50,6 +51,7 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     song: [],
     completedQuestions: new Set(),
   });
+  const [isHydrated, setIsHydrated] = useState(false);
 
   const [assignedQuestions, setAssignedQuestionsState] = useState<Question[]>(
     [],
@@ -94,6 +96,8 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
       setAssignedQuestionsState(questions);
     } catch (error) {
       console.error("Error loading data:", error);
+    } finally {
+      setIsHydrated(true);
     }
   };
 
@@ -253,6 +257,7 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     <AppContext.Provider
       value={{
         state,
+        isHydrated,
         setGuest,
         addAnswer,
         addPhoto,

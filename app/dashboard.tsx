@@ -30,6 +30,8 @@ export default function DashboardScreen() {
     GreatVibes: require("@/assets/GreatVibes-Regular.ttf"),
   });
 
+  const isCompleted = !!state.guest?.gotGiftAt;
+
   const getStatusBadge = (completed: boolean, inProgress: boolean) => {
     if (completed) {
       return {
@@ -88,134 +90,185 @@ export default function DashboardScreen() {
           </View>
 
           <Text style={[styles.text, styles.subtitle]}>
-            {t("dashboard.subtitle1")}
+            {isCompleted
+              ? t("dashboard.completedSubtitle1")
+              : t("dashboard.subtitle1")}
           </Text>
           <Text style={[styles.text, styles.subtitle]}>
-            {t("dashboard.subtitle2")}
+            {isCompleted
+              ? t("dashboard.completedSubtitle2")
+              : t("dashboard.subtitle2")}
           </Text>
         </Card>
 
-        {/* Progress Bar */}
-        <Card style={styles.progressContainer}>
-          <View style={styles.progressHeader}>
-            <Text style={styles.progressLabel}>{t("dashboard.progress")}</Text>
-            <Text style={styles.progressPercentage}>
-              {taskStatus.progressPercentage}%
-            </Text>
-          </View>
-          <View style={styles.progressBarBackground}>
-            <View
-              style={[
-                styles.progressBarFill,
-                { width: `${taskStatus.progressPercentage}%` },
-              ]}
-            />
-          </View>
-        </Card>
-
-        {/* Task Cards */}
-        <Card style={styles.tasksContainer}>
-          <Text style={styles.sectionTitle}>{t("dashboard.tasks")}</Text>
-
-          {/* Questions Card */}
-          <TouchableOpacity
-            style={styles.taskCard}
-            onPress={() => router.push("/questions")}
-            activeOpacity={0.7}
-          >
-            <View style={styles.taskIcon}>
-              <Text style={styles.taskEmoji}>❓</Text>
-            </View>
-            <View style={styles.taskContent}>
-              <Text style={styles.taskTitle}>{t("dashboard.questions")}</Text>
-              <Text style={styles.taskDescription}>
-                {t("dashboard.questionsProgress", {
-                  count: state.answers.length,
-                })}
+        {/* Progress Bar - Hidden when completed */}
+        {!isCompleted && (
+          <Card style={styles.progressContainer}>
+            <View style={styles.progressHeader}>
+              <Text style={styles.progressLabel}>
+                {t("dashboard.progress")}
+              </Text>
+              <Text style={styles.progressPercentage}>
+                {taskStatus.progressPercentage}%
               </Text>
             </View>
-            <View
-              style={[
-                styles.statusBadge,
-                { backgroundColor: questionStatus.bgColor },
-              ]}
+            <View style={styles.progressBarBackground}>
+              <View
+                style={[
+                  styles.progressBarFill,
+                  { width: `${taskStatus.progressPercentage}%` },
+                ]}
+              />
+            </View>
+          </Card>
+        )}
+
+        {/* Task Cards - Hidden when completed */}
+        {!isCompleted && (
+          <Card style={styles.tasksContainer}>
+            <Text style={styles.sectionTitle}>{t("dashboard.tasks")}</Text>
+
+            {/* Questions Card */}
+            <TouchableOpacity
+              style={styles.taskCard}
+              onPress={() => router.push("/questions")}
+              activeOpacity={0.7}
             >
-              <Text
-                style={[styles.statusText, { color: questionStatus.color }]}
+              <View style={styles.taskIcon}>
+                <Text style={styles.taskEmoji}>❓</Text>
+              </View>
+              <View style={styles.taskContent}>
+                <Text style={styles.taskTitle}>{t("dashboard.questions")}</Text>
+                <Text style={styles.taskDescription}>
+                  {t("dashboard.questionsProgress", {
+                    count: state.answers.length,
+                  })}
+                </Text>
+              </View>
+              <View
+                style={[
+                  styles.statusBadge,
+                  { backgroundColor: questionStatus.bgColor },
+                ]}
               >
-                {questionStatus.text}
-              </Text>
-            </View>
-          </TouchableOpacity>
+                <Text
+                  style={[styles.statusText, { color: questionStatus.color }]}
+                >
+                  {questionStatus.text}
+                </Text>
+              </View>
+            </TouchableOpacity>
 
-          {/* Photos Card */}
-          <TouchableOpacity
-            style={styles.taskCard}
-            onPress={() => router.push("/photos")}
-            activeOpacity={0.7}
-          >
-            <View style={styles.taskIcon}>
-              <Text style={styles.taskEmoji}>📸</Text>
-            </View>
-            <View style={styles.taskContent}>
-              <Text style={styles.taskTitle}>{t("dashboard.photos")}</Text>
-              <Text style={styles.taskDescription}>
-                {t("dashboard.photosProgress", { count: state.photos.length })}
-              </Text>
-            </View>
-            <View
-              style={[
-                styles.statusBadge,
-                { backgroundColor: photoStatus.bgColor },
-              ]}
+            {/* Photos Card */}
+            <TouchableOpacity
+              style={styles.taskCard}
+              onPress={() => router.push("/photos")}
+              activeOpacity={0.7}
             >
-              <Text style={[styles.statusText, { color: photoStatus.color }]}>
-                {photoStatus.text}
-              </Text>
-            </View>
-          </TouchableOpacity>
+              <View style={styles.taskIcon}>
+                <Text style={styles.taskEmoji}>📸</Text>
+              </View>
+              <View style={styles.taskContent}>
+                <Text style={styles.taskTitle}>{t("dashboard.photos")}</Text>
+                <Text style={styles.taskDescription}>
+                  {t("dashboard.photosProgress", {
+                    count: state.photos.length,
+                  })}
+                </Text>
+              </View>
+              <View
+                style={[
+                  styles.statusBadge,
+                  { backgroundColor: photoStatus.bgColor },
+                ]}
+              >
+                <Text style={[styles.statusText, { color: photoStatus.color }]}>
+                  {photoStatus.text}
+                </Text>
+              </View>
+            </TouchableOpacity>
 
-          {/* Song Card */}
-          <TouchableOpacity
-            style={styles.taskCard}
-            onPress={() => router.push("/song")}
-            activeOpacity={0.7}
-          >
-            <View style={styles.taskIcon}>
-              <Text style={styles.taskEmoji}>🎵</Text>
-            </View>
-            <View style={styles.taskContent}>
-              <Text style={styles.taskTitle}>{t("dashboard.song")}</Text>
-              <Text style={styles.taskDescription}>
-                {latestSelectedSong
-                  ? t("dashboard.songSelected", {
-                      name: latestSelectedSong.name,
-                    })
-                  : t("dashboard.songNotSelected")}
-              </Text>
-            </View>
-            <View
-              style={[
-                styles.statusBadge,
-                { backgroundColor: songStatus.bgColor },
-              ]}
+            {/* Song Card */}
+            <TouchableOpacity
+              style={styles.taskCard}
+              onPress={() => router.push("/song")}
+              activeOpacity={0.7}
             >
-              <Text style={[styles.statusText, { color: songStatus.color }]}>
-                {songStatus.text}
-              </Text>
-            </View>
-          </TouchableOpacity>
-        </Card>
+              <View style={styles.taskIcon}>
+                <Text style={styles.taskEmoji}>🎵</Text>
+              </View>
+              <View style={styles.taskContent}>
+                <Text style={styles.taskTitle}>{t("dashboard.song")}</Text>
+                <Text style={styles.taskDescription}>
+                  {latestSelectedSong
+                    ? t("dashboard.songSelected", {
+                        name: latestSelectedSong.name,
+                      })
+                    : t("dashboard.songNotSelected")}
+                </Text>
+              </View>
+              <View
+                style={[
+                  styles.statusBadge,
+                  { backgroundColor: songStatus.bgColor },
+                ]}
+              >
+                <Text style={[styles.statusText, { color: songStatus.color }]}>
+                  {songStatus.text}
+                </Text>
+              </View>
+            </TouchableOpacity>
+          </Card>
+        )}
 
-        <Button
-          title={
-            taskStatus.allTasksCompleted
-              ? t("dashboard.finish")
-              : t("dashboard.motivation")
-          }
-          onPress={() => router.push("/gift")}
-          disabled={!taskStatus.allTasksCompleted}
-        />
+        {/* Conditionally show button based on completion state */}
+        {!isCompleted ? (
+          <Button
+            title={
+              taskStatus.allTasksCompleted
+                ? t("dashboard.finish")
+                : t("dashboard.motivation")
+            }
+            onPress={() => router.push("/gift")}
+            disabled={!taskStatus.allTasksCompleted}
+          />
+        ) : (
+          <Card style={styles.completedContainer}>
+            {/* Show photos and songs still available after completion */}
+            <TouchableOpacity
+              style={styles.taskCard}
+              onPress={() => router.push("/photos")}
+              activeOpacity={0.7}
+            >
+              <View style={styles.taskIcon}>
+                <Text style={styles.taskEmoji}>📸</Text>
+              </View>
+              <View style={styles.taskContent}>
+                <Text style={styles.taskTitle}>{t("dashboard.photos")}</Text>
+              </View>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={styles.taskCard}
+              onPress={() => router.push("/song")}
+              activeOpacity={0.7}
+            >
+              <View style={styles.taskIcon}>
+                <Text style={styles.taskEmoji}>🎵</Text>
+              </View>
+              <View style={styles.taskContent}>
+                <Text style={styles.taskTitle}>{t("dashboard.song")}</Text>
+                <Text style={styles.taskDescription}>
+                  {latestSelectedSong
+                    ? t("dashboard.songSelected", {
+                        name: latestSelectedSong.name,
+                      })
+                    : t("dashboard.songNotSelected")}
+                </Text>
+              </View>
+            </TouchableOpacity>
+          </Card>
+        )}
       </ScrollView>
 
       <Modal
@@ -391,6 +444,9 @@ const styles = StyleSheet.create({
   statusText: {
     fontSize: 12,
     fontWeight: "600",
+  },
+  completedContainer: {
+    marginBottom: 30,
   },
   modalOverlay: {
     flex: 1,
