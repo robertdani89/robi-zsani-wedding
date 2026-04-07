@@ -30,7 +30,9 @@ export default function GalleryScreen() {
 
     try {
       const response = await apiService.getGalleryCollections();
-      setCollections(response);
+      setCollections(
+        response.filter((collection) => !collection.hiddenFromGallery),
+      );
     } catch (error) {
       console.error("Gallery collections error:", error);
       Alert.alert(

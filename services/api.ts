@@ -22,6 +22,9 @@ const getBaseUrl = () => {
 
 const API_BASE_URL = getBaseUrl();
 
+export const PUZZLE_COLLECTION_ID = "our-little-pets";
+export const PUZZLE_COLLECTION_NAME = "Our little pets";
+
 const RETRY_COUNT = 3;
 const RETRY_DELAY_MS = 700;
 const REQUEST_TIMEOUT_MS = 2500;
@@ -37,7 +40,7 @@ const isServerReachable = async (): Promise<boolean> => {
       const controller = new AbortController();
       timeoutId = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
 
-      const response = await fetch(`${API_BASE_URL}/questions`, {
+      const response = await fetch(`${API_BASE_URL}`, {
         method: "GET",
         signal: controller.signal,
       });
@@ -167,12 +170,13 @@ const MOCK_GALLERY_COLLECTIONS: GalleryCollection[] = [
     photoCount: 5,
   },
   {
-    id: "our-little-pets",
-    title: "Our little pets",
+    id: PUZZLE_COLLECTION_ID,
+    title: PUZZLE_COLLECTION_NAME,
     description:
       "Meet our beloved dogs, who are part of our family and often steal the spotlight!",
     thumbnailUrl: "https://picsum.photos/seed/our-little-pets/900/600",
     photoCount: 5,
+    hiddenFromGallery: true,
   },
 ];
 
@@ -315,7 +319,9 @@ class MockApiService {
 
   async getGalleryCollections(): Promise<GalleryCollection[]> {
     await this.delay();
-    return MOCK_GALLERY_COLLECTIONS;
+    return MOCK_GALLERY_COLLECTIONS.filter(
+      (collection) => !collection.hiddenFromGallery,
+    );
   }
 
   async getGalleryCollectionPhotos(
@@ -650,10 +656,12 @@ class ApiService {
   }
 
   private normalizeGalleryCollection(item: any): GalleryCollection {
+    const id = String(
+      item.id ?? item.slug ?? item.collectionId ?? item.name ?? Date.now(),
+    );
+
     return {
-      id: String(
-        item.id ?? item.slug ?? item.collectionId ?? item.name ?? Date.now(),
-      ),
+      id,
       title: String(item.title ?? item.name ?? item.label ?? "Gallery"),
       description: item.description ? String(item.description) : undefined,
       thumbnailUrl:
@@ -671,6 +679,8 @@ class ApiService {
           : Array.isArray(item.photos)
             ? item.photos.length
             : undefined,
+      hiddenFromGallery:
+        Boolean(item.hiddenFromGallery) || id === PUZZLE_COLLECTION_ID,
     };
   }
 
@@ -710,9 +720,9 @@ class ApiService {
           ? data.items
           : [];
 
-    return collections.map((item: any) =>
-      this.normalizeGalleryCollection(item),
-    );
+    return collections
+      .map((item: any) => this.normalizeGalleryCollection(item))
+      .filter((collection: GalleryCollection) => !collection.hiddenFromGallery);
   }
 
   async getGalleryCollectionPhotos(

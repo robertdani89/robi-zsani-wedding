@@ -48,6 +48,7 @@ export interface GalleryCollection {
   thumbnailUrl?: string;
   googlePhotosUrl?: string;
   photoCount?: number;
+  hiddenFromGallery?: boolean;
 }
 
 export interface GalleryPhoto {

@@ -2,7 +2,7 @@
   "expo": {
     "name": "Zsani & Robi Wedding",
     "slug": "robi-zsani-wedding",
-    "version": "1.0.5",
+    "version": "1.0.7",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
@@ -11,12 +11,10 @@
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
-    "assetBundlePatterns": [
-      "**/*"
-    ],
+    "assetBundlePatterns": ["**/*"],
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.robizsniwedding.app"
+      "bundleIdentifier": "com.stygianlamp.zsanirobiwedding"
     },
     "android": {
       "adaptiveIcon": {
@@ -32,7 +30,7 @@
         "android.permission.WRITE_EXTERNAL_STORAGE",
         "android.permission.RECORD_AUDIO"
       ],
-      "versionCode": 5
+      "versionCode": 7
     },
     "web": {
       "favicon": "./assets/favicon.png"

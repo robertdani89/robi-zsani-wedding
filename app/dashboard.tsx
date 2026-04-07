@@ -8,6 +8,10 @@ import {
   View,
   useWindowDimensions,
 } from "react-native";
+import apiService, {
+  PUZZLE_COLLECTION_ID,
+  PUZZLE_COLLECTION_NAME,
+} from "@/services/api";
 
 import Button from "@/components/Button";
 import Card from "@/components/Card";
@@ -267,6 +271,26 @@ export default function DashboardScreen() {
                   <Text style={styles.taskTitle}>{t("dashboard.gallery")}</Text>
                   <Text style={styles.taskDescription}>
                     {t("dashboard.galleryDescription")}
+                  </Text>
+                </View>
+              </View>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={[styles.taskCard, isSmallScreen && styles.taskCardSmall]}
+              onPress={() => router.push("/puzzle")}
+              activeOpacity={0.7}
+            >
+              <View
+                style={[styles.taskInfo, isSmallScreen && styles.taskInfoSmall]}
+              >
+                <View style={styles.taskIcon}>
+                  <Text style={styles.taskEmoji}>🧩</Text>
+                </View>
+                <View style={styles.taskContent}>
+                  <Text style={styles.taskTitle}>{t("dashboard.puzzle")}</Text>
+                  <Text style={styles.taskDescription}>
+                    {t("dashboard.puzzleDescription")}
                   </Text>
                 </View>
               </View>
