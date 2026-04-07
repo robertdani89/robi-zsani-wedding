@@ -100,6 +100,11 @@ export const TRANSLATIONS = {
     "common.cancel": "Cancel",
     "common.back": "← Back",
     "common.done": "Done ✓",
+    "common.reset": "Reset",
+    "common.resetDescription": "Start over and clear all your progress",
+    "common.resetConfirmTitle": "Reset progress?",
+    "common.resetConfirmMessage":
+      "This will delete all saved data and send you back to the first page.",
     "gift.missingGuestTitle": "Error",
     "gift.missingGuestMessage":
       "Guest data not found. Please identify yourself.",
@@ -282,6 +287,10 @@ export const TRANSLATIONS = {
     "common.cancel": "Mégse",
     "common.back": "← Vissza",
     "common.done": "Kész ✓",
+    "common.reset": "Reset",
+    "common.resetConfirmTitle": "Biztosan újrakezded?",
+    "common.resetConfirmMessage":
+      "Ez törli az összes mentett adatot, és visszaküld az első oldalra.",
     "gift.missingGuestTitle": "Hiba",
     "gift.missingGuestMessage":
       "Nem található vendég adat. Kérlek azonosítsd magad.",

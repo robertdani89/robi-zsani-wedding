@@ -1,4 +1,5 @@
 import {
+  Alert,
   Linking,
   Modal,
   ScrollView,
@@ -8,24 +9,23 @@ import {
   View,
   useWindowDimensions,
 } from "react-native";
-import apiService, {
-  PUZZLE_COLLECTION_ID,
-  PUZZLE_COLLECTION_NAME,
-} from "@/services/api";
 
 import Button from "@/components/Button";
 import Card from "@/components/Card";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
 import { StatusBar } from "expo-status-bar";
+import apiService from "@/services/api";
 import { useApp } from "@/context/AppContext";
 import { useFonts } from "expo-font";
 import { useLocalization } from "@/context/LocalizationContext";
 import { useRouter } from "expo-router";
 import { useState } from "react";
 
+apiService; // initialize API service to set up base URL and interceptors
+
 export default function DashboardScreen() {
   const router = useRouter();
-  const { state, getTaskStatus } = useApp();
+  const { state, getTaskStatus, resetApp } = useApp();
   const { t } = useLocalization();
   const taskStatus = getTaskStatus();
   const { width } = useWindowDimensions();
@@ -38,6 +38,27 @@ export default function DashboardScreen() {
   });
 
   const isCompleted = !!state.guest?.gotGiftAt;
+
+  const handleReset = () => {
+    Alert.alert(
+      t("common.resetConfirmTitle"),
+      t("common.resetConfirmMessage"),
+      [
+        {
+          text: t("common.cancel"),
+          style: "cancel",
+        },
+        {
+          text: t("common.reset"),
+          style: "destructive",
+          onPress: async () => {
+            await resetApp();
+            router.replace("/");
+          },
+        },
+      ],
+    );
+  };
 
   const getStatusBadge = (completed: boolean, inProgress: boolean) => {
     if (completed) {
@@ -335,6 +356,26 @@ export default function DashboardScreen() {
                 </View>
               </View>
             </TouchableOpacity>
+
+            <TouchableOpacity
+              style={[styles.taskCard, isSmallScreen && styles.taskCardSmall]}
+              onPress={handleReset}
+              activeOpacity={0.7}
+            >
+              <View
+                style={[styles.taskInfo, isSmallScreen && styles.taskInfoSmall]}
+              >
+                <View style={styles.taskIcon}>
+                  <Text style={styles.taskEmoji}>🔄</Text>
+                </View>
+                <View style={styles.taskContent}>
+                  <Text style={styles.taskTitle}>{t("common.reset")}</Text>
+                  <Text style={styles.taskDescription}>
+                    {t("common.resetDescription")}
+                  </Text>
+                </View>
+              </View>
+            </TouchableOpacity>
           </Card>
         )}
       </ScrollView>
@@ -532,6 +573,9 @@ const styles = StyleSheet.create({
   },
   completedContainer: {
     marginBottom: 30,
+  },
+  resetButton: {
+    marginTop: 8,
   },
   modalOverlay: {
     flex: 1,
