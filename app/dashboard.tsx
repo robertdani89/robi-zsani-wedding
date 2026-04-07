@@ -130,7 +130,6 @@ export default function DashboardScreen() {
         {!isCompleted && (
           <Card style={styles.tasksContainer}>
             <Text style={styles.sectionTitle}>{t("dashboard.tasks")}</Text>
-
             {/* Questions Card */}
             <TouchableOpacity
               style={[styles.taskCard, isSmallScreen && styles.taskCardSmall]}
@@ -168,7 +167,6 @@ export default function DashboardScreen() {
                 </Text>
               </View>
             </TouchableOpacity>
-
             {/* Photos Card */}
             <TouchableOpacity
               style={[styles.taskCard, isSmallScreen && styles.taskCardSmall]}
@@ -202,7 +200,6 @@ export default function DashboardScreen() {
                 </Text>
               </View>
             </TouchableOpacity>
-
             {/* Song Card */}
             <TouchableOpacity
               style={[styles.taskCard, isSmallScreen && styles.taskCardSmall]}
@@ -215,6 +212,7 @@ export default function DashboardScreen() {
                 <View style={styles.taskIcon}>
                   <Text style={styles.taskEmoji}>🎵</Text>
                 </View>
+
                 <View style={styles.taskContent}>
                   <Text style={styles.taskTitle}>{t("dashboard.song")}</Text>
                   <Text style={styles.taskDescription}>
@@ -254,6 +252,26 @@ export default function DashboardScreen() {
           />
         ) : (
           <Card style={styles.completedContainer}>
+            <TouchableOpacity
+              style={[styles.taskCard, isSmallScreen && styles.taskCardSmall]}
+              onPress={() => router.push("/galery")}
+              activeOpacity={0.7}
+            >
+              <View
+                style={[styles.taskInfo, isSmallScreen && styles.taskInfoSmall]}
+              >
+                <View style={styles.taskIcon}>
+                  <Text style={styles.taskEmoji}>🖼️</Text>
+                </View>
+                <View style={styles.taskContent}>
+                  <Text style={styles.taskTitle}>{t("dashboard.gallery")}</Text>
+                  <Text style={styles.taskDescription}>
+                    {t("dashboard.galleryDescription")}
+                  </Text>
+                </View>
+              </View>
+            </TouchableOpacity>
+
             {/* Show photos and songs still available after completion */}
             <TouchableOpacity
               style={[styles.taskCard, isSmallScreen && styles.taskCardSmall]}
@@ -267,7 +285,9 @@ export default function DashboardScreen() {
                   <Text style={styles.taskEmoji}>📸</Text>
                 </View>
                 <View style={styles.taskContent}>
-                  <Text style={styles.taskTitle}>{t("dashboard.photos")}</Text>
+                  <Text style={styles.taskTitle}>
+                    {t("dashboard.morePhotos")}
+                  </Text>
                 </View>
               </View>
             </TouchableOpacity>
@@ -284,14 +304,10 @@ export default function DashboardScreen() {
                   <Text style={styles.taskEmoji}>🎵</Text>
                 </View>
                 <View style={styles.taskContent}>
-                  <Text style={styles.taskTitle}>{t("dashboard.song")}</Text>
-                  <Text style={styles.taskDescription}>
-                    {latestSelectedSong
-                      ? t("dashboard.songSelected", {
-                          name: latestSelectedSong.name,
-                        })
-                      : t("dashboard.songNotSelected")}
+                  <Text style={styles.taskTitle}>
+                    {t("dashboard.moreSongs")}
                   </Text>
+                  <Text style={styles.taskDescription}></Text>
                 </View>
               </View>
             </TouchableOpacity>

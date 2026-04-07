@@ -45,7 +45,7 @@ export const getAnswerDisplay = (answer: Answer): string => {
   if (Array.isArray(answer.value)) {
     return answer.value.join(", ");
   }
-  return answer.value;
+  return String(answer.value);
 };
 
 /**

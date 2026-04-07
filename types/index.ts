@@ -41,6 +41,24 @@ export interface Photo {
   uploadedAt: string;
 }
 
+export interface GalleryCollection {
+  id: string;
+  title: string;
+  description?: string;
+  thumbnailUrl?: string;
+  googlePhotosUrl?: string;
+  photoCount?: number;
+}
+
+export interface GalleryPhoto {
+  id: string;
+  collectionId: string;
+  title?: string;
+  thumbnailUrl: string;
+  displayUrl: string;
+  fullUrl?: string;
+}
+
 export interface Song {
   id: string;
   spotifyId: string;

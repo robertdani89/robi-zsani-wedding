@@ -1,4 +1,13 @@
-import { Answer, Guest, Photo, Question, QuestionType, Song } from "@/types";
+import {
+  Answer,
+  GalleryCollection,
+  GalleryPhoto,
+  Guest,
+  Photo,
+  Question,
+  QuestionType,
+  Song,
+} from "@/types";
 
 import { Platform } from "react-native";
 
@@ -142,6 +151,46 @@ export const QUESTIONS: Question[] = [
   },
 ];
 
+const MOCK_GALLERY_COLLECTIONS: GalleryCollection[] = [
+  {
+    id: "preparations",
+    title: "Preparations",
+    description: "Making the rings and gifts.",
+    thumbnailUrl: "https://picsum.photos/seed/preparations/900/600",
+    photoCount: 5,
+  },
+  {
+    id: "the-couple",
+    title: "The couple",
+    description: "Our special moments together.",
+    thumbnailUrl: "https://picsum.photos/seed/the-couple/900/600",
+    photoCount: 5,
+  },
+  {
+    id: "our-little-pets",
+    title: "Our little pets",
+    description:
+      "Meet our beloved dogs, who are part of our family and often steal the spotlight!",
+    thumbnailUrl: "https://picsum.photos/seed/our-little-pets/900/600",
+    photoCount: 5,
+  },
+];
+
+const buildMockGalleryPhotos = (collectionId: string): GalleryPhoto[] =>
+  Array.from({ length: 5 }, (_, index) => {
+    const photoNumber = index + 1;
+    const seed = `${collectionId}-${photoNumber}`;
+
+    return {
+      id: `${collectionId}-${photoNumber}`,
+      collectionId,
+      title: `Photo ${photoNumber}`,
+      thumbnailUrl: `https://picsum.photos/seed/${seed}/240/180`,
+      displayUrl: `https://picsum.photos/seed/${seed}/1400/1000`,
+      fullUrl: `https://picsum.photos/seed/${seed}/2000/1400`,
+    };
+  });
+
 // ---------------------------------------------------------------------------
 // MockApiService
 // ---------------------------------------------------------------------------
@@ -262,6 +311,23 @@ class MockApiService {
 
   getPhotoThumbnailUrl(photoId: string): string {
     return `https://picsum.photos/seed/${photoId}/200/150`;
+  }
+
+  async getGalleryCollections(): Promise<GalleryCollection[]> {
+    await this.delay();
+    return MOCK_GALLERY_COLLECTIONS;
+  }
+
+  async getGalleryCollectionPhotos(
+    collectionId: string,
+  ): Promise<GalleryPhoto[]> {
+    await this.delay();
+    const selectedCollection =
+      MOCK_GALLERY_COLLECTIONS.find(
+        (collection) => collection.id === collectionId,
+      )?.id ?? MOCK_GALLERY_COLLECTIONS[0].id;
+
+    return buildMockGalleryPhotos(selectedCollection);
   }
 
   async getAllGuestsWithStats() {
@@ -567,6 +633,110 @@ class ApiService {
     return `${this.baseUrl}/photos/${photoId}/thumbnail`;
   }
 
+  private async fetchGalleryData<T>(endpoints: string[]): Promise<T> {
+    let lastError: unknown;
+
+    for (const endpoint of endpoints) {
+      try {
+        return await this.fetch<T>(endpoint);
+      } catch (error) {
+        lastError = error;
+      }
+    }
+
+    throw lastError instanceof Error
+      ? lastError
+      : new Error("Gallery endpoint not available.");
+  }
+
+  private normalizeGalleryCollection(item: any): GalleryCollection {
+    return {
+      id: String(
+        item.id ?? item.slug ?? item.collectionId ?? item.name ?? Date.now(),
+      ),
+      title: String(item.title ?? item.name ?? item.label ?? "Gallery"),
+      description: item.description ? String(item.description) : undefined,
+      thumbnailUrl:
+        item.thumbnailUrl ??
+        item.coverPhotoUrl ??
+        item.coverUrl ??
+        item.thumbnail ??
+        item.cover ??
+        undefined,
+      googlePhotosUrl:
+        item.googlePhotosUrl ?? item.externalUrl ?? item.shareUrl ?? undefined,
+      photoCount:
+        typeof item.photoCount === "number"
+          ? item.photoCount
+          : Array.isArray(item.photos)
+            ? item.photos.length
+            : undefined,
+    };
+  }
+
+  private normalizeGalleryPhoto(item: any, collectionId: string): GalleryPhoto {
+    const thumbnailUrl =
+      item.thumbnailUrl ?? item.thumbnail ?? item.previewUrl ?? item.url;
+    const displayUrl =
+      item.displayUrl ?? item.mediumUrl ?? item.previewUrl ?? item.url;
+
+    return {
+      id: String(
+        item.id ??
+          item.photoId ??
+          item.filename ??
+          `${collectionId}-${Date.now()}`,
+      ),
+      collectionId,
+      title: item.title ? String(item.title) : undefined,
+      thumbnailUrl: String(thumbnailUrl),
+      displayUrl: String(displayUrl),
+      fullUrl: item.fullUrl ?? item.originalUrl ?? item.url ?? undefined,
+    };
+  }
+
+  async getGalleryCollections(): Promise<GalleryCollection[]> {
+    const data: any = await this.fetchGalleryData([
+      "/gallery/collections",
+      "/galleries",
+      "/photos/collections",
+    ]);
+
+    const collections = Array.isArray(data)
+      ? data
+      : Array.isArray(data?.collections)
+        ? data.collections
+        : Array.isArray(data?.items)
+          ? data.items
+          : [];
+
+    return collections.map((item: any) =>
+      this.normalizeGalleryCollection(item),
+    );
+  }
+
+  async getGalleryCollectionPhotos(
+    collectionId: string,
+  ): Promise<GalleryPhoto[]> {
+    const data: any = await this.fetchGalleryData([
+      `/gallery/collections/${encodeURIComponent(collectionId)}/photos`,
+      `/galleries/${encodeURIComponent(collectionId)}/photos`,
+      `/photos/collections/${encodeURIComponent(collectionId)}`,
+    ]);
+
+    const photos = Array.isArray(data)
+      ? data
+      : Array.isArray(data?.photos)
+        ? data.photos
+        : Array.isArray(data?.items)
+          ? data.items
+          : [];
+
+    return photos.map((item: any) =>
+      this.normalizeGalleryPhoto(item, collectionId),
+    );
+  }
+
   async getAllGuestsWithStats(): Promise<
     {
       id: string;
@@ -724,6 +894,30 @@ class SmartApiService {
     }
 
     return this.api.getPhotoThumbnailUrl(photoId);
+  }
+
+  async getGalleryCollections(): Promise<GalleryCollection[]> {
+    const service = await this.getService();
+
+    try {
+      return await service.getGalleryCollections();
+    } catch (error) {
+      console.warn("Falling back to mock gallery collections:", error);
+      return this.mock.getGalleryCollections();
+    }
+  }
+
+  async getGalleryCollectionPhotos(
+    collectionId: string,
+  ): Promise<GalleryPhoto[]> {
+    const service = await this.getService();
+
+    try {
+      return await service.getGalleryCollectionPhotos(collectionId);
+    } catch (error) {
+      console.warn("Falling back to mock gallery photos:", error);
+      return this.mock.getGalleryCollectionPhotos(collectionId);
+    }
   }
 
   async getAllGuestsWithStats(): Promise<

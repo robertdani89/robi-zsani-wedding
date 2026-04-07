@@ -20,8 +20,8 @@ interface GuestSummary {
   createdAt: string;
   answerCount: number;
   photoCount: number;
-  hasSong: boolean;
-  songName: string | null;
+  hasSong?: boolean;
+  songName?: string | null;
 }
 
 export default function AdminScreen() {

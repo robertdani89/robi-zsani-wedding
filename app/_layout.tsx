@@ -29,7 +29,10 @@ export default function RootLayout() {
               <Stack.Screen name="dashboard" />
               <Stack.Screen name="questions" />
               <Stack.Screen name="photos" />
+              <Stack.Screen name="song" />
               <Stack.Screen name="gift" />
+              <Stack.Screen name="galery/index" />
+              <Stack.Screen name="galery/[id]" />
             </Stack>
           </ThemeProvider>
         </BackgroundWithLeaves>
