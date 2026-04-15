@@ -94,6 +94,9 @@ export default function DashboardScreen() {
 
   const songStatus = getStatusBadge(taskStatus.songSelected, false);
 
+  const maxName = state.guest?.name.split(" ").slice(0, 2).join(" ") ?? "";
+  const name = maxName.length > 20 ? "" : maxName;
+
   return (
     <View style={styles.container}>
       <StatusBar style="dark" />
@@ -105,7 +108,9 @@ export default function DashboardScreen() {
         <Card style={styles.header}>
           <View style={styles.headerTopRow}>
             <Text style={[styles.text, styles.greeting]}>
-              {t("dashboard.greeting", { name: state.guest?.name ?? "" })}
+              {name
+                ? t("dashboard.greetingWithName", { name })
+                : t("dashboard.greeting")}
             </Text>
 
             <TouchableOpacity
@@ -453,6 +458,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     borderWidth: 1,
     borderColor: "#D9C4A0",
+    marginLeft: 5,
   },
   settingsButtonText: {
     fontSize: 18,

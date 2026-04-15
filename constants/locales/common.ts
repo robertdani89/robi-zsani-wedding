@@ -22,7 +22,8 @@ export const TRANSLATIONS = {
     "identify.connectionErrorMessage":
       "Could not connect to the server. Please check your connection and try again.",
     "identify.privacyPolicy": "View Privacy Policy",
-    "dashboard.greeting": "Hi, {{name}}! 👋",
+    "dashboard.greeting": "Hi! 👋",
+    "dashboard.greetingWithName": "Hi, {{name}}! 👋",
     "dashboard.subtitle1": "We'll read every answer on our honeymoon",
     "dashboard.subtitle2": "Please don't let us get bored on the flight! 😉",
     "dashboard.completedSubtitle1": "Thank you!",
@@ -208,7 +209,8 @@ export const TRANSLATIONS = {
     "identify.connectionErrorMessage":
       "Nem sikerült kapcsolódni a szerverhez. Kérlek ellenőrizd a kapcsolatot és próbáld újra.",
     "identify.privacyPolicy": "Adatvédelmi szabályzat",
-    "dashboard.greeting": "Szia, {{name}}! 👋",
+    "dashboard.greeting": "Szia! 👋",
+    "dashboard.greetingWithName": "Szia, {{name}}! 👋",
     "dashboard.subtitle1": "Nászutunkon minden választ elolvasunk",
     "dashboard.subtitle2": "Kérlek, ne hagyd, hogy unatkozzunk a repülőn! 😉",
     "dashboard.completedSubtitle1": "Köszönjük!",

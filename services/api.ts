@@ -17,7 +17,6 @@ const getBaseUrl = () => {
   }
 
   return "https://homeharmonyhub.hu/api";
-  // return "http://192.168.0.232:8096/api";
 };
 
 const API_BASE_URL = getBaseUrl();
