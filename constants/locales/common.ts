@@ -125,6 +125,9 @@ export const TRANSLATIONS = {
       "If the machine did not give it to you, request assistance now.",
     "gift.gotGiftButton": "I got it",
     "gift.assistanceButton": "Request assistance",
+    "gift.assistanceSuccessTitle": "Help is on the way",
+    "gift.assistanceSuccessMessage":
+      "Your assistance request was sent successfully. Someone will come help you soon.",
     "gift.assistanceErrorTitle": "Assistance request failed",
     "gift.assistanceErrorMessage":
       "We could not send the assistance request. Your gift is still marked as given.",
@@ -325,6 +328,9 @@ export const TRANSLATIONS = {
       "Ha a gép nem adta ki, most tudsz segítséget kérni.",
     "gift.gotGiftButton": "Igen, megkaptam",
     "gift.assistanceButton": "Segítséget kérek",
+    "gift.assistanceSuccessTitle": "Úton van a segítség",
+    "gift.assistanceSuccessMessage":
+      "A segítségkérés sikeresen elküldve. Hamarosan odamegy valaki segíteni.",
     "gift.assistanceErrorTitle": "A segítségkérés nem sikerült",
     "gift.assistanceErrorMessage":
       "Nem sikerült elküldeni a segítségkérést. Az ajándékot ettől függetlenül kiadottnak tekintjük.",

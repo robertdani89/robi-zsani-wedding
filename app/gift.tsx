@@ -10,13 +10,13 @@ import {
 
 import Button from "@/components/Button";
 import Card from "@/components/Card";
+import type { Guest } from "@/types";
 import { StatusBar } from "expo-status-bar";
 import apiService from "@/services/api";
 import { useApp } from "@/context/AppContext";
 import { useLocalization } from "@/context/LocalizationContext";
 import { useRouter } from "expo-router";
 import { useState } from "react";
-import type { Guest } from "@/types";
 
 type GiftType = "gift_for_man" | "gift_for_ladies";
 
@@ -36,6 +36,7 @@ export default function GiftScreen() {
     gotGiftAt: string,
   ) => {
     setIsSubmitting(true);
+    let shouldReturnToDashboard = true;
 
     try {
       await apiService.requestGiftAssistance(guest.id, {
@@ -43,6 +44,20 @@ export default function GiftScreen() {
         gotGiftAt,
         typeOfGift: giftType,
       });
+
+      shouldReturnToDashboard = false;
+      setIsSubmitting(false);
+      Alert.alert(
+        t("gift.assistanceSuccessTitle"),
+        t("gift.assistanceSuccessMessage"),
+        [
+          {
+            text: t("common.done"),
+            onPress: () => router.replace("/dashboard"),
+          },
+        ],
+      );
+      return;
     } catch (error) {
       console.error("Gift assistance request error:", error);
       Alert.alert(
@@ -51,7 +66,9 @@ export default function GiftScreen() {
       );
     } finally {
       setIsSubmitting(false);
-      router.replace("/dashboard");
+      if (shouldReturnToDashboard) {
+        router.replace("/dashboard");
+      }
     }
   };
 
