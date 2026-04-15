@@ -92,8 +92,6 @@ export default function PhotosScreen() {
     try {
       const result = await ImagePicker.launchCameraAsync({
         mediaTypes: ImagePicker.MediaTypeOptions.Images,
-        allowsEditing: true,
-        aspect: [4, 3],
         quality: 0.8,
       });
 
@@ -119,17 +117,21 @@ export default function PhotosScreen() {
     const hasPermission = await requestPermissions();
     if (!hasPermission) return;
 
+    const remainingSlots = MAX_PHOTOS_ALLOWED - state.photos.length;
+
     setIsLoading(true);
     try {
       const result = await ImagePicker.launchImageLibraryAsync({
         mediaTypes: ImagePicker.MediaTypeOptions.Images,
-        allowsEditing: true,
-        aspect: [4, 3],
+        allowsMultipleSelection: true,
+        selectionLimit: remainingSlots,
         quality: 0.8,
       });
 
-      if (!result.canceled && result.assets[0]) {
-        await uploadPhotoToServer(result.assets[0].uri);
+      if (!result.canceled && result.assets.length > 0) {
+        for (const asset of result.assets.slice(0, remainingSlots)) {
+          await uploadPhotoToServer(asset.uri);
+        }
       }
     } catch (error) {
       Alert.alert(t("photos.errorTitle"), t("photos.uploadRetry"));
@@ -238,7 +240,7 @@ export default function PhotosScreen() {
         {state.photos.length > 0 && (
           <View style={styles.photosSection}>
             <Card style={styles.sectionTitle}>
-              <>{t("photos.yourPhotos")}</>
+              <Text>{t("photos.yourPhotos")}</Text>
             </Card>
             <View style={styles.photoGrid}>
               {state.photos.map((photo) => (

@@ -13,6 +13,7 @@ import React, {
   createContext,
   useContext,
   useEffect,
+  useRef,
   useState,
 } from "react";
 
@@ -51,6 +52,7 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     song: [],
     completedQuestions: new Set(),
   });
+  const photosRef = useRef<Photo[]>([]);
   const [isHydrated, setIsHydrated] = useState(false);
 
   const [assignedQuestions, setAssignedQuestionsState] = useState<Question[]>(
@@ -84,6 +86,8 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
         : parsedSong
           ? [parsedSong]
           : [];
+
+      photosRef.current = photos;
 
       setState({
         guest,
@@ -136,7 +140,8 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
 
   const addPhoto = async (photo: Photo) => {
     try {
-      const updatedPhotos = [...state.photos, photo];
+      const updatedPhotos = [...photosRef.current, photo];
+      photosRef.current = updatedPhotos;
       await AsyncStorage.setItem(
         STORAGE_KEYS.PHOTOS,
         JSON.stringify(updatedPhotos),
@@ -149,7 +154,8 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
 
   const removePhoto = async (photoId: string) => {
     try {
-      const updatedPhotos = state.photos.filter((p) => p.id !== photoId);
+      const updatedPhotos = photosRef.current.filter((p) => p.id !== photoId);
+      photosRef.current = updatedPhotos;
       await AsyncStorage.setItem(
         STORAGE_KEYS.PHOTOS,
         JSON.stringify(updatedPhotos),
@@ -240,6 +246,7 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
         STORAGE_KEYS.QUESTIONS,
         STORAGE_KEYS.SONG,
       ]);
+      photosRef.current = [];
       setState({
         guest: null,
         answers: [],

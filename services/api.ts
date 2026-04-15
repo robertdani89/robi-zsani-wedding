@@ -294,7 +294,7 @@ class MockApiService {
     _photoUri: string,
   ): Promise<UploadPhotoResponse> {
     await this.delay(800);
-    const id = `mock-photo-${Date.now()}`;
+    const id = `mock-photo-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
     return {
       id,
       filename: `${id}.jpg`,
