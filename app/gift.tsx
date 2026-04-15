@@ -1,6 +1,6 @@
 import {
-  ActivityIndicator,
   Alert,
+  Image,
   ScrollView,
   StyleSheet,
   Text,
@@ -16,6 +16,7 @@ import { useApp } from "@/context/AppContext";
 import { useLocalization } from "@/context/LocalizationContext";
 import { useRouter } from "expo-router";
 import { useState } from "react";
+import type { Guest } from "@/types";
 
 type GiftType = "gift_for_man" | "gift_for_ladies";
 
@@ -29,7 +30,78 @@ export default function GiftScreen() {
   );
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleGiveMe = async () => {
+  const handleRequestAssistance = async (
+    guest: Guest,
+    giftType: GiftType,
+    gotGiftAt: string,
+  ) => {
+    setIsSubmitting(true);
+
+    try {
+      await apiService.requestGiftAssistance(guest.id, {
+        requestedAt: new Date().toISOString(),
+        gotGiftAt,
+        typeOfGift: giftType,
+      });
+    } catch (error) {
+      console.error("Gift assistance request error:", error);
+      Alert.alert(
+        t("gift.assistanceErrorTitle"),
+        t("gift.assistanceErrorMessage"),
+      );
+    } finally {
+      setIsSubmitting(false);
+      router.replace("/dashboard");
+    }
+  };
+
+  const promptGiftOutcome = (
+    guest: Guest,
+    giftType: GiftType,
+    gotGiftAt: string,
+  ) => {
+    Alert.alert(t("gift.followUpTitle"), t("gift.followUpMessage"), [
+      {
+        text: t("gift.gotGiftButton"),
+        onPress: () => router.replace("/dashboard"),
+      },
+      {
+        text: t("gift.assistanceButton"),
+        onPress: () => {
+          void handleRequestAssistance(guest, giftType, gotGiftAt);
+        },
+      },
+    ]);
+  };
+
+  const submitGiftRequest = async (guest: Guest, giftType: GiftType) => {
+    setIsSubmitting(true);
+
+    try {
+      const gotGiftAt = new Date().toISOString();
+
+      const updatedGuest = await apiService.updateGuest(guest.id, {
+        gotGiftAt,
+        typeOfGift: giftType,
+      });
+
+      await setGuest({
+        ...guest,
+        ...updatedGuest,
+        gotGiftAt,
+        typeOfGift: giftType,
+      });
+
+      promptGiftOutcome(guest, giftType, gotGiftAt);
+    } catch (error) {
+      console.error("Gift update error:", error);
+      Alert.alert(t("gift.saveErrorTitle"), t("gift.saveErrorMessage"));
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleGiveMe = () => {
     if (!state.guest) {
       Alert.alert(t("gift.missingGuestTitle"), t("gift.missingGuestMessage"));
       router.replace("/identify");
@@ -44,30 +116,26 @@ export default function GiftScreen() {
       return;
     }
 
-    setIsSubmitting(true);
+    const guest = state.guest;
+    const giftType = selectedGiftType;
 
-    try {
-      const gotGiftAt = new Date().toISOString();
-
-      const updatedGuest = await apiService.updateGuest(state.guest.id, {
-        gotGiftAt,
-        typeOfGift: selectedGiftType,
-      });
-
-      await setGuest({
-        ...state.guest,
-        ...updatedGuest,
-        gotGiftAt,
-        typeOfGift: selectedGiftType,
-      });
-
-      router.replace("/dashboard");
-    } catch (error) {
-      console.error("Gift update error:", error);
-      Alert.alert(t("gift.saveErrorTitle"), t("gift.saveErrorMessage"));
-    } finally {
-      setIsSubmitting(false);
-    }
+    Alert.alert(
+      t("gift.confirmMachineTitle"),
+      t("gift.confirmMachineMessage"),
+      [
+        {
+          text: t("common.cancel"),
+          style: "cancel",
+        },
+        {
+          text: t("gift.confirmMachineButton"),
+          onPress: () => {
+            void submitGiftRequest(guest, giftType);
+          },
+        },
+      ],
+      { cancelable: true },
+    );
   };
 
   return (
@@ -98,11 +166,11 @@ export default function GiftScreen() {
 
         {!isGiftGiven && (
           <Card style={styles.machine}>
-            <View style={styles.placeholderBox}>
-              <Text style={styles.placeholderText}>
-                {t("gift.placeholder")}
-              </Text>
-            </View>
+            <Image
+              source={require("../assets/machine.jpg")}
+              style={styles.machineImage}
+              resizeMode="cover"
+            />
           </Card>
         )}
 
@@ -209,21 +277,11 @@ const styles = StyleSheet.create({
     color: "#7D5260",
     marginBottom: 24,
   },
-  placeholderBox: {
-    height: 180,
+  machineImage: {
+    width: "100%",
+    height: 260,
     borderRadius: 16,
-    borderWidth: 2,
-    borderColor: "#FFD1DC",
-    borderStyle: "dashed",
-    backgroundColor: "#FFF6F8",
-    alignItems: "center",
-    justifyContent: "center",
     marginBottom: 24,
-  },
-  placeholderText: {
-    color: "#A86C79",
-    fontSize: 16,
-    fontWeight: "600",
   },
   selectionCard: {
     backgroundColor: "#FFF",

@@ -242,6 +242,13 @@ class MockApiService {
     return updated;
   }
 
+  async requestGiftAssistance(
+    _guestId: string,
+    _payload: GiftAssistancePayload,
+  ): Promise<void> {
+    await this.delay();
+  }
+
   async getGuestQuestions(guestId: string): Promise<Question[]> {
     await this.delay();
     return QUESTIONS;
@@ -440,6 +447,12 @@ interface UpdateGuestPayload {
   completed?: boolean;
 }
 
+interface GiftAssistancePayload {
+  requestedAt?: string;
+  gotGiftAt?: string;
+  typeOfGift?: string;
+}
+
 interface UploadPhotoResponse {
   id: string;
   filename: string;
@@ -472,7 +485,17 @@ class ApiService {
       throw new Error(`API Error: ${response.status} - ${error}`);
     }
 
-    return response.json();
+    if (response.status === 204) {
+      return undefined as T;
+    }
+
+    const text = await response.text();
+
+    if (!text) {
+      return undefined as T;
+    }
+
+    return JSON.parse(text) as T;
   }
 
   async registerGuest(
@@ -507,6 +530,52 @@ class ApiService {
         body: JSON.stringify(payload),
       });
     }
+  }
+
+  async requestGiftAssistance(
+    guestId: string,
+    payload: GiftAssistancePayload,
+  ): Promise<void> {
+    const endpoints = [
+      {
+        path: `/guests/${guestId}/gift-assistance`,
+        body: payload,
+      },
+      {
+        path: `/guests/${guestId}/assistance`,
+        body: payload,
+      },
+      {
+        path: `/guests/${guestId}/assistance-request`,
+        body: payload,
+      },
+      {
+        path: "/gift-assistance",
+        body: { guestId, ...payload },
+      },
+      {
+        path: "/assistance-requests",
+        body: { guestId, ...payload },
+      },
+    ];
+
+    let lastError: unknown;
+
+    for (const endpoint of endpoints) {
+      try {
+        await this.fetch(endpoint.path, {
+          method: "POST",
+          body: JSON.stringify(endpoint.body),
+        });
+        return;
+      } catch (error) {
+        lastError = error;
+      }
+    }
+
+    throw lastError instanceof Error
+      ? lastError
+      : new Error("Failed to request gift assistance.");
   }
 
   async getGuestQuestions(guestId: string): Promise<Question[]> {
@@ -840,6 +909,14 @@ class SmartApiService {
   ): Promise<Guest> {
     const service = await this.getService();
     return service.updateGuest(guestId, payload);
+  }
+
+  async requestGiftAssistance(
+    guestId: string,
+    payload: GiftAssistancePayload,
+  ): Promise<void> {
+    const service = await this.getService();
+    return service.requestGiftAssistance(guestId, payload);
   }
 
   async getGuestQuestions(guestId: string): Promise<Question[]> {

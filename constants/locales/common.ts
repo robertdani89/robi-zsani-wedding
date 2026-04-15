@@ -116,6 +116,18 @@ export const TRANSLATIONS = {
     "gift.title": "Thank you!",
     "gift.subtitle": "Go to the gift machine!",
     "gift.placeholder": "Image placeholder",
+    "gift.confirmMachineTitle": "Are you at the machine?",
+    "gift.confirmMachineMessage":
+      "The gift will be given immediately after this request is sent.",
+    "gift.confirmMachineButton": "Yes, request gift",
+    "gift.followUpTitle": "Did you get the gift?",
+    "gift.followUpMessage":
+      "If the machine did not give it to you, request assistance now.",
+    "gift.gotGiftButton": "I got it",
+    "gift.assistanceButton": "Request assistance",
+    "gift.assistanceErrorTitle": "Assistance request failed",
+    "gift.assistanceErrorMessage":
+      "We could not send the assistance request. Your gift is still marked as given.",
     "gift.selectionTitle": "Choose your gift type:",
     "gift.forMen": "Gift for men / boys",
     "gift.forWomen": "Gift for women / girls",
@@ -304,6 +316,18 @@ export const TRANSLATIONS = {
     "gift.title": "Köszönjük!",
     "gift.subtitle": "Menj az ajándékadó géphez!",
     "gift.placeholder": "Kép helye (placeholder)",
+    "gift.confirmMachineTitle": "Ott állsz a gépnél?",
+    "gift.confirmMachineMessage":
+      "A kérés elküldése után az ajándék azonnal kiadásra kerül.",
+    "gift.confirmMachineButton": "Igen, kérem az ajándékot",
+    "gift.followUpTitle": "Megkaptad az ajándékot?",
+    "gift.followUpMessage":
+      "Ha a gép nem adta ki, most tudsz segítséget kérni.",
+    "gift.gotGiftButton": "Igen, megkaptam",
+    "gift.assistanceButton": "Segítséget kérek",
+    "gift.assistanceErrorTitle": "A segítségkérés nem sikerült",
+    "gift.assistanceErrorMessage":
+      "Nem sikerült elküldeni a segítségkérést. Az ajándékot ettől függetlenül kiadottnak tekintjük.",
     "gift.selectionTitle": "Válaszd ki az ajándék típusát:",
     "gift.forMen": "Ajándék férfiaknak / fiúknak",
     "gift.forWomen": "Ajándék hölgyeknek / lányoknak",
