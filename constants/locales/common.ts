@@ -333,7 +333,7 @@ export const TRANSLATIONS = {
       "A segítségkérés sikeresen elküldve. Hamarosan odamegy valaki segíteni.",
     "gift.assistanceErrorTitle": "A segítségkérés nem sikerült",
     "gift.assistanceErrorMessage":
-      "Nem sikerült elküldeni a segítségkérést. Az ajándékot ettől függetlenül kiadottnak tekintjük.",
+      "Nem sikerült elküldeni a segítségkérést. Kérlek szólj, Emmának, a ceremóniamesternek.",
     "gift.selectionTitle": "Válaszd ki az ajándék típusát:",
     "gift.forMen": "Ajándék férfiaknak / fiúknak",
     "gift.forWomen": "Ajándék hölgyeknek / lányoknak",

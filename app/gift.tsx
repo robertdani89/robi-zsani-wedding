@@ -1,6 +1,7 @@
 import {
   Alert,
   Image,
+  Platform,
   ScrollView,
   StyleSheet,
   Text,
@@ -30,6 +31,67 @@ export default function GiftScreen() {
   );
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  const showMessage = (
+    title: string,
+    message: string,
+    onDismiss?: () => void,
+  ) => {
+    if (Platform.OS === "web") {
+      window.alert(`${title}\n\n${message}`);
+      onDismiss?.();
+      return;
+    }
+
+    Alert.alert(title, message, [
+      {
+        text: t("common.done"),
+        onPress: onDismiss,
+      },
+    ]);
+  };
+
+  const showDecision = ({
+    title,
+    message,
+    confirmText,
+    cancelText,
+    onConfirm,
+    onCancel,
+  }: {
+    title: string;
+    message: string;
+    confirmText: string;
+    cancelText: string;
+    onConfirm: () => void;
+    onCancel?: () => void;
+  }) => {
+    if (Platform.OS === "web") {
+      const confirmed = window.confirm(
+        `${title}\n\n${message}\n\nOK = ${confirmText}\nCancel = ${cancelText}`,
+      );
+
+      if (confirmed) {
+        onConfirm();
+        return;
+      }
+
+      onCancel?.();
+      return;
+    }
+
+    Alert.alert(title, message, [
+      {
+        text: cancelText,
+        style: "cancel",
+        onPress: onCancel,
+      },
+      {
+        text: confirmText,
+        onPress: onConfirm,
+      },
+    ]);
+  };
+
   const handleRequestAssistance = async (
     guest: Guest,
     giftType: GiftType,
@@ -47,20 +109,15 @@ export default function GiftScreen() {
 
       shouldReturnToDashboard = false;
       setIsSubmitting(false);
-      Alert.alert(
+      showMessage(
         t("gift.assistanceSuccessTitle"),
         t("gift.assistanceSuccessMessage"),
-        [
-          {
-            text: t("common.done"),
-            onPress: () => router.replace("/dashboard"),
-          },
-        ],
+        () => router.replace("/dashboard"),
       );
       return;
     } catch (error) {
       console.error("Gift assistance request error:", error);
-      Alert.alert(
+      showMessage(
         t("gift.assistanceErrorTitle"),
         t("gift.assistanceErrorMessage"),
       );
@@ -77,18 +134,16 @@ export default function GiftScreen() {
     giftType: GiftType,
     gotGiftAt: string,
   ) => {
-    Alert.alert(t("gift.followUpTitle"), t("gift.followUpMessage"), [
-      {
-        text: t("gift.gotGiftButton"),
-        onPress: () => router.replace("/dashboard"),
+    showDecision({
+      title: t("gift.followUpTitle"),
+      message: t("gift.followUpMessage"),
+      confirmText: t("gift.gotGiftButton"),
+      cancelText: t("gift.assistanceButton"),
+      onConfirm: () => router.replace("/dashboard"),
+      onCancel: () => {
+        void handleRequestAssistance(guest, giftType, gotGiftAt);
       },
-      {
-        text: t("gift.assistanceButton"),
-        onPress: () => {
-          void handleRequestAssistance(guest, giftType, gotGiftAt);
-        },
-      },
-    ]);
+    });
   };
 
   const submitGiftRequest = async (guest: Guest, giftType: GiftType) => {
@@ -112,7 +167,7 @@ export default function GiftScreen() {
       promptGiftOutcome(guest, giftType, gotGiftAt);
     } catch (error) {
       console.error("Gift update error:", error);
-      Alert.alert(t("gift.saveErrorTitle"), t("gift.saveErrorMessage"));
+      showMessage(t("gift.saveErrorTitle"), t("gift.saveErrorMessage"));
     } finally {
       setIsSubmitting(false);
     }
@@ -120,13 +175,16 @@ export default function GiftScreen() {
 
   const handleGiveMe = () => {
     if (!state.guest) {
-      Alert.alert(t("gift.missingGuestTitle"), t("gift.missingGuestMessage"));
-      router.replace("/identify");
+      showMessage(
+        t("gift.missingGuestTitle"),
+        t("gift.missingGuestMessage"),
+        () => router.replace("/identify"),
+      );
       return;
     }
 
     if (!selectedGiftType) {
-      Alert.alert(
+      showMessage(
         t("gift.choiceRequiredTitle"),
         t("gift.choiceRequiredMessage"),
       );
@@ -136,23 +194,15 @@ export default function GiftScreen() {
     const guest = state.guest;
     const giftType = selectedGiftType;
 
-    Alert.alert(
-      t("gift.confirmMachineTitle"),
-      t("gift.confirmMachineMessage"),
-      [
-        {
-          text: t("common.cancel"),
-          style: "cancel",
-        },
-        {
-          text: t("gift.confirmMachineButton"),
-          onPress: () => {
-            void submitGiftRequest(guest, giftType);
-          },
-        },
-      ],
-      { cancelable: true },
-    );
+    showDecision({
+      title: t("gift.confirmMachineTitle"),
+      message: t("gift.confirmMachineMessage"),
+      confirmText: t("gift.confirmMachineButton"),
+      cancelText: t("common.cancel"),
+      onConfirm: () => {
+        void submitGiftRequest(guest, giftType);
+      },
+    });
   };
 
   return (

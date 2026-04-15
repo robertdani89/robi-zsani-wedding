@@ -23,7 +23,7 @@ import { useLocalization } from "@/context/LocalizationContext";
 import { useRouter } from "expo-router";
 import { useState } from "react";
 
-const ADMIN_SECRET = "zsanirobi";
+const ADMIN_SECRET = "zsanirobisecret";
 
 export default function IdentifyScreen() {
   const [name, setName] = useState("");
