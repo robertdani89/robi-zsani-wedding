@@ -24,6 +24,7 @@ import { useRouter } from "expo-router";
 import { useState } from "react";
 
 const ADMIN_SECRET = "zsanirobisecret";
+const ASSIST_SECRET = "nezemazenet";
 
 export default function IdentifyScreen() {
   const [name, setName] = useState("");
@@ -47,6 +48,11 @@ export default function IdentifyScreen() {
         t("identify.nameRequiredTitle"),
         t("identify.nameRequiredMessage"),
       );
+      return;
+    }
+
+    if (trimmedName.toLowerCase() === ASSIST_SECRET) {
+      router.replace("/assist");
       return;
     }
 

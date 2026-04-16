@@ -9,6 +9,7 @@ import {
   type GalleryPhoto,
   type GiftAssistancePayload,
   type Guest,
+  type PendingSongReview,
   type Photo,
   type Question,
   type Song,
@@ -149,7 +150,7 @@ const buildMockGalleryPhotos = (collectionId: string): GalleryPhoto[] =>
 export class MockApiService {
   private guests: Map<string, Guest> = new Map();
   private answers: Answer[] = [];
-  private songs: Map<string, Song> = new Map();
+  private songs: Map<string, PendingSongReview> = new Map();
 
   private delay(ms = 400): Promise<void> {
     return new Promise((resolve) => setTimeout(resolve, ms));
@@ -345,6 +346,7 @@ export class MockApiService {
     guestId: string;
   }): Promise<Song> {
     await this.delay();
+    const guest = this.guests.get(songData.guestId);
     const song: Song = {
       id: `mock-song-${Date.now()}`,
       spotifyId: songData.spotifyId,
@@ -355,7 +357,14 @@ export class MockApiService {
       previewUrl: songData.previewUrl,
       selectedAt: new Date().toISOString(),
     };
-    this.songs.set(songData.guestId, song);
+
+    this.songs.set(songData.guestId, {
+      ...song,
+      allowed: null,
+      guestId: songData.guestId,
+      guestName: guest?.name,
+    });
+
     return song;
   }
 
@@ -372,5 +381,38 @@ export class MockApiService {
         break;
       }
     }
+  }
+
+  async getNextPendingSong(): Promise<PendingSongReview | null> {
+    await this.delay();
+
+    for (const song of this.songs.values()) {
+      if (song.allowed === null || song.allowed === undefined) {
+        return song;
+      }
+    }
+
+    return null;
+  }
+
+  async updateSongAllowed(
+    songId: string,
+    allowed: boolean,
+  ): Promise<PendingSongReview> {
+    await this.delay();
+
+    for (const [guestId, song] of this.songs.entries()) {
+      if (song.id === songId) {
+        const updatedSong: PendingSongReview = {
+          ...song,
+          allowed,
+        };
+
+        this.songs.set(guestId, updatedSong);
+        return updatedSong;
+      }
+    }
+
+    throw new Error("Song not found.");
   }
 }

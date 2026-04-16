@@ -3,6 +3,7 @@ import {
   GalleryCollection,
   GalleryPhoto,
   Guest,
+  PendingSongReview,
   Photo,
   Question,
   Song,
@@ -191,6 +192,52 @@ class ApiService {
     }
 
     return JSON.parse(text) as T;
+  }
+
+  private normalizePendingSong(item: any): PendingSongReview | null {
+    if (!item) {
+      return null;
+    }
+
+    const guest = item.guest ?? item.requestedBy ?? item.user ?? null;
+    const name = item.name ?? item.title;
+    const artist = item.artist ?? item.artistName ?? item.artists;
+    const album = item.album ?? item.albumName ?? "";
+
+    return {
+      id: String(item.id ?? item.songId ?? ""),
+      spotifyId: String(item.spotifyId ?? item.spotify_id ?? ""),
+      name: String(name ?? "Unknown song"),
+      artist: String(artist ?? "Unknown artist"),
+      album: String(album),
+      albumArt:
+        item.albumArt ??
+        item.albumArtUrl ??
+        item.imageUrl ??
+        item.coverUrl ??
+        item.thumbnailUrl ??
+        undefined,
+      previewUrl: item.previewUrl ?? item.preview_url ?? undefined,
+      selectedAt: String(
+        item.selectedAt ?? item.createdAt ?? new Date().toISOString(),
+      ),
+      allowed:
+        typeof item.allowed === "boolean"
+          ? item.allowed
+          : item.allowed === null
+            ? null
+            : undefined,
+      guestId: item.guestId
+        ? String(item.guestId)
+        : guest?.id
+          ? String(guest.id)
+          : undefined,
+      guestName: item.guestName
+        ? String(item.guestName)
+        : guest?.name
+          ? String(guest.name)
+          : undefined,
+    };
   }
 
   async registerGuest(
@@ -643,6 +690,29 @@ class ApiService {
       method: "DELETE",
     });
   }
+
+  async getNextPendingSong(): Promise<PendingSongReview | null> {
+    const response = await this.fetch<any>("/songs/next-pending");
+    return this.normalizePendingSong(response);
+  }
+
+  async updateSongAllowed(
+    songId: string,
+    allowed: boolean,
+  ): Promise<PendingSongReview> {
+    const response = await this.fetch<any>(`/songs/${songId}/allowed`, {
+      method: "PATCH",
+      body: JSON.stringify({ allowed }),
+    });
+
+    const normalized = this.normalizePendingSong(response);
+
+    if (!normalized) {
+      throw new Error("Invalid song moderation response.");
+    }
+
+    return normalized;
+  }
 }
 
 class SmartApiService {
@@ -835,6 +905,19 @@ class SmartApiService {
   async deleteSong(songId: string): Promise<void> {
     const service = await this.getService();
     return service.deleteSong(songId);
+  }
+
+  async getNextPendingSong(): Promise<PendingSongReview | null> {
+    const service = await this.getService();
+    return service.getNextPendingSong();
+  }
+
+  async updateSongAllowed(
+    songId: string,
+    allowed: boolean,
+  ): Promise<PendingSongReview> {
+    const service = await this.getService();
+    return service.updateSongAllowed(songId, allowed);
   }
 }
 

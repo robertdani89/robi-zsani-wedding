@@ -72,6 +72,12 @@ export interface Song {
   selectedAt: string;
 }
 
+export interface PendingSongReview extends Song {
+  allowed?: boolean | null;
+  guestId?: string;
+  guestName?: string;
+}
+
 export interface AppState {
   guest: Guest | null;
   answers: Answer[];
