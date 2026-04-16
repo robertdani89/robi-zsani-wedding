@@ -44,18 +44,18 @@ export default function PhotosScreen() {
     return true;
   };
 
-  const uploadPhotoToServer = async (uri: string) => {
+  const uploadPhotoToServer = async (asset: ImagePicker.ImagePickerAsset) => {
     try {
-      setUploadingPhotoUri(uri);
+      setUploadingPhotoUri(asset.uri);
 
       // Upload to server
-      const serverPhoto = await apiService.uploadPhoto(state.guest!.id, uri);
+      const serverPhoto = await apiService.uploadPhoto(state.guest!.id, asset);
 
       // Save locally with server photo ID
       const newPhoto: Photo = {
         id: serverPhoto.id,
         guestId: state.guest!.id,
-        uri: uri, // Keep local URI for display
+        uri: asset.uri,
         uploadedAt: serverPhoto.createdAt,
       };
 
@@ -96,7 +96,7 @@ export default function PhotosScreen() {
       });
 
       if (!result.canceled && result.assets[0]) {
-        await uploadPhotoToServer(result.assets[0].uri);
+        await uploadPhotoToServer(result.assets[0]);
       }
     } catch (error) {
       Alert.alert(t("photos.errorTitle"), t("photos.uploadRetry"));
@@ -130,7 +130,7 @@ export default function PhotosScreen() {
 
       if (!result.canceled && result.assets.length > 0) {
         for (const asset of result.assets.slice(0, remainingSlots)) {
-          await uploadPhotoToServer(asset.uri);
+          await uploadPhotoToServer(asset);
         }
       }
     } catch (error) {

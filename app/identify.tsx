@@ -106,7 +106,7 @@ export default function IdentifyScreen() {
             {t("identify.nameLabel")}
           </Text>
           <TextInput
-            style={[styles.text, styles.input]}
+            style={[styles.input]}
             placeholder={t("identify.namePlaceholder")}
             placeholderTextColor="#999"
             value={name}

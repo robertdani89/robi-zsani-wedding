@@ -86,3 +86,39 @@ export interface TaskStatus {
   allTasksCompleted: boolean;
   progressPercentage: number;
 }
+
+export interface SpotifySearchResult {
+  spotifyId: string;
+  name: string;
+  artist: string;
+  album: string;
+  albumArt: string | null;
+  previewUrl: string | null;
+}
+
+export interface RegisterResponse {
+  guest: Guest;
+  questions: Question[];
+}
+
+export interface UpdateGuestPayload {
+  gotGiftAt?: string;
+  typeOfGift?: string;
+  completed?: boolean;
+}
+
+export interface GiftAssistancePayload {
+  requestedAt?: string;
+  gotGiftAt?: string;
+  typeOfGift?: string;
+}
+
+export interface UploadPhotoResponse {
+  id: string;
+  filename: string;
+  path: string;
+  mimetype: string;
+  size: number;
+  guestId: string;
+  createdAt: string;
+}

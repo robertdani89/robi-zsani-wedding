@@ -259,7 +259,7 @@ export const TRANSLATIONS = {
     "questions.answerRequiredMessage": "Kérlek adj meg választ a folytatáshoz.",
     "questions.thankYouTitle": "Köszönjük!",
     "questions.thankYouMessage":
-      "Minden kérdésre válaszoltál. Bármikor áttekintheted a válaszaidat.",
+      "Minden kérdésre válaszoltál. Lezárásig áttekintheted a válaszaidat.",
     "questions.submitErrorTitle": "Beküldési hiba",
     "questions.submitErrorMessage":
       "Nem sikerült beküldeni a válaszodat. Kérlek, ellenőrizd a kapcsolatot és próbáld újra.",
