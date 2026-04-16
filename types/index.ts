@@ -39,6 +39,7 @@ export interface Photo {
   guestId: string;
   uri: string;
   uploadedAt: string;
+  uploadFingerprint?: string;
 }
 
 export interface GalleryCollection {
@@ -111,6 +112,14 @@ export interface GiftAssistancePayload {
   requestedAt?: string;
   gotGiftAt?: string;
   typeOfGift?: string;
+}
+
+export interface UploadPhotoAsset {
+  uri: string;
+  fileName?: string | null;
+  mimeType?: string | null;
+  width?: number;
+  height?: number;
 }
 
 export interface UploadPhotoResponse {

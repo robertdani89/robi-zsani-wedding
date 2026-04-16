@@ -77,6 +77,9 @@ export const TRANSLATIONS = {
     "photos.uploadFailedTitle": "Upload Failed",
     "photos.uploadFailedMessage":
       "Could not upload the photo to the server. Please check your connection and try again.",
+    "photos.duplicateTitle": "Already uploaded",
+    "photos.duplicateMessage":
+      "This image was already uploaded. Please choose a different one.",
     "photos.errorTitle": "Error",
     "photos.uploadRetry": "Failed to upload the photo. Please try again.",
     "photos.limitTitle": "Limit Reached",
@@ -279,6 +282,9 @@ export const TRANSLATIONS = {
     "photos.uploadFailedTitle": "Feltöltés sikertelen",
     "photos.uploadFailedMessage":
       "Nem sikerült feltölteni a fotót a szerverre. Kérlek, ellenőrizd a kapcsolatot és próbáld újra.",
+    "photos.duplicateTitle": "Már feltöltötted",
+    "photos.duplicateMessage":
+      "Ezt a képet már feltöltötted. Kérlek válassz másikat.",
     "photos.errorTitle": "Hiba",
     "photos.uploadRetry":
       "Nem sikerült feltölteni a fotót. Kérlek próbáld újra.",

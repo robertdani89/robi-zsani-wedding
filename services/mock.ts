@@ -7,10 +7,15 @@ import {
   type Answer,
   type GalleryCollection,
   type GalleryPhoto,
+  type GiftAssistancePayload,
   type Guest,
   type Photo,
   type Question,
   type Song,
+  type SpotifySearchResult,
+  type UpdateGuestPayload,
+  type UploadPhotoAsset,
+  type UploadPhotoResponse,
 } from "@/types";
 import { PUZZLE_COLLECTION_ID, PUZZLE_COLLECTION_NAME } from "./constants";
 
@@ -234,7 +239,7 @@ export class MockApiService {
 
   async uploadPhoto(
     guestId: string,
-    _photoUri: string,
+    _photo: UploadPhotoAsset,
   ): Promise<UploadPhotoResponse> {
     await this.delay(800);
     const id = `mock-photo-${Date.now()}-${Math.floor(Math.random() * 1000)}`;

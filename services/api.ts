@@ -9,10 +9,14 @@ import {
   type GiftAssistancePayload,
   type RegisterResponse,
   type SpotifySearchResult,
+  type UploadPhotoAsset,
   type UpdateGuestPayload,
   type UploadPhotoResponse,
 } from "@/types";
 
+import * as FileSystem from "expo-file-system/legacy";
+import { SaveFormat, manipulateAsync } from "expo-image-manipulator";
+import { NetworkStateType, getNetworkStateAsync } from "expo-network";
 import { Platform } from "react-native";
 import { PUZZLE_COLLECTION_ID } from "./constants";
 import { MockApiService } from "./mock";
@@ -22,8 +26,8 @@ const getBaseUrl = () => {
     return "http://localhost:8096/api";
   }
 
-  // return "https://homeharmonyhub.hu/api";
-  return "http://192.168.0.140:8096/api";
+  return "https://homeharmonyhub.hu/api";
+  // return "http://192.168.0.140:8096/api";
 };
 
 const API_BASE_URL = getBaseUrl();
@@ -31,9 +35,96 @@ const API_BASE_URL = getBaseUrl();
 const RETRY_COUNT = 3;
 const RETRY_DELAY_MS = 700;
 const REQUEST_TIMEOUT_MS = 2500;
+const MAX_UPLOAD_DIMENSION = 1600;
+const UPLOAD_COMPRESS_QUALITY = 0.7;
 
 const delay = (ms: number): Promise<void> =>
   new Promise((resolve) => setTimeout(resolve, ms));
+
+const ALLOWED_IMAGE_EXTENSIONS = new Set([
+  "jpg",
+  "jpeg",
+  "png",
+  "gif",
+  "webp",
+  "heic",
+  "heif",
+]);
+
+const MIME_TYPE_BY_EXTENSION: Record<string, string> = {
+  gif: "image/gif",
+  heic: "image/heic",
+  heif: "image/heif",
+  jpeg: "image/jpeg",
+  jpg: "image/jpeg",
+  png: "image/png",
+  webp: "image/webp",
+};
+
+const EXTENSION_BY_MIME_TYPE: Record<string, string> = {
+  "image/gif": "gif",
+  "image/heic": "heic",
+  "image/heif": "heif",
+  "image/jpeg": "jpg",
+  "image/jpg": "jpg",
+  "image/png": "png",
+  "image/webp": "webp",
+};
+
+const sanitizeFileName = (value: string): string =>
+  value.replace(/[^a-zA-Z0-9._-]/g, "_");
+
+const getFileNameWithoutExtension = (fileName: string): string => {
+  const lastDotIndex = fileName.lastIndexOf(".");
+
+  if (lastDotIndex <= 0) {
+    return fileName;
+  }
+
+  return fileName.slice(0, lastDotIndex);
+};
+
+const getFileExtension = (fileName?: string | null): string | null => {
+  if (!fileName || !fileName.includes(".")) {
+    return null;
+  }
+
+  return fileName.split(".").pop()?.toLowerCase() ?? null;
+};
+
+const getUploadMetadata = (photo: UploadPhotoAsset) => {
+  const normalizedMimeType = photo.mimeType?.toLowerCase() ?? null;
+  const extensionFromMime = normalizedMimeType
+    ? EXTENSION_BY_MIME_TYPE[normalizedMimeType]
+    : undefined;
+  const extensionFromName = getFileExtension(photo.fileName);
+
+  const extension =
+    extensionFromMime ??
+    (extensionFromName && ALLOWED_IMAGE_EXTENSIONS.has(extensionFromName)
+      ? extensionFromName
+      : "jpg");
+
+  const mimeType =
+    normalizedMimeType ?? MIME_TYPE_BY_EXTENSION[extension] ?? "image/jpeg";
+  const fallbackName = `photo_${Date.now()}.${extension}`;
+  const providedName = photo.fileName ? sanitizeFileName(photo.fileName) : "";
+  const fileName = providedName || fallbackName;
+
+  return {
+    fileName,
+    mimeType,
+  };
+};
+
+const isCellularConnection = async (): Promise<boolean> => {
+  try {
+    const networkState = await getNetworkStateAsync();
+    return networkState.type === NetworkStateType.CELLULAR;
+  } catch {
+    return false;
+  }
+};
 
 const isServerReachable = async (): Promise<boolean> => {
   for (let attempt = 1; attempt <= RETRY_COUNT; attempt += 1) {
@@ -213,69 +304,155 @@ class ApiService {
     return this.fetch<Answer[]>(`/answers/guest/${guestId}`);
   }
 
+  private async resolveUploadUri(photo: UploadPhotoAsset): Promise<{
+    fileName: string;
+    mimeType: string;
+    uri: string;
+    temporaryUri?: string;
+  }> {
+    const { fileName, mimeType } = getUploadMetadata(photo);
+
+    if (Platform.OS !== "android" || !photo.uri.startsWith("content://")) {
+      return {
+        fileName,
+        mimeType,
+        uri: photo.uri,
+      };
+    }
+
+    if (!FileSystem.cacheDirectory) {
+      throw new Error("Upload cache directory is not available.");
+    }
+
+    const targetUri = `${FileSystem.cacheDirectory}upload-${Date.now()}-${Math.random()
+      .toString(36)
+      .slice(2)}-${fileName}`;
+
+    await FileSystem.copyAsync({
+      from: photo.uri,
+      to: targetUri,
+    });
+
+    return {
+      fileName,
+      mimeType,
+      uri: targetUri,
+      temporaryUri: targetUri,
+    };
+  }
+
+  private async optimizeUploadUri(photo: UploadPhotoAsset): Promise<{
+    fileName: string;
+    mimeType: string;
+    uri: string;
+    temporaryUri?: string;
+  }> {
+    const { fileName } = getUploadMetadata(photo);
+    const width = photo.width ?? 0;
+    const height = photo.height ?? 0;
+    const longestEdge = Math.max(width, height);
+    const shouldResize = longestEdge > MAX_UPLOAD_DIMENSION;
+
+    const result = await manipulateAsync(
+      photo.uri,
+      shouldResize
+        ? [
+            {
+              resize:
+                width >= height
+                  ? {
+                      width: MAX_UPLOAD_DIMENSION,
+                    }
+                  : {
+                      height: MAX_UPLOAD_DIMENSION,
+                    },
+            },
+          ]
+        : [],
+      {
+        compress: UPLOAD_COMPRESS_QUALITY,
+        format: SaveFormat.JPEG,
+      },
+    );
+
+    return {
+      fileName: `${getFileNameWithoutExtension(fileName)}.jpg`,
+      mimeType: "image/jpeg",
+      uri: result.uri,
+      temporaryUri: result.uri,
+    };
+  }
+
   async uploadPhoto(
     guestId: string,
-    photoUri: string,
+    photo: UploadPhotoAsset,
   ): Promise<UploadPhotoResponse> {
     const formData = new FormData();
-
-    const uriParts = photoUri.split("/");
-    let fileName = uriParts[uriParts.length - 1];
 
     const isWeb =
       typeof window !== "undefined" && typeof window.document !== "undefined";
 
     if (isWeb) {
-      const response = await fetch(photoUri);
+      const response = await fetch(photo.uri);
       const blob = await response.blob();
 
-      const blobMimeType = blob.type || "image/jpeg";
+      const { fileName, mimeType } = getUploadMetadata({
+        ...photo,
+        mimeType: blob.type || photo.mimeType,
+      });
+      const uploadBlob =
+        blob.type === mimeType ? blob : blob.slice(0, blob.size, mimeType);
 
-      let extension = "jpg";
-      if (blobMimeType.includes("png")) {
-        extension = "png";
-      } else if (blobMimeType.includes("gif")) {
-        extension = "gif";
-      } else if (blobMimeType.includes("webp")) {
-        extension = "webp";
-      } else if (
-        blobMimeType.includes("jpeg") ||
-        blobMimeType.includes("jpg")
-      ) {
-        extension = "jpg";
-      }
-
-      const webFileName = `photo_${Date.now()}.${extension}`;
-      formData.append("photo", blob, webFileName);
+      formData.append("photo", uploadBlob, fileName);
     } else {
-      let extension = fileName.split(".").pop()?.toLowerCase();
+      const normalizedPhoto = await this.resolveUploadUri(photo);
+      const shouldOptimizeUpload = await isCellularConnection();
+      const uploadPhoto = shouldOptimizeUpload
+        ? await this.optimizeUploadUri({
+            ...photo,
+            uri: normalizedPhoto.uri,
+            fileName: normalizedPhoto.fileName,
+            mimeType: normalizedPhoto.mimeType,
+          })
+        : normalizedPhoto;
 
-      if (
-        !extension ||
-        !["jpg", "jpeg", "png", "gif", "webp", "heic", "heif"].includes(
-          extension,
-        )
-      ) {
-        extension = "jpg";
-        fileName = `photo_${Date.now()}.jpg`;
+      try {
+        formData.append("photo", {
+          uri: uploadPhoto.uri,
+          name: uploadPhoto.fileName,
+          type: uploadPhoto.mimeType,
+        } as any);
+
+        formData.append("guestId", guestId);
+
+        const response = await fetch(`${this.baseUrl}/photos/upload`, {
+          method: "POST",
+          body: formData,
+        });
+
+        if (!response.ok) {
+          const error = await response.text();
+          throw new Error(`Upload failed: ${response.status} - ${error}`);
+        }
+
+        return response.json();
+      } finally {
+        if (
+          shouldOptimizeUpload &&
+          uploadPhoto.temporaryUri &&
+          uploadPhoto.temporaryUri !== normalizedPhoto.temporaryUri
+        ) {
+          await FileSystem.deleteAsync(uploadPhoto.temporaryUri, {
+            idempotent: true,
+          }).catch(() => undefined);
+        }
+
+        if (normalizedPhoto.temporaryUri) {
+          await FileSystem.deleteAsync(normalizedPhoto.temporaryUri, {
+            idempotent: true,
+          }).catch(() => undefined);
+        }
       }
-
-      let mimeType = "image/jpeg";
-      if (extension === "png") {
-        mimeType = "image/png";
-      } else if (extension === "gif") {
-        mimeType = "image/gif";
-      } else if (extension === "webp") {
-        mimeType = "image/webp";
-      } else if (extension === "heic" || extension === "heif") {
-        mimeType = "image/heic";
-      }
-
-      formData.append("photo", {
-        uri: photoUri,
-        name: fileName,
-        type: mimeType,
-      } as any);
     }
 
     formData.append("guestId", guestId);
@@ -556,10 +733,10 @@ class SmartApiService {
 
   async uploadPhoto(
     guestId: string,
-    photoUri: string,
+    photo: UploadPhotoAsset,
   ): Promise<UploadPhotoResponse> {
     const service = await this.getService();
-    return service.uploadPhoto(guestId, photoUri);
+    return service.uploadPhoto(guestId, photo);
   }
 
   async getGuestPhotos(guestId: string): Promise<Photo[]> {

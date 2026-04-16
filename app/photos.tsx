@@ -23,6 +23,22 @@ import { useLocalization } from "@/context/LocalizationContext";
 import { useRouter } from "expo-router";
 import { useState } from "react";
 
+const buildPhotoFingerprint = (asset: ImagePicker.ImagePickerAsset): string => {
+  if (asset.assetId) {
+    return `asset:${asset.assetId}`;
+  }
+
+  const fileName = asset.fileName?.trim().toLowerCase() ?? "";
+  const fileSize = asset.fileSize ?? 0;
+  const mimeType = asset.mimeType?.trim().toLowerCase() ?? "";
+
+  if (fileName || fileSize || mimeType) {
+    return `meta:${fileName}:${fileSize}:${mimeType}`;
+  }
+
+  return `uri:${asset.uri}`;
+};
+
 export default function PhotosScreen() {
   const router = useRouter();
   const { state, addPhoto, removePhoto } = useApp();
@@ -35,6 +51,13 @@ export default function PhotosScreen() {
   const [photoToDelete, setPhotoToDelete] = useState<string | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
 
+  const isAlreadyUploaded = (asset: ImagePicker.ImagePickerAsset) => {
+    const fingerprint = buildPhotoFingerprint(asset);
+    return state.photos.some(
+      (photo) => photo.uploadFingerprint === fingerprint,
+    );
+  };
+
   const requestPermissions = async () => {
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (status !== "granted") {
@@ -45,6 +68,13 @@ export default function PhotosScreen() {
   };
 
   const uploadPhotoToServer = async (asset: ImagePicker.ImagePickerAsset) => {
+    if (isAlreadyUploaded(asset)) {
+      Alert.alert(t("photos.duplicateTitle"), t("photos.duplicateMessage"));
+      return false;
+    }
+
+    const uploadFingerprint = buildPhotoFingerprint(asset);
+
     try {
       setUploadingPhotoUri(asset.uri);
 
@@ -57,6 +87,7 @@ export default function PhotosScreen() {
         guestId: state.guest!.id,
         uri: asset.uri,
         uploadedAt: serverPhoto.createdAt,
+        uploadFingerprint,
       };
 
       await addPhoto(newPhoto);
@@ -129,7 +160,24 @@ export default function PhotosScreen() {
       });
 
       if (!result.canceled && result.assets.length > 0) {
+        const seenFingerprints = new Set(
+          state.photos
+            .map((photo) => photo.uploadFingerprint)
+            .filter((value): value is string => Boolean(value)),
+        );
+
         for (const asset of result.assets.slice(0, remainingSlots)) {
+          const fingerprint = buildPhotoFingerprint(asset);
+
+          if (seenFingerprints.has(fingerprint)) {
+            Alert.alert(
+              t("photos.duplicateTitle"),
+              t("photos.duplicateMessage"),
+            );
+            continue;
+          }
+
+          seenFingerprints.add(fingerprint);
           await uploadPhotoToServer(asset);
         }
       }
