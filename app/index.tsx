@@ -37,7 +37,7 @@ export default function WelcomeScreen() {
   }
 
   const handleGetStarted = () => {
-    router.push("/identify");
+    router.replace("/identify");
   };
 
   return (

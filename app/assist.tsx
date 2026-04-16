@@ -366,7 +366,6 @@ const styles = StyleSheet.create({
     right: 18,
     bottom: 18,
     borderRadius: 24,
-    backgroundColor: "rgba(125, 82, 96, 0.14)",
   },
   songCardWrapper: {
     width: "100%",
