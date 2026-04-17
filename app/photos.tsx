@@ -122,7 +122,7 @@ export default function PhotosScreen() {
     setIsLoading(true);
     try {
       const result = await ImagePicker.launchCameraAsync({
-        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        mediaTypes: "images",
         quality: 0.8,
       });
 
@@ -153,7 +153,7 @@ export default function PhotosScreen() {
     setIsLoading(true);
     try {
       const result = await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        mediaTypes: "images",
         allowsMultipleSelection: true,
         selectionLimit: remainingSlots,
         quality: 0.8,

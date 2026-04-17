@@ -8,6 +8,7 @@ import {
   Question,
   Song,
   type GiftAssistancePayload,
+  type GiftType,
   type RegisterResponse,
   type SpotifySearchResult,
   type UploadPhotoAsset,
@@ -27,8 +28,9 @@ const getBaseUrl = () => {
     return "http://localhost:8096/api";
   }
 
-  return "https://homeharmonyhub.hu/api";
+  // return "https://homeharmonyhub.hu/api";
   // return "http://192.168.0.140:8096/api";
+  return "http://192.168.0.232:8096/api";
 };
 
 const API_BASE_URL = getBaseUrl();
@@ -318,6 +320,13 @@ class ApiService {
     throw lastError instanceof Error
       ? lastError
       : new Error("Failed to request gift assistance.");
+  }
+
+  async openGift(guestId: string, giftType: GiftType): Promise<void> {
+    await this.fetch("/gift/open", {
+      method: "POST",
+      body: JSON.stringify({ guestId, giftType }),
+    });
   }
 
   async getGuestQuestions(guestId: string): Promise<Question[]> {
@@ -770,6 +779,11 @@ class SmartApiService {
   ): Promise<void> {
     const service = await this.getService();
     return service.requestGiftAssistance(guestId, payload);
+  }
+
+  async openGift(guestId: string, giftType: GiftType): Promise<void> {
+    const service = await this.getService();
+    return service.openGift(guestId, giftType);
   }
 
   async getGuestQuestions(guestId: string): Promise<Question[]> {

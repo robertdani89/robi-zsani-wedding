@@ -11,15 +11,13 @@ import {
 
 import Button from "@/components/Button";
 import Card from "@/components/Card";
-import type { Guest } from "@/types";
+import type { GiftType, Guest } from "@/types";
 import { StatusBar } from "expo-status-bar";
 import apiService from "@/services/api";
 import { useApp } from "@/context/AppContext";
 import { useLocalization } from "@/context/LocalizationContext";
 import { useRouter } from "expo-router";
 import { useState } from "react";
-
-type GiftType = "gift_for_man" | "gift_for_ladies";
 
 export default function GiftScreen() {
   const router = useRouter();
@@ -150,21 +148,23 @@ export default function GiftScreen() {
     setIsSubmitting(true);
 
     try {
-      const gotGiftAt = new Date().toISOString();
+      await apiService.openGift(guest.id, giftType);
 
-      const updatedGuest = await apiService.updateGuest(guest.id, {
-        gotGiftAt,
-        typeOfGift: giftType,
-      });
+      const refreshedGuest = await apiService.getGuest(guest.id);
 
       await setGuest({
         ...guest,
-        ...updatedGuest,
-        gotGiftAt,
-        typeOfGift: giftType,
+        ...refreshedGuest,
       });
 
-      promptGiftOutcome(guest, giftType, gotGiftAt);
+      promptGiftOutcome(
+        {
+          ...guest,
+          ...refreshedGuest,
+        },
+        giftType,
+        refreshedGuest.gotGiftAt ?? new Date().toISOString(),
+      );
     } catch (error) {
       console.error("Gift update error:", error);
       showMessage(t("gift.saveErrorTitle"), t("gift.saveErrorMessage"));

@@ -8,6 +8,7 @@ import {
   type GalleryCollection,
   type GalleryPhoto,
   type GiftAssistancePayload,
+  type GiftType,
   type Guest,
   type PendingSongReview,
   type Photo,
@@ -196,6 +197,17 @@ export class MockApiService {
     _payload: GiftAssistancePayload,
   ): Promise<void> {
     await this.delay();
+  }
+
+  async openGift(guestId: string, giftType: GiftType): Promise<void> {
+    await this.delay();
+    const existing =
+      this.guests.get(guestId) ?? this.makeGuest(guestId, "Teszt Vendég");
+    this.guests.set(guestId, {
+      ...existing,
+      gotGiftAt: new Date().toISOString(),
+      typeOfGift: giftType,
+    });
   }
 
   async getGuestQuestions(guestId: string): Promise<Question[]> {
