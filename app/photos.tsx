@@ -67,9 +67,16 @@ export default function PhotosScreen() {
     return true;
   };
 
+  const MAX_PHOTO_SIZE_BYTES = 10 * 1024 * 1024; // 10 MB
+
   const uploadPhotoToServer = async (asset: ImagePicker.ImagePickerAsset) => {
     if (isAlreadyUploaded(asset)) {
       Alert.alert(t("photos.duplicateTitle"), t("photos.duplicateMessage"));
+      return false;
+    }
+
+    if (asset.fileSize && asset.fileSize > MAX_PHOTO_SIZE_BYTES) {
+      Alert.alert(t("photos.tooLargeTitle"), t("photos.tooLargeMessage"));
       return false;
     }
 

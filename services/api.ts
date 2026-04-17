@@ -18,7 +18,6 @@ import {
 
 import * as FileSystem from "expo-file-system/legacy";
 import { SaveFormat, manipulateAsync } from "expo-image-manipulator";
-import { NetworkStateType, getNetworkStateAsync } from "expo-network";
 import { Platform } from "react-native";
 import { PUZZLE_COLLECTION_ID } from "./constants";
 import { MockApiService } from "./mock";
@@ -28,9 +27,9 @@ const getBaseUrl = () => {
     return "http://localhost:8096/api";
   }
 
-  // return "https://homeharmonyhub.hu/api";
+  return "https://homeharmonyhub.hu/api";
   // return "http://192.168.0.140:8096/api";
-  return "http://192.168.0.232:8096/api";
+  // return "http://192.168.0.232:8096/api";
 };
 
 const API_BASE_URL = getBaseUrl();
@@ -39,7 +38,7 @@ const RETRY_COUNT = 3;
 const RETRY_DELAY_MS = 700;
 const REQUEST_TIMEOUT_MS = 2500;
 const MAX_UPLOAD_DIMENSION = 1600;
-const UPLOAD_COMPRESS_QUALITY = 0.7;
+const UPLOAD_COMPRESS_QUALITY = 0.8;
 
 const delay = (ms: number): Promise<void> =>
   new Promise((resolve) => setTimeout(resolve, ms));
@@ -118,15 +117,6 @@ const getUploadMetadata = (photo: UploadPhotoAsset) => {
     fileName,
     mimeType,
   };
-};
-
-const isCellularConnection = async (): Promise<boolean> => {
-  try {
-    const networkState = await getNetworkStateAsync();
-    return networkState.type === NetworkStateType.CELLULAR;
-  } catch {
-    return false;
-  }
 };
 
 const isServerReachable = async (): Promise<boolean> => {
@@ -461,16 +451,7 @@ class ApiService {
 
       formData.append("photo", uploadBlob, fileName);
     } else {
-      const normalizedPhoto = await this.resolveUploadUri(photo);
-      const shouldOptimizeUpload = await isCellularConnection();
-      const uploadPhoto = shouldOptimizeUpload
-        ? await this.optimizeUploadUri({
-            ...photo,
-            uri: normalizedPhoto.uri,
-            fileName: normalizedPhoto.fileName,
-            mimeType: normalizedPhoto.mimeType,
-          })
-        : normalizedPhoto;
+      const uploadPhoto = await this.resolveUploadUri(photo);
 
       try {
         formData.append("photo", {
@@ -493,18 +474,8 @@ class ApiService {
 
         return response.json();
       } finally {
-        if (
-          shouldOptimizeUpload &&
-          uploadPhoto.temporaryUri &&
-          uploadPhoto.temporaryUri !== normalizedPhoto.temporaryUri
-        ) {
+        if (uploadPhoto.temporaryUri) {
           await FileSystem.deleteAsync(uploadPhoto.temporaryUri, {
-            idempotent: true,
-          }).catch(() => undefined);
-        }
-
-        if (normalizedPhoto.temporaryUri) {
-          await FileSystem.deleteAsync(normalizedPhoto.temporaryUri, {
             idempotent: true,
           }).catch(() => undefined);
         }

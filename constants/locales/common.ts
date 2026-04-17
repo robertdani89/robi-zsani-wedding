@@ -77,6 +77,9 @@ export const TRANSLATIONS = {
     "photos.uploadFailedTitle": "Upload Failed",
     "photos.uploadFailedMessage":
       "Could not upload the photo to the server. Please check your connection and try again.",
+    "photos.tooLargeTitle": "Photo too large",
+    "photos.tooLargeMessage":
+      "This photo exceeds the 10 MB limit. Please choose a smaller photo.",
     "photos.duplicateTitle": "Already uploaded",
     "photos.duplicateMessage":
       "This image was already uploaded. Please choose a different one.",
@@ -297,6 +300,9 @@ export const TRANSLATIONS = {
     "photos.uploadFailedTitle": "Feltöltés sikertelen",
     "photos.uploadFailedMessage":
       "Nem sikerült feltölteni a fotót a szerverre. Kérlek, ellenőrizd a kapcsolatot és próbáld újra.",
+    "photos.tooLargeTitle": "Túl nagy a fotó",
+    "photos.tooLargeMessage":
+      "Ez a fotó meghaladja a 10 MB-os limitet. Kérlek válassz kisebbet.",
     "photos.duplicateTitle": "Már feltöltötted",
     "photos.duplicateMessage":
       "Ezt a képet már feltöltötted. Kérlek válassz másikat.",
