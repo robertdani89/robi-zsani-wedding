@@ -8,10 +8,10 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import type { GiftType, Guest } from "@/types";
 
 import Button from "@/components/Button";
 import Card from "@/components/Card";
-import type { GiftType, Guest } from "@/types";
 import { StatusBar } from "expo-status-bar";
 import apiService from "@/services/api";
 import { useApp } from "@/context/AppContext";
@@ -148,7 +148,12 @@ export default function GiftScreen() {
     setIsSubmitting(true);
 
     try {
-      await apiService.openGift(guest.id, giftType);
+      const result = await apiService.openGift(guest.id, giftType);
+
+      if (result.status !== "success") {
+        showMessage(t("questions.errorTitle"), result.message);
+        return;
+      }
 
       const refreshedGuest = await apiService.getGuest(guest.id);
 

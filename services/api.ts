@@ -312,8 +312,11 @@ class ApiService {
       : new Error("Failed to request gift assistance.");
   }
 
-  async openGift(guestId: string, giftType: GiftType): Promise<void> {
-    await this.fetch("/gift/open", {
+  async openGift(
+    guestId: string,
+    giftType: GiftType,
+  ): Promise<{ status: string; message: string }> {
+    return this.fetch<{ status: string; message: string }>("/gift/open", {
       method: "POST",
       body: JSON.stringify({ guestId, giftType }),
     });
@@ -752,7 +755,10 @@ class SmartApiService {
     return service.requestGiftAssistance(guestId, payload);
   }
 
-  async openGift(guestId: string, giftType: GiftType): Promise<void> {
+  async openGift(
+    guestId: string,
+    giftType: GiftType,
+  ): Promise<{ status: string; message: string }> {
     const service = await this.getService();
     return service.openGift(guestId, giftType);
   }
