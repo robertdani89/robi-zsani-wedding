@@ -202,7 +202,7 @@ export class MockApiService {
   async openGift(
     guestId: string,
     giftType: GiftType,
-  ): Promise<{ status: string; message: string }> {
+  ): Promise<{ status: string; message?: string }> {
     await this.delay();
     const existing =
       this.guests.get(guestId) ?? this.makeGuest(guestId, "Teszt Vendég");
@@ -211,7 +211,7 @@ export class MockApiService {
       gotGiftAt: new Date().toISOString(),
       typeOfGift: giftType,
     });
-    return { status: "success", message: "Gift opened successfully." };
+    return { status: "ok" };
   }
 
   async getGuestQuestions(guestId: string): Promise<Question[]> {

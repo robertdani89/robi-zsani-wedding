@@ -315,8 +315,8 @@ class ApiService {
   async openGift(
     guestId: string,
     giftType: GiftType,
-  ): Promise<{ status: string; message: string }> {
-    return this.fetch<{ status: string; message: string }>("/gift/open", {
+  ): Promise<{ status: string; message?: string }> {
+    return this.fetch<{ status: string; message?: string }>("/gift/open", {
       method: "POST",
       body: JSON.stringify({ guestId, giftType }),
     });
@@ -758,7 +758,7 @@ class SmartApiService {
   async openGift(
     guestId: string,
     giftType: GiftType,
-  ): Promise<{ status: string; message: string }> {
+  ): Promise<{ status: string; message?: string }> {
     const service = await this.getService();
     return service.openGift(guestId, giftType);
   }

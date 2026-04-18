@@ -150,8 +150,11 @@ export default function GiftScreen() {
     try {
       const result = await apiService.openGift(guest.id, giftType);
 
-      if (result.status !== "success") {
-        showMessage(t("questions.errorTitle"), result.message);
+      if (result.status !== "ok") {
+        showMessage(
+          t("questions.errorTitle"),
+          result.message || "Unknown error",
+        );
         return;
       }
 
