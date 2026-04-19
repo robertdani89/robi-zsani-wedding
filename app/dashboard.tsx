@@ -38,6 +38,7 @@ export default function DashboardScreen() {
   });
 
   const isCompleted = !!state.guest?.gotGiftAt;
+  const hideReset = new Date() >= new Date("2026-05-01");
 
   const handleReset = () => {
     Alert.alert(
@@ -362,25 +363,30 @@ export default function DashboardScreen() {
               </View>
             </TouchableOpacity>
 
-            <TouchableOpacity
-              style={[styles.taskCard, isSmallScreen && styles.taskCardSmall]}
-              onPress={handleReset}
-              activeOpacity={0.7}
-            >
-              <View
-                style={[styles.taskInfo, isSmallScreen && styles.taskInfoSmall]}
+            {!hideReset && (
+              <TouchableOpacity
+                style={[styles.taskCard, isSmallScreen && styles.taskCardSmall]}
+                onPress={handleReset}
+                activeOpacity={0.7}
               >
-                <View style={styles.taskIcon}>
-                  <Text style={styles.taskEmoji}>🔄</Text>
+                <View
+                  style={[
+                    styles.taskInfo,
+                    isSmallScreen && styles.taskInfoSmall,
+                  ]}
+                >
+                  <View style={styles.taskIcon}>
+                    <Text style={styles.taskEmoji}>🔄</Text>
+                  </View>
+                  <View style={styles.taskContent}>
+                    <Text style={styles.taskTitle}>{t("common.reset")}</Text>
+                    <Text style={styles.taskDescription}>
+                      {t("common.resetDescription")}
+                    </Text>
+                  </View>
                 </View>
-                <View style={styles.taskContent}>
-                  <Text style={styles.taskTitle}>{t("common.reset")}</Text>
-                  <Text style={styles.taskDescription}>
-                    {t("common.resetDescription")}
-                  </Text>
-                </View>
-              </View>
-            </TouchableOpacity>
+              </TouchableOpacity>
+            )}
           </Card>
         )}
       </ScrollView>
