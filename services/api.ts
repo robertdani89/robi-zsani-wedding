@@ -315,10 +315,11 @@ class ApiService {
   async openGift(
     guestId: string,
     giftType: GiftType,
+    childGiftType?: GiftType,
   ): Promise<{ status: string; message?: string }> {
     return this.fetch<{ status: string; message?: string }>("/gift/open", {
       method: "POST",
-      body: JSON.stringify({ guestId, giftType }),
+      body: JSON.stringify({ guestId, giftType, childGiftType }),
     });
   }
 
@@ -758,9 +759,10 @@ class SmartApiService {
   async openGift(
     guestId: string,
     giftType: GiftType,
+    childGiftType?: GiftType,
   ): Promise<{ status: string; message?: string }> {
     const service = await this.getService();
-    return service.openGift(guestId, giftType);
+    return service.openGift(guestId, giftType, childGiftType);
   }
 
   async getGuestQuestions(guestId: string): Promise<Question[]> {

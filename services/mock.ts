@@ -202,6 +202,7 @@ export class MockApiService {
   async openGift(
     guestId: string,
     giftType: GiftType,
+    childGiftType?: GiftType,
   ): Promise<{ status: string; message?: string }> {
     await this.delay();
     const existing =

@@ -27,6 +27,8 @@ export default function GiftScreen() {
   const [selectedGiftType, setSelectedGiftType] = useState<GiftType | null>(
     null,
   );
+  const [alsoForChild, setAlsoForChild] = useState(false);
+  const [childGiftType, setChildGiftType] = useState<GiftType | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const showMessage = (
@@ -94,6 +96,7 @@ export default function GiftScreen() {
     guest: Guest,
     giftType: GiftType,
     gotGiftAt: string,
+    childGift?: GiftType,
   ) => {
     setIsSubmitting(true);
     let shouldReturnToDashboard = true;
@@ -103,6 +106,7 @@ export default function GiftScreen() {
         requestedAt: new Date().toISOString(),
         gotGiftAt,
         typeOfGift: giftType,
+        childGiftType: childGift,
       });
 
       shouldReturnToDashboard = false;
@@ -131,6 +135,7 @@ export default function GiftScreen() {
     guest: Guest,
     giftType: GiftType,
     gotGiftAt: string,
+    childGift?: GiftType,
   ) => {
     showDecision({
       title: t("gift.followUpTitle"),
@@ -139,16 +144,17 @@ export default function GiftScreen() {
       cancelText: t("gift.assistanceButton"),
       onConfirm: () => router.replace("/dashboard"),
       onCancel: () => {
-        void handleRequestAssistance(guest, giftType, gotGiftAt);
+        void handleRequestAssistance(guest, giftType, gotGiftAt, childGift);
       },
     });
   };
 
   const submitGiftRequest = async (guest: Guest, giftType: GiftType) => {
     setIsSubmitting(true);
+    const childGift = alsoForChild ? (childGiftType ?? undefined) : undefined;
 
     try {
-      const result = await apiService.openGift(guest.id, giftType);
+      const result = await apiService.openGift(guest.id, giftType, childGift);
 
       if (result.status !== "ok") {
         showMessage(
@@ -172,6 +178,7 @@ export default function GiftScreen() {
         },
         giftType,
         refreshedGuest.gotGiftAt ?? new Date().toISOString(),
+        childGift,
       );
     } catch (error) {
       console.error("Gift update error:", error);
@@ -195,6 +202,14 @@ export default function GiftScreen() {
       showMessage(
         t("gift.choiceRequiredTitle"),
         t("gift.choiceRequiredMessage"),
+      );
+      return;
+    }
+
+    if (alsoForChild && !childGiftType) {
+      showMessage(
+        t("gift.childChoiceRequiredTitle"),
+        t("gift.childChoiceRequiredMessage"),
       );
       return;
     }
@@ -296,6 +311,74 @@ export default function GiftScreen() {
                 <Text style={styles.optionText}>{t("gift.forWomen")}</Text>
               </TouchableOpacity>
             </View>
+
+            {/* Also for child checkbox */}
+            <TouchableOpacity
+              style={styles.checkboxRow}
+              onPress={() => {
+                setAlsoForChild((v) => !v);
+                setChildGiftType(null);
+              }}
+              activeOpacity={0.8}
+              disabled={isSubmitting}
+            >
+              <View
+                style={[styles.checkbox, alsoForChild && styles.checkboxActive]}
+              >
+                {alsoForChild && (
+                  <Text style={styles.checkboxTick}>{"\u2713"}</Text>
+                )}
+              </View>
+              <Text style={styles.optionText}>{t("gift.alsoForChild")}</Text>
+            </TouchableOpacity>
+
+            {alsoForChild && (
+              <View style={styles.childSelectionCard}>
+                <Text style={styles.selectionTitle}>
+                  {t("gift.childSelectionTitle")}
+                </Text>
+
+                <TouchableOpacity
+                  style={styles.optionRow}
+                  onPress={() => setChildGiftType("gift_for_man")}
+                  activeOpacity={0.8}
+                  disabled={isSubmitting}
+                >
+                  <View
+                    style={[
+                      styles.radioOuter,
+                      childGiftType === "gift_for_man" &&
+                        styles.radioOuterActive,
+                    ]}
+                  >
+                    {childGiftType === "gift_for_man" && (
+                      <View style={styles.radioInner} />
+                    )}
+                  </View>
+                  <Text style={styles.optionText}>{t("gift.forBoy")}</Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                  style={styles.optionRow}
+                  onPress={() => setChildGiftType("gift_for_ladies")}
+                  activeOpacity={0.8}
+                  disabled={isSubmitting}
+                >
+                  <View
+                    style={[
+                      styles.radioOuter,
+                      childGiftType === "gift_for_ladies" &&
+                        styles.radioOuterActive,
+                    ]}
+                  >
+                    {childGiftType === "gift_for_ladies" && (
+                      <View style={styles.radioInner} />
+                    )}
+                  </View>
+                  <Text style={styles.optionText}>{t("gift.forGirl")}</Text>
+                </TouchableOpacity>
+              </View>
+            )}
           </Card>
         )}
 
@@ -303,7 +386,11 @@ export default function GiftScreen() {
           <Button
             title={t("gift.submit")}
             onPress={handleGiveMe}
-            disabled={!selectedGiftType || isSubmitting}
+            disabled={
+              !selectedGiftType ||
+              (alsoForChild && !childGiftType) ||
+              isSubmitting
+            }
           />
         )}
       </ScrollView>
@@ -403,6 +490,41 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: "#333",
     fontWeight: "600",
+  },
+  checkboxRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingVertical: 10,
+    paddingHorizontal: 18,
+    marginTop: 4,
+  },
+  checkbox: {
+    width: 24,
+    height: 24,
+    borderRadius: 6,
+    borderWidth: 2,
+    borderColor: "#C9A5B0",
+    marginRight: 12,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  checkboxActive: {
+    borderColor: "#D4526E",
+    backgroundColor: "#D4526E",
+  },
+  checkboxTick: {
+    color: "#FFF",
+    fontSize: 14,
+    fontWeight: "bold",
+  },
+  childSelectionCard: {
+    backgroundColor: "#FFF7F9",
+    borderRadius: 12,
+    padding: 14,
+    marginTop: 8,
+    marginBottom: 10,
+    borderWidth: 1,
+    borderColor: "#F0C5CE",
   },
   giveButton: {
     backgroundColor: "#D4526E",

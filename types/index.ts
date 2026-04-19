@@ -112,14 +112,15 @@ export interface RegisterResponse {
 
 export interface UpdateGuestPayload {
   gotGiftAt?: string;
-  typeOfGift?: string;
+  typeOfGift?: GiftType;
   completed?: boolean;
 }
 
 export interface GiftAssistancePayload {
   requestedAt?: string;
   gotGiftAt?: string;
-  typeOfGift?: string;
+  typeOfGift?: GiftType;
+  childGiftType?: GiftType;
 }
 
 export interface UploadPhotoAsset {
