@@ -18,13 +18,11 @@ import LanguageSwitcher from "@/components/LanguageSwitcher";
 import { StatusBar } from "expo-status-bar";
 import apiService from "@/services/api";
 import { useApp } from "@/context/AppContext";
+import { useEvent } from "@/context/EventContext";
 import { useFonts } from "expo-font";
 import { useLocalization } from "@/context/LocalizationContext";
 import { useRouter } from "expo-router";
 import { useState } from "react";
-
-const ADMIN_SECRET = "zsanirobisecret";
-const ASSIST_SECRET = "nezemazenet";
 
 export default function IdentifyScreen() {
   const [name, setName] = useState("");
@@ -32,6 +30,7 @@ export default function IdentifyScreen() {
   const router = useRouter();
   const { t } = useLocalization();
   const { setGuest, setAssignedQuestions } = useApp();
+  const { activeEvent } = useEvent();
   const [fontsLoaded] = useFonts({
     GreatVibes: require("@/assets/GreatVibes-Regular.ttf"),
   });
@@ -48,17 +47,6 @@ export default function IdentifyScreen() {
         t("identify.nameRequiredTitle"),
         t("identify.nameRequiredMessage"),
       );
-      return;
-    }
-
-    if (trimmedName.toLowerCase() === ASSIST_SECRET) {
-      router.replace("/assist");
-      return;
-    }
-
-    // Check for admin secret
-    if (trimmedName.toLowerCase() === ADMIN_SECRET) {
-      router.replace("/admin");
       return;
     }
 
@@ -101,6 +89,15 @@ export default function IdentifyScreen() {
         <LanguageSwitcher />
 
         <View style={styles.content}>
+          {activeEvent && (
+            <Card style={styles.eventBanner}>
+              <Text style={styles.eventName}>{activeEvent.name}</Text>
+              {activeEvent.date ? (
+                <Text style={styles.eventDate}>{activeEvent.date}</Text>
+              ) : null}
+            </Card>
+          )}
+
           <Card>
             <Text style={[styles.text, styles.title]}>
               {t("identify.title")}
@@ -162,8 +159,20 @@ const styles = StyleSheet.create({
     marginTop: 50,
     marginBottom: 50,
   },
-  LanguageSwitcher: {
-    marginTop: 50,
+  eventBanner: {
+    marginBottom: 15,
+    alignItems: "center",
+  },
+  eventName: {
+    fontSize: 22,
+    fontWeight: "700",
+    color: "#D4526E",
+    textAlign: "center",
+  },
+  eventDate: {
+    fontSize: 15,
+    color: "#7D5260",
+    marginTop: 4,
   },
   content: {
     flex: 1,

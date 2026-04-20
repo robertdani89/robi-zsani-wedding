@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "Zsani & Robi Wedding",
-    "slug": "robi-zsani-wedding",
+    "name": "Event Companion",
+    "slug": "event-companion",
     "version": "1.0.12",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -14,7 +14,7 @@
     "assetBundlePatterns": ["**/*"],
     "ios": {
       "supportsTablet": false,
-      "bundleIdentifier": "com.stygianlamp.zsanirobiwedding",
+      "bundleIdentifier": "com.stygianlamp.eventcompanion",
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false
       }
@@ -24,7 +24,7 @@
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.robizsniwedding.app",
+      "package": "com.eventcompanion.app",
       "permissions": [
         "android.permission.INTERNET",
         "android.permission.CAMERA",
@@ -52,7 +52,7 @@
         }
       ]
     ],
-    "scheme": "robi-zsani-wedding",
+    "scheme": "event-companion",
     "extra": {
       "router": {
         "origin": false

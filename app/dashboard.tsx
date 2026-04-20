@@ -16,6 +16,7 @@ import LanguageSwitcher from "@/components/LanguageSwitcher";
 import { StatusBar } from "expo-status-bar";
 import apiService from "@/services/api";
 import { useApp } from "@/context/AppContext";
+import { useEvent } from "@/context/EventContext";
 import { useFonts } from "expo-font";
 import { useLocalization } from "@/context/LocalizationContext";
 import { useRouter } from "expo-router";
@@ -26,6 +27,7 @@ apiService; // initialize API service to set up base URL and interceptors
 export default function DashboardScreen() {
   const router = useRouter();
   const { state, getTaskStatus, resetApp } = useApp();
+  const { activeEvent, leaveCurrentEvent } = useEvent();
   const { t } = useLocalization();
   const taskStatus = getTaskStatus();
   const { width } = useWindowDimensions();
@@ -38,7 +40,7 @@ export default function DashboardScreen() {
   });
 
   const isCompleted = !!state.guest?.gotGiftAt;
-  const hideReset = new Date() >= new Date("2026-05-01");
+  const isOrganizer = activeEvent?.role === "organizer";
 
   const handleReset = () => {
     Alert.alert(
@@ -54,6 +56,7 @@ export default function DashboardScreen() {
           style: "destructive",
           onPress: async () => {
             await resetApp();
+            await leaveCurrentEvent();
             router.replace("/");
           },
         },
@@ -123,6 +126,14 @@ export default function DashboardScreen() {
             </TouchableOpacity>
           </View>
 
+          {activeEvent && (
+            <Text style={styles.eventLabel}>
+              {activeEvent.name}
+              {activeEvent.date ? ` · ${activeEvent.date}` : ""}
+              {activeEvent.code ? ` · ${activeEvent.code}` : ""}
+            </Text>
+          )}
+
           <Text style={[styles.text, styles.subtitle]}>
             {isCompleted
               ? t("dashboard.completedSubtitle1")
@@ -134,6 +145,81 @@ export default function DashboardScreen() {
               : t("dashboard.subtitle2")}
           </Text>
         </Card>
+
+        {/* Organizer Tools */}
+        {isOrganizer && !isCompleted && (
+          <Card style={styles.organizerTools}>
+            <Text style={styles.sectionTitle}>
+              {t("dashboard.organizerTools")}
+            </Text>
+
+            <TouchableOpacity
+              style={[styles.taskCard, isSmallScreen && styles.taskCardSmall]}
+              onPress={() => router.push("/admin")}
+              activeOpacity={0.7}
+            >
+              <View
+                style={[styles.taskInfo, isSmallScreen && styles.taskInfoSmall]}
+              >
+                <View style={styles.taskIcon}>
+                  <Text style={styles.taskEmoji}>🔐</Text>
+                </View>
+                <View style={styles.taskContent}>
+                  <Text style={styles.taskTitle}>
+                    {t("dashboard.adminPanel")}
+                  </Text>
+                  <Text style={styles.taskDescription}>
+                    {t("dashboard.adminPanelDesc")}
+                  </Text>
+                </View>
+              </View>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={[styles.taskCard, isSmallScreen && styles.taskCardSmall]}
+              onPress={() => router.push("/edit-template")}
+              activeOpacity={0.7}
+            >
+              <View
+                style={[styles.taskInfo, isSmallScreen && styles.taskInfoSmall]}
+              >
+                <View style={styles.taskIcon}>
+                  <Text style={styles.taskEmoji}>📝</Text>
+                </View>
+                <View style={styles.taskContent}>
+                  <Text style={styles.taskTitle}>
+                    {t("dashboard.editTemplate")}
+                  </Text>
+                  <Text style={styles.taskDescription}>
+                    {t("dashboard.editTemplateDesc")}
+                  </Text>
+                </View>
+              </View>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={[styles.taskCard, isSmallScreen && styles.taskCardSmall]}
+              onPress={() => router.push("/assist")}
+              activeOpacity={0.7}
+            >
+              <View
+                style={[styles.taskInfo, isSmallScreen && styles.taskInfoSmall]}
+              >
+                <View style={styles.taskIcon}>
+                  <Text style={styles.taskEmoji}>🎵</Text>
+                </View>
+                <View style={styles.taskContent}>
+                  <Text style={styles.taskTitle}>
+                    {t("dashboard.songAssist")}
+                  </Text>
+                  <Text style={styles.taskDescription}>
+                    {t("dashboard.songAssistDesc")}
+                  </Text>
+                </View>
+              </View>
+            </TouchableOpacity>
+          </Card>
+        )}
 
         {/* Progress Bar - Hidden when completed */}
         {!isCompleted && (
@@ -363,30 +449,25 @@ export default function DashboardScreen() {
               </View>
             </TouchableOpacity>
 
-            {!hideReset && (
-              <TouchableOpacity
-                style={[styles.taskCard, isSmallScreen && styles.taskCardSmall]}
-                onPress={handleReset}
-                activeOpacity={0.7}
+            <TouchableOpacity
+              style={[styles.taskCard, isSmallScreen && styles.taskCardSmall]}
+              onPress={handleReset}
+              activeOpacity={0.7}
+            >
+              <View
+                style={[styles.taskInfo, isSmallScreen && styles.taskInfoSmall]}
               >
-                <View
-                  style={[
-                    styles.taskInfo,
-                    isSmallScreen && styles.taskInfoSmall,
-                  ]}
-                >
-                  <View style={styles.taskIcon}>
-                    <Text style={styles.taskEmoji}>🔄</Text>
-                  </View>
-                  <View style={styles.taskContent}>
-                    <Text style={styles.taskTitle}>{t("common.reset")}</Text>
-                    <Text style={styles.taskDescription}>
-                      {t("common.resetDescription")}
-                    </Text>
-                  </View>
+                <View style={styles.taskIcon}>
+                  <Text style={styles.taskEmoji}>🔄</Text>
                 </View>
-              </TouchableOpacity>
-            )}
+                <View style={styles.taskContent}>
+                  <Text style={styles.taskTitle}>{t("common.reset")}</Text>
+                  <Text style={styles.taskDescription}>
+                    {t("common.resetDescription")}
+                  </Text>
+                </View>
+              </View>
+            </TouchableOpacity>
           </Card>
         )}
       </ScrollView>
@@ -454,6 +535,14 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     marginBottom: 6,
+  },
+  eventLabel: {
+    fontSize: 14,
+    color: "#999",
+    marginBottom: 8,
+  },
+  organizerTools: {
+    marginBottom: 20,
   },
   settingsButton: {
     width: 34,

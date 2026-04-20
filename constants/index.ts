@@ -1,7 +1,5 @@
 // App constants
-export const APP_NAME = "Zsani & Robi Wedding";
-export const COUPLE_NAMES = "Zsani & Robi";
-export const WEDDING_DATE = "2026. május 2.";
+export const APP_NAME = "Event Companion";
 
 // Color palette
 export const COLORS = {

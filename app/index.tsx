@@ -1,5 +1,10 @@
-import { COUPLE_NAMES, WEDDING_DATE } from "@/constants";
-import { Image, ScrollView, StyleSheet, Text, View } from "react-native";
+import {
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 
 import Button from "@/components/Button";
 import Card from "@/components/Card";
@@ -8,37 +13,40 @@ import { StatusBar } from "expo-status-bar";
 import apiService from "@/services/api";
 import { useApp } from "@/context/AppContext";
 import { useEffect } from "react";
+import { useEvent } from "@/context/EventContext";
 import { useFonts } from "expo-font";
 import { useLocalization } from "@/context/LocalizationContext";
 import { useRouter } from "expo-router";
 
 apiService; // initialize API service to set up base URL and interceptors
 
-export default function WelcomeScreen() {
+export default function OnboardingScreen() {
   const router = useRouter();
   const { state, isHydrated } = useApp();
-  const { t, locale } = useLocalization();
+  const { activeEvent, events, isHydrated: eventsHydrated } = useEvent();
+  const { t } = useLocalization();
   const [fontsLoaded] = useFonts({
     GreatVibes: require("@/assets/GreatVibes-Regular.ttf"),
   });
 
   useEffect(() => {
-    if (!isHydrated) {
+    if (!isHydrated || !eventsHydrated) {
       return;
     }
 
-    if (state.guest) {
+    // If there's an active event and guest is registered, go to dashboard
+    if (activeEvent && state.guest) {
       router.replace("/dashboard");
     }
-  }, [isHydrated, router, state.guest]);
+    // If there's an active event but no guest, go to identify
+    else if (activeEvent && !state.guest) {
+      router.replace("/identify");
+    }
+  }, [isHydrated, eventsHydrated, router, state.guest, activeEvent]);
 
-  if (!fontsLoaded || !isHydrated) {
+  if (!fontsLoaded || !isHydrated || !eventsHydrated) {
     return null;
   }
-
-  const handleGetStarted = () => {
-    router.replace("/identify");
-  };
 
   return (
     <ScrollView>
@@ -47,37 +55,65 @@ export default function WelcomeScreen() {
         <StatusBar style="dark" />
         <View style={styles.content}>
           <Card>
-            <Text style={[styles.text, styles.coupleNames]}>
-              {COUPLE_NAMES}
+            <Text style={[styles.text, styles.appTitle]}>
+              {t("onboarding.appName")}
             </Text>
-            <Text style={[styles.text, styles.weddingDateText]}>
-              {locale === "hu" ? WEDDING_DATE : "May 2, 2026"}
+            <Text style={[styles.text, styles.appSubtitle]}>
+              {t("onboarding.tagline")}
             </Text>
           </Card>
-
-          <View style={[styles.coupleImagesContainer]}>
-            <Image source={require("../assets/zsani.png")} resizeMode="cover" />
-            <View style={styles.heartContainer}>
-              <Text style={[styles.text, styles.heart]}>💕</Text>
-            </View>
-            <Image source={require("../assets/robi.png")} resizeMode="cover" />
-          </View>
 
           <View style={styles.messageContainer}>
             <Card>
               <Text style={[styles.text, styles.message]}>
-                {t("welcome.message")}
-              </Text>
-            </Card>
-
-            <Card style={styles.subMessageContainer}>
-              <Text style={[styles.text, styles.subMessage]}>
-                {t("welcome.subMessage")}
+                {t("onboarding.description")}
               </Text>
             </Card>
           </View>
 
-          <Button title={t("welcome.start")} onPress={handleGetStarted} />
+          <View style={styles.buttonGroup}>
+            <Button
+              title={t("onboarding.createEvent")}
+              onPress={() => router.push("/create-event")}
+            />
+            <View style={styles.buttonSpacer} />
+            <Button
+              title={t("onboarding.joinEvent")}
+              onPress={() => router.push("/join-event")}
+            />
+          </View>
+
+          {events.length > 0 && (
+            <Card style={styles.eventsListContainer}>
+              <Text style={styles.eventsListTitle}>
+                {t("onboarding.yourEvents")}
+              </Text>
+              {events.map((event) => (
+                <TouchableOpacity
+                  key={event.id}
+                  style={styles.eventItem}
+                  onPress={() => {
+                    router.push({
+                      pathname: "/join-event",
+                      params: { code: event.code, rejoin: "1" },
+                    });
+                  }}
+                  activeOpacity={0.7}
+                >
+                  <View style={styles.eventItemContent}>
+                    <Text style={styles.eventItemName}>{event.name}</Text>
+                    <Text style={styles.eventItemMeta}>
+                      {event.role === "organizer"
+                        ? t("onboarding.roleOrganizer")
+                        : t("onboarding.roleGuest")}{" "}
+                      · {event.code}
+                    </Text>
+                  </View>
+                  <Text style={styles.eventItemArrow}>→</Text>
+                </TouchableOpacity>
+              ))}
+            </Card>
+          )}
         </View>
       </View>
     </ScrollView>
@@ -91,13 +127,6 @@ const styles = StyleSheet.create({
     marginTop: 50,
     marginBottom: 50,
   },
-  coupleImagesContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    marginTop: 20,
-    marginBottom: 20,
-  },
   content: {
     flex: 1,
     justifyContent: "center",
@@ -107,54 +136,73 @@ const styles = StyleSheet.create({
   text: {
     fontFamily: "GreatVibes",
   },
-  coupleNames: {
-    fontSize: 36,
+  appTitle: {
+    fontSize: 34,
     color: "#D4526E",
-    marginBottom: 0,
     textAlign: "center",
   },
-  heartContainer: {
-    marginVertical: 20,
-  },
-  heart: {
-    fontSize: 36,
-  },
-  weddingDateText: {
-    fontSize: 24,
+  appSubtitle: {
+    fontSize: 20,
+    color: "#7D5260",
     textAlign: "center",
+    marginTop: 4,
   },
   messageContainer: {
-    marginBottom: 50,
+    marginTop: 30,
+    marginBottom: 40,
   },
   message: {
-    fontSize: 24,
+    fontSize: 22,
     color: "#333",
     textAlign: "center",
-    lineHeight: 32,
+    lineHeight: 30,
   },
-  subMessageContainer: {
-    marginTop: 15,
+  buttonGroup: {
+    width: "100%",
+    marginBottom: 30,
   },
-  subMessage: {
-    fontSize: 24,
+  buttonSpacer: {
+    height: 15,
+  },
+  eventsListContainer: {
+    width: "100%",
+    marginTop: 10,
+  },
+  eventsListTitle: {
+    fontSize: 18,
+    fontWeight: "700",
     color: "#333",
-    textAlign: "center",
-    lineHeight: 32,
+    marginBottom: 12,
   },
-  button: {
-    backgroundColor: "#D4526E",
-    paddingVertical: 16,
-    paddingHorizontal: 60,
-    borderRadius: 30,
-    elevation: 3,
+  eventItem: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#FFF",
+    borderRadius: 12,
+    padding: 14,
+    marginBottom: 10,
+    elevation: 1,
     shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.08,
+    shadowRadius: 2,
   },
-  buttonText: {
-    color: "#000",
-    fontSize: 24,
-    textAlign: "center",
+  eventItemContent: {
+    flex: 1,
+  },
+  eventItemName: {
+    fontSize: 16,
+    fontWeight: "600",
+    color: "#333",
+  },
+  eventItemMeta: {
+    fontSize: 13,
+    color: "#999",
+    marginTop: 2,
+  },
+  eventItemArrow: {
+    fontSize: 20,
+    color: "#D4526E",
+    marginLeft: 10,
   },
 });

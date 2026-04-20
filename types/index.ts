@@ -10,6 +10,33 @@ export interface Guest {
 
 export type GiftType = "gift_for_man" | "gift_for_ladies";
 
+export type EventRole = "organizer" | "guest";
+
+export interface EventTemplate {
+  id: string;
+  name: string;
+  description?: string;
+  questions: Question[];
+  features: {
+    photos: boolean;
+    songs: boolean;
+    gift: boolean;
+    gallery: boolean;
+    puzzle: boolean;
+  };
+}
+
+export interface AppEvent {
+  id: string;
+  code: string;
+  name: string;
+  date: string;
+  organizerName?: string;
+  template: EventTemplate;
+  role: EventRole;
+  createdAt: string;
+}
+
 export enum QuestionType {
   SINGLE_CHOICE = "single_choice",
   MULTIPLE_CHOICE = "multiple_choice",
