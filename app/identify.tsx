@@ -1,9 +1,9 @@
 import {
-  ActivityIndicator,
   Alert,
   KeyboardAvoidingView,
   Linking,
   Platform,
+  ScrollView,
   StyleSheet,
   Text,
   TextInput,
@@ -96,54 +96,58 @@ export default function IdentifyScreen() {
       behavior={Platform.OS === "ios" ? "padding" : "height"}
       style={[styles.container]}
     >
-      <StatusBar style="dark" />
-      <LanguageSwitcher />
+      <ScrollView>
+        <StatusBar style="dark" />
+        <LanguageSwitcher />
 
-      <View style={styles.content}>
-        <Card>
-          <Text style={[styles.text, styles.title]}>{t("identify.title")}</Text>
-          <Text style={[styles.text, styles.subtitle]}>
-            {t("identify.subtitle")}
-          </Text>
-        </Card>
+        <View style={styles.content}>
+          <Card>
+            <Text style={[styles.text, styles.title]}>
+              {t("identify.title")}
+            </Text>
+            <Text style={[styles.text, styles.subtitle]}>
+              {t("identify.subtitle")}
+            </Text>
+          </Card>
 
-        <Card style={styles.inputContainer}>
-          <Text style={[styles.text, styles.label]}>
-            {t("identify.nameLabel")}
-          </Text>
-          <TextInput
-            style={[styles.input]}
-            placeholder={t("identify.namePlaceholder")}
-            placeholderTextColor="#999"
-            value={name}
-            onChangeText={setName}
-            autoFocus
-            returnKeyType="done"
-            onSubmitEditing={handleContinue}
-            editable={!isLoading}
+          <Card style={styles.inputContainer}>
+            <Text style={[styles.text, styles.label]}>
+              {t("identify.nameLabel")}
+            </Text>
+            <TextInput
+              style={[styles.input]}
+              placeholder={t("identify.namePlaceholder")}
+              placeholderTextColor="#999"
+              value={name}
+              onChangeText={setName}
+              autoFocus
+              returnKeyType="done"
+              onSubmitEditing={handleContinue}
+              editable={!isLoading}
+            />
+            <Text style={[styles.text, styles.hint]}>{t("identify.hint")}</Text>
+          </Card>
+
+          <TouchableOpacity
+            onPress={() =>
+              Linking.openURL(
+                "https://robertdani89.github.io/robi-zsani-wedding/",
+              )
+            }
+            activeOpacity={0.7}
+          >
+            <Text style={[styles.privacyPolicyLink]}>
+              {t("identify.privacyPolicy")}
+            </Text>
+          </TouchableOpacity>
+
+          <Button
+            title={t("welcome.start")}
+            onPress={handleContinue}
+            disabled={!name.trim() || name.trim().length < 3 || isLoading}
           />
-          <Text style={[styles.text, styles.hint]}>{t("identify.hint")}</Text>
-        </Card>
-
-        <TouchableOpacity
-          onPress={() =>
-            Linking.openURL(
-              "https://robertdani89.github.io/robi-zsani-wedding/",
-            )
-          }
-          activeOpacity={0.7}
-        >
-          <Text style={[styles.privacyPolicyLink]}>
-            {t("identify.privacyPolicy")}
-          </Text>
-        </TouchableOpacity>
-
-        <Button
-          title={t("welcome.start")}
-          onPress={handleContinue}
-          disabled={!name.trim() || name.trim().length < 3 || isLoading}
-        />
-      </View>
+        </View>
+      </ScrollView>
     </KeyboardAvoidingView>
   );
 }
@@ -155,6 +159,8 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "transparent",
+    marginTop: 50,
+    marginBottom: 50,
   },
   LanguageSwitcher: {
     marginTop: 50,

@@ -34,3 +34,9 @@ adb devices
 adb -s <serial> install app.apk
 
 adb disconnect 192.168.0.187:<connecting_port>
+
+### IOS
+
+eas build -p ios
+
+eas submit -p ios

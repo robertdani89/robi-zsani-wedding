@@ -1,5 +1,5 @@
 import { COUPLE_NAMES, WEDDING_DATE } from "@/constants";
-import { ScrollView, StyleSheet, Text, View } from "react-native";
+import { Image, ScrollView, StyleSheet, Text, View } from "react-native";
 
 import Button from "@/components/Button";
 import Card from "@/components/Card";
@@ -55,8 +55,12 @@ export default function WelcomeScreen() {
             </Text>
           </Card>
 
-          <View style={styles.heartContainer}>
-            <Text style={[styles.text, styles.heart]}>💕</Text>
+          <View style={[styles.coupleImagesContainer]}>
+            <Image source={require("../assets/zsani.png")} resizeMode="cover" />
+            <View style={styles.heartContainer}>
+              <Text style={[styles.text, styles.heart]}>💕</Text>
+            </View>
+            <Image source={require("../assets/robi.png")} resizeMode="cover" />
           </View>
 
           <View style={styles.messageContainer}>
@@ -86,6 +90,13 @@ const styles = StyleSheet.create({
     backgroundColor: "transparent",
     marginTop: 50,
     marginBottom: 50,
+  },
+  coupleImagesContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    marginTop: 20,
+    marginBottom: 20,
   },
   content: {
     flex: 1,
