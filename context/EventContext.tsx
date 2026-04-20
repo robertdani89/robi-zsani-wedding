@@ -1,4 +1,11 @@
-import { AppEvent, EventTemplate, Question, QuestionType } from "@/types";
+import {
+  AppEvent,
+  EventRole,
+  EventTemplate,
+  Question,
+  QuestionType,
+  ServerEvent,
+} from "@/types";
 import React, {
   ReactNode,
   createContext,
@@ -8,6 +15,7 @@ import React, {
 } from "react";
 
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import apiService from "@/services/api";
 
 const STORAGE_KEYS = {
   EVENTS: "@events_app_events",
@@ -108,6 +116,25 @@ const generateEventCode = (): string => {
   return code;
 };
 
+const mapServerEventToAppEvent = (
+  event: ServerEvent,
+  role: EventRole,
+): AppEvent => ({
+  id: event.id,
+  code: event.code,
+  name: event.name,
+  date: event.date ?? "",
+  organizerName: event.organizerName,
+  template: {
+    ...DEFAULT_WEDDING_TEMPLATE,
+    questions: event.questions?.length
+      ? event.questions
+      : DEFAULT_WEDDING_TEMPLATE.questions,
+  },
+  role,
+  createdAt: event.createdAt,
+});
+
 interface EventContextType {
   events: AppEvent[];
   activeEvent: AppEvent | null;
@@ -169,16 +196,14 @@ export const EventProvider = ({ children }: { children: ReactNode }) => {
     date: string,
     organizerName?: string,
   ): Promise<AppEvent> => {
-    const event: AppEvent = {
-      id: `evt_${Date.now()}`,
+    const serverEvent = await apiService.createEvent({
       code: generateEventCode(),
       name,
       date,
       organizerName,
-      template: { ...DEFAULT_WEDDING_TEMPLATE },
-      role: "organizer",
-      createdAt: new Date().toISOString(),
-    };
+      questions: DEFAULT_WEDDING_TEMPLATE.questions,
+    });
+    const event = mapServerEventToAppEvent(serverEvent, "organizer");
 
     const updatedEvents = [...events, event];
     await persistEvents(updatedEvents);
@@ -190,24 +215,30 @@ export const EventProvider = ({ children }: { children: ReactNode }) => {
 
   const joinEvent = async (code: string): Promise<AppEvent> => {
     const normalizedCode = code.trim().toUpperCase();
-
-    // Check if already joined
+    const serverEvent = await apiService.getEventByCode(normalizedCode);
     const existing = events.find((e) => e.code === normalizedCode);
+    const verifiedEvent = mapServerEventToAppEvent(
+      serverEvent,
+      existing?.role ?? "guest",
+    );
+
     if (existing) {
-      await AsyncStorage.setItem(STORAGE_KEYS.ACTIVE_EVENT, existing.id);
-      setActiveEventState(existing);
-      return existing;
+      const updatedExisting = {
+        ...existing,
+        ...verifiedEvent,
+        id: existing.id,
+        role: existing.role,
+      };
+      const updatedEvents = events.map((event) =>
+        event.id === existing.id ? updatedExisting : event,
+      );
+      await persistEvents(updatedEvents);
+      await AsyncStorage.setItem(STORAGE_KEYS.ACTIVE_EVENT, updatedExisting.id);
+      setActiveEventState(updatedExisting);
+      return updatedExisting;
     }
 
-    const event: AppEvent = {
-      id: `evt_${Date.now()}`,
-      code: normalizedCode,
-      name: `Event ${normalizedCode}`,
-      date: "",
-      template: { ...DEFAULT_WEDDING_TEMPLATE },
-      role: "guest",
-      createdAt: new Date().toISOString(),
-    };
+    const event = verifiedEvent;
 
     const updatedEvents = [...events, event];
     await persistEvents(updatedEvents);

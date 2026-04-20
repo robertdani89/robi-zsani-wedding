@@ -15,6 +15,8 @@ import Card from "@/components/Card";
 import { PendingSongReview } from "@/types";
 import { StatusBar } from "expo-status-bar";
 import apiService from "@/services/api";
+import { useApp } from "@/context/AppContext";
+import { useEvent } from "@/context/EventContext";
 import { useLocalization } from "@/context/LocalizationContext";
 import { useRouter } from "expo-router";
 
@@ -24,6 +26,8 @@ const OFFSCREEN_DISTANCE = 420;
 export default function AssistScreen() {
   const router = useRouter();
   const { locale, t } = useLocalization();
+  const { state } = useApp();
+  const { activeEvent } = useEvent();
   const [song, setSong] = useState<PendingSongReview | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -48,8 +52,15 @@ export default function AssistScreen() {
   };
 
   useEffect(() => {
+    const resolvedRole = state.guest?.role ?? activeEvent?.role ?? "guest";
+
+    if (resolvedRole !== "organizer" && resolvedRole !== "assistant") {
+      router.replace("/dashboard");
+      return;
+    }
+
     void loadNextSong();
-  }, []);
+  }, [activeEvent?.role, router, state.guest?.role]);
 
   const completeDecision = async (allowed: boolean) => {
     if (!song) {
@@ -154,7 +165,13 @@ export default function AssistScreen() {
   return (
     <View style={styles.container}>
       <StatusBar style="dark" />
+
       <View style={styles.content}>
+        <Card style={styles.header}>
+          <TouchableOpacity onPress={() => router.back()}>
+            <Text style={styles.backButtonText}>{t("common.back")}</Text>
+          </TouchableOpacity>
+        </Card>
         {isLoading ? (
           <View style={styles.centerState}>
             <ActivityIndicator size="large" color="#D4526E" />
@@ -309,6 +326,14 @@ export default function AssistScreen() {
 }
 
 const styles = StyleSheet.create({
+  backButtonText: {
+    fontSize: 16,
+    color: "#D4526E",
+    fontWeight: "600",
+  },
+  header: {
+    marginBottom: 30,
+  },
   container: {
     flex: 1,
   },

@@ -15,6 +15,8 @@ import { useLocalSearchParams, useRouter } from "expo-router";
 
 import { StatusBar } from "expo-status-bar";
 import apiService from "@/services/api";
+import { useApp } from "@/context/AppContext";
+import { useEvent } from "@/context/EventContext";
 import { useLocalization } from "@/context/LocalizationContext";
 
 interface PhotoData {
@@ -29,6 +31,8 @@ const { width: screenWidth } = Dimensions.get("window");
 export default function GuestDetailScreen() {
   const router = useRouter();
   const { locale, t } = useLocalization();
+  const { state } = useApp();
+  const { activeEvent } = useEvent();
   const { id } = useLocalSearchParams<{ id: string }>();
   const [guest, setGuest] = useState<Guest | null>(null);
   const [answers, setAnswers] = useState<(Answer & { question?: Question })[]>(
@@ -40,10 +44,17 @@ export default function GuestDetailScreen() {
   const [selectedPhoto, setSelectedPhoto] = useState<string | null>(null);
 
   useEffect(() => {
+    const resolvedRole = state.guest?.role ?? activeEvent?.role ?? "guest";
+
+    if (resolvedRole !== "organizer") {
+      router.replace("/dashboard");
+      return;
+    }
+
     if (id) {
       loadGuestData();
     }
-  }, [id]);
+  }, [activeEvent?.role, id, router, state.guest?.role]);
 
   const loadGuestData = async () => {
     setIsLoading(true);

@@ -1,6 +1,7 @@
 export interface Guest {
   id: string;
   name: string;
+  role?: EventRole;
   invitationCode?: string;
   completed: boolean;
   createdAt: string;
@@ -10,7 +11,17 @@ export interface Guest {
 
 export type GiftType = "gift_for_man" | "gift_for_ladies";
 
-export type EventRole = "organizer" | "guest";
+export type EventRole = "organizer" | "assistant" | "guest";
+
+export interface ServerEvent {
+  id: string;
+  code: string;
+  name: string;
+  date: string;
+  organizerName?: string;
+  questions?: Question[];
+  createdAt: string;
+}
 
 export interface EventTemplate {
   id: string;

@@ -8,6 +8,7 @@ import {
 
 import Button from "@/components/Button";
 import Card from "@/components/Card";
+import { Guest } from "@/types";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
 import { StatusBar } from "expo-status-bar";
 import apiService from "@/services/api";
@@ -22,8 +23,13 @@ apiService; // initialize API service to set up base URL and interceptors
 
 export default function OnboardingScreen() {
   const router = useRouter();
-  const { state, isHydrated } = useApp();
-  const { activeEvent, events, isHydrated: eventsHydrated } = useEvent();
+  const { state, isHydrated, setGuest, setAssignedQuestions } = useApp();
+  const {
+    activeEvent,
+    events,
+    isHydrated: eventsHydrated,
+    updateEvent,
+  } = useEvent();
   const { t } = useLocalization();
   const [fontsLoaded] = useFonts({
     GreatVibes: require("@/assets/GreatVibes-Regular.ttf"),
@@ -37,9 +43,44 @@ export default function OnboardingScreen() {
     // If there's an active event and guest is registered, go to dashboard
     if (activeEvent && state.guest) {
       router.replace("/dashboard");
+      return;
+    }
+    // If organizer has a name stored, auto-register and skip identify
+    if (
+      activeEvent &&
+      !state.guest &&
+      activeEvent.role === "organizer" &&
+      activeEvent.organizerName
+    ) {
+      (async () => {
+        try {
+          const { guest: serverGuest, questions } =
+            await apiService.registerGuest(
+              activeEvent.organizerName!,
+              activeEvent.code,
+              "organizer",
+            );
+          const newGuest: Guest = {
+            id: serverGuest.id,
+            name: serverGuest.name,
+            role: serverGuest.role,
+            completed: false,
+            createdAt: serverGuest.createdAt,
+          };
+          await setGuest(newGuest);
+          await setAssignedQuestions(questions);
+          if (serverGuest.role && activeEvent.role !== serverGuest.role) {
+            await updateEvent({ ...activeEvent, role: serverGuest.role });
+          }
+          router.replace("/dashboard");
+        } catch {
+          router.replace("/identify");
+        }
+      })();
+      return;
     }
     // If there's an active event but no guest, go to identify
-    else if (activeEvent && !state.guest) {
+    if (activeEvent && !state.guest) {
       router.replace("/identify");
     }
   }, [isHydrated, eventsHydrated, router, state.guest, activeEvent]);
@@ -105,7 +146,9 @@ export default function OnboardingScreen() {
                     <Text style={styles.eventItemMeta}>
                       {event.role === "organizer"
                         ? t("onboarding.roleOrganizer")
-                        : t("onboarding.roleGuest")}{" "}
+                        : event.role === "assistant"
+                          ? t("onboarding.roleAssistant")
+                          : t("onboarding.roleGuest")}{" "}
                       · {event.code}
                     </Text>
                   </View>

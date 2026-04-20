@@ -13,6 +13,7 @@ import {
   type PendingSongReview,
   type Photo,
   type Question,
+  type ServerEvent,
   type Song,
   type SpotifySearchResult,
   type UpdateGuestPayload,
@@ -150,6 +151,7 @@ const buildMockGalleryPhotos = (collectionId: string): GalleryPhoto[] =>
 
 export class MockApiService {
   private guests: Map<string, Guest> = new Map();
+  private events: Map<string, ServerEvent> = new Map();
   private answers: Answer[] = [];
   private songs: Map<string, PendingSongReview> = new Map();
 
@@ -166,12 +168,53 @@ export class MockApiService {
     };
   }
 
-  async registerGuest(name: string, questionCount: number = 4) {
+  async createEvent(event: {
+    code: string;
+    name: string;
+    date: string;
+    organizerName?: string;
+    questions?: Question[];
+  }): Promise<ServerEvent> {
     await this.delay();
+    const normalizedCode = event.code.trim().toUpperCase();
+    const createdEvent: ServerEvent = {
+      id: `mock-event-${Date.now()}`,
+      code: normalizedCode,
+      name: event.name,
+      date: event.date,
+      organizerName: event.organizerName,
+      questions: event.questions ?? QUESTIONS,
+      createdAt: new Date().toISOString(),
+    };
+
+    this.events.set(normalizedCode, createdEvent);
+    return createdEvent;
+  }
+
+  async getEventByCode(code: string): Promise<ServerEvent> {
+    await this.delay();
+    const normalizedCode = code.trim().toUpperCase();
+    const event = this.events.get(normalizedCode);
+
+    if (!event) {
+      throw new Error("Event not found");
+    }
+
+    return event;
+  }
+
+  async registerGuest(
+    name: string,
+    eventCode: string,
+    _role: "organizer" | "assistant" | "guest" = "guest",
+    questionCount: number = 4,
+  ) {
+    await this.delay();
+    const event = await this.getEventByCode(eventCode);
     const id = `mock-${Date.now()}`;
     const guest = this.makeGuest(id, name);
     this.guests.set(id, guest);
-    const questions = QUESTIONS.slice(0, questionCount);
+    const questions = (event.questions ?? QUESTIONS).slice(0, questionCount);
     return { guest, questions };
   }
 

@@ -10,20 +10,22 @@ import {
   View,
 } from "react-native";
 import { Question, QuestionType } from "@/types";
+import { useEffect, useState } from "react";
 
 import Button from "@/components/Button";
 import Card from "@/components/Card";
 import { StatusBar } from "expo-status-bar";
+import { useApp } from "@/context/AppContext";
 import { useEvent } from "@/context/EventContext";
 import { useFonts } from "expo-font";
 import { useLocalization } from "@/context/LocalizationContext";
 import { useRouter } from "expo-router";
-import { useState } from "react";
 
 export default function EditTemplateScreen() {
   const router = useRouter();
   const { t, locale } = useLocalization();
   const { activeEvent, updateEvent } = useEvent();
+  const { state } = useApp();
   const [fontsLoaded] = useFonts({
     GreatVibes: require("@/assets/GreatVibes-Regular.ttf"),
   });
@@ -40,6 +42,14 @@ export default function EditTemplateScreen() {
   const [newOptions, setNewOptions] = useState<{ en: string; hu: string }[]>(
     [],
   );
+
+  useEffect(() => {
+    const resolvedRole = state.guest?.role ?? activeEvent?.role ?? "guest";
+
+    if (resolvedRole !== "organizer") {
+      router.replace("/dashboard");
+    }
+  }, [activeEvent?.role, router, state.guest?.role]);
 
   if (!fontsLoaded || !activeEvent) {
     return null;

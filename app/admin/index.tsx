@@ -11,6 +11,8 @@ import { useCallback, useEffect, useState } from "react";
 
 import { StatusBar } from "expo-status-bar";
 import apiService from "@/services/api";
+import { useApp } from "@/context/AppContext";
+import { useEvent } from "@/context/EventContext";
 import { useLocalization } from "@/context/LocalizationContext";
 import { useRouter } from "expo-router";
 
@@ -27,6 +29,8 @@ interface GuestSummary {
 export default function AdminScreen() {
   const router = useRouter();
   const { locale, t } = useLocalization();
+  const { state } = useApp();
+  const { activeEvent } = useEvent();
   const [guests, setGuests] = useState<GuestSummary[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isRefreshing, setIsRefreshing] = useState(false);
@@ -53,15 +57,22 @@ export default function AdminScreen() {
   };
 
   useEffect(() => {
+    const resolvedRole = state.guest?.role ?? activeEvent?.role ?? "guest";
+
+    if (resolvedRole !== "organizer") {
+      router.replace("/dashboard");
+      return;
+    }
+
     loadData();
-  }, []);
+  }, [activeEvent?.role, router, state.guest?.role]);
 
   const handleGuestPress = (guestId: string) => {
     router.push(`/admin/guest/${guestId}`);
   };
 
-  const handleLogout = () => {
-    router.replace("/identify");
+  const handleExit = () => {
+    router.back();
   };
 
   const renderGuestItem = ({ item }: { item: GuestSummary }) => (
@@ -130,11 +141,11 @@ export default function AdminScreen() {
         </TouchableOpacity>
 
         <TouchableOpacity
-          style={styles.logoutButton}
-          onPress={handleLogout}
+          style={styles.exitButton}
+          onPress={handleExit}
           activeOpacity={0.7}
         >
-          <Text style={styles.logoutButtonText}>{t("admin.exit")}</Text>
+          <Text style={styles.exitButtonText}>{t("admin.exit")}</Text>
         </TouchableOpacity>
       </View>
 
@@ -219,14 +230,14 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "600",
   },
-  logoutButton: {
+  exitButton: {
     backgroundColor: "#7D5260",
     paddingVertical: 12,
     paddingHorizontal: 20,
     borderRadius: 10,
     alignItems: "center",
   },
-  logoutButtonText: {
+  exitButtonText: {
     color: "#FFF",
     fontSize: 16,
     fontWeight: "600",

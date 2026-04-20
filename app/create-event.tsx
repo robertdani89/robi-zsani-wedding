@@ -11,8 +11,11 @@ import {
 
 import Button from "@/components/Button";
 import Card from "@/components/Card";
+import { Guest } from "@/types";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
 import { StatusBar } from "expo-status-bar";
+import apiService from "@/services/api";
+import { useApp } from "@/context/AppContext";
 import { useEvent } from "@/context/EventContext";
 import { useFonts } from "expo-font";
 import { useLocalization } from "@/context/LocalizationContext";
@@ -26,7 +29,8 @@ export default function CreateEventScreen() {
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
   const { t } = useLocalization();
-  const { createEvent } = useEvent();
+  const { createEvent, updateEvent } = useEvent();
+  const { setGuest, setAssignedQuestions } = useApp();
   const [fontsLoaded] = useFonts({
     GreatVibes: require("@/assets/GreatVibes-Regular.ttf"),
   });
@@ -49,11 +53,33 @@ export default function CreateEventScreen() {
     setIsLoading(true);
 
     try {
+      const orgName = organizerName.trim();
       const event = await createEvent(
         trimmedName,
         eventDate.trim(),
-        organizerName.trim() || undefined,
+        orgName || undefined,
       );
+
+      if (orgName) {
+        try {
+          const { guest: serverGuest, questions } =
+            await apiService.registerGuest(orgName, event.code, "organizer");
+          const newGuest: Guest = {
+            id: serverGuest.id,
+            name: serverGuest.name,
+            role: serverGuest.role,
+            completed: false,
+            createdAt: serverGuest.createdAt,
+          };
+          await setGuest(newGuest);
+          await setAssignedQuestions(questions);
+          if (serverGuest.role && event.role !== serverGuest.role) {
+            await updateEvent({ ...event, role: serverGuest.role });
+          }
+        } catch {
+          // Registration failed – they'll land on identify instead
+        }
+      }
 
       Alert.alert(
         t("createEvent.successTitle"),
@@ -61,7 +87,7 @@ export default function CreateEventScreen() {
         [
           {
             text: t("common.done"),
-            onPress: () => router.replace("/identify"),
+            onPress: () => router.replace("/dashboard"),
           },
         ],
       );

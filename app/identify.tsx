@@ -30,7 +30,7 @@ export default function IdentifyScreen() {
   const router = useRouter();
   const { t } = useLocalization();
   const { setGuest, setAssignedQuestions } = useApp();
-  const { activeEvent } = useEvent();
+  const { activeEvent, updateEvent } = useEvent();
   const [fontsLoaded] = useFonts({
     GreatVibes: require("@/assets/GreatVibes-Regular.ttf"),
   });
@@ -50,22 +50,41 @@ export default function IdentifyScreen() {
       return;
     }
 
+    if (!activeEvent?.code) {
+      Alert.alert(
+        t("identify.connectionErrorTitle"),
+        t("joinEvent.errorMessage"),
+      );
+      return;
+    }
+
     setIsLoading(true);
 
     try {
       // Register guest on server and get assigned questions
-      const { guest: serverGuest, questions } =
-        await apiService.registerGuest(trimmedName);
+      const { guest: serverGuest, questions } = await apiService.registerGuest(
+        trimmedName,
+        activeEvent.code,
+      );
 
       const newGuest: Guest = {
         id: serverGuest.id,
         name: serverGuest.name,
+        role: serverGuest.role,
         completed: false,
         createdAt: serverGuest.createdAt,
       };
 
       await setGuest(newGuest);
       await setAssignedQuestions(questions);
+
+      if (
+        activeEvent &&
+        serverGuest.role &&
+        activeEvent.role !== serverGuest.role
+      ) {
+        await updateEvent({ ...activeEvent, role: serverGuest.role });
+      }
 
       router.replace("/dashboard");
     } catch (error) {
@@ -89,15 +108,6 @@ export default function IdentifyScreen() {
         <LanguageSwitcher />
 
         <View style={styles.content}>
-          {activeEvent && (
-            <Card style={styles.eventBanner}>
-              <Text style={styles.eventName}>{activeEvent.name}</Text>
-              {activeEvent.date ? (
-                <Text style={styles.eventDate}>{activeEvent.date}</Text>
-              ) : null}
-            </Card>
-          )}
-
           <Card>
             <Text style={[styles.text, styles.title]}>
               {t("identify.title")}
@@ -158,21 +168,6 @@ const styles = StyleSheet.create({
     backgroundColor: "transparent",
     marginTop: 50,
     marginBottom: 50,
-  },
-  eventBanner: {
-    marginBottom: 15,
-    alignItems: "center",
-  },
-  eventName: {
-    fontSize: 22,
-    fontWeight: "700",
-    color: "#D4526E",
-    textAlign: "center",
-  },
-  eventDate: {
-    fontSize: 15,
-    color: "#7D5260",
-    marginTop: 4,
   },
   content: {
     flex: 1,

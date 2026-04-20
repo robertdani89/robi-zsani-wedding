@@ -14,6 +14,7 @@ export const TRANSLATIONS = {
     "onboarding.joinEvent": "Join an event",
     "onboarding.yourEvents": "Your events",
     "onboarding.roleOrganizer": "Organizer",
+    "onboarding.roleAssistant": "Assistant",
     "onboarding.roleGuest": "Guest",
     "createEvent.title": "Create your event",
     "createEvent.subtitle": "Set up your event and invite guests with a code.",
@@ -316,6 +317,7 @@ export const TRANSLATIONS = {
     "onboarding.joinEvent": "Csatlakozás eseményhez",
     "onboarding.yourEvents": "Eseményeid",
     "onboarding.roleOrganizer": "Szervező",
+    "onboarding.roleAssistant": "Segítő",
     "onboarding.roleGuest": "Vendég",
     "createEvent.title": "Esemény létrehozása",
     "createEvent.subtitle":

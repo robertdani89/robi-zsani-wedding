@@ -6,6 +6,7 @@ import {
   PendingSongReview,
   Photo,
   Question,
+  ServerEvent,
   Song,
   type GiftAssistancePayload,
   type GiftType,
@@ -232,17 +233,67 @@ class ApiService {
     };
   }
 
+  private normalizeRegisterResponse(payload: any): RegisterResponse {
+    const person = payload?.person ?? payload?.guest ?? null;
+
+    if (!person) {
+      throw new Error("Invalid registration response.");
+    }
+
+    return {
+      guest: {
+        id: String(person.id),
+        name: String(person.name),
+        role:
+          person.role === "organizer" ||
+          person.role === "assistant" ||
+          person.role === "guest"
+            ? person.role
+            : undefined,
+        completed: Boolean(person.completed),
+        createdAt: String(person.createdAt ?? new Date().toISOString()),
+        gotGiftAt: person.gotGiftAt ? String(person.gotGiftAt) : undefined,
+        typeOfGift: person.typeOfGift ? String(person.typeOfGift) : undefined,
+      },
+      questions: Array.isArray(payload?.questions) ? payload.questions : [],
+    };
+  }
+
+  async createEvent(payload: {
+    code: string;
+    name: string;
+    date: string;
+    organizerName?: string;
+    questions?: Question[];
+  }): Promise<ServerEvent> {
+    return this.fetch<ServerEvent>("/events", {
+      method: "POST",
+      body: JSON.stringify(payload),
+    });
+  }
+
+  async getEventByCode(code: string): Promise<ServerEvent> {
+    const normalizedCode = code.trim().toUpperCase();
+    return this.fetch<ServerEvent>(
+      `/events/code/${encodeURIComponent(normalizedCode)}`,
+    );
+  }
+
   async registerGuest(
     name: string,
+    eventCode: string,
+    role: "organizer" | "assistant" | "guest" = "guest",
     questionCount: number = 8,
   ): Promise<RegisterResponse> {
-    return this.fetch<RegisterResponse>(
-      `/guests/register?questionCount=${questionCount}`,
+    const response = await this.fetch<any>(
+      `/persons/register?questionCount=${questionCount}`,
       {
         method: "POST",
-        body: JSON.stringify({ name }),
+        body: JSON.stringify({ name, eventCode, role }),
       },
     );
+
+    return this.normalizeRegisterResponse(response);
   }
 
   async getGuest(guestId: string): Promise<Guest> {
@@ -727,12 +778,30 @@ class SmartApiService {
     return this.resolvePromise;
   }
 
+  async createEvent(payload: {
+    code: string;
+    name: string;
+    date: string;
+    organizerName?: string;
+    questions?: Question[];
+  }): Promise<ServerEvent> {
+    const service = await this.getService();
+    return service.createEvent(payload);
+  }
+
+  async getEventByCode(code: string): Promise<ServerEvent> {
+    const service = await this.getService();
+    return service.getEventByCode(code);
+  }
+
   async registerGuest(
     name: string,
+    eventCode: string,
+    role: "organizer" | "assistant" | "guest" = "guest",
     questionCount: number = 8,
   ): Promise<RegisterResponse> {
     const service = await this.getService();
-    return service.registerGuest(name, questionCount);
+    return service.registerGuest(name, eventCode, role, questionCount);
   }
 
   async getGuest(guestId: string): Promise<Guest> {

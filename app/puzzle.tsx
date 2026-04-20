@@ -10,16 +10,17 @@ import {
   View,
   useWindowDimensions,
 } from "react-native";
-import apiService, {
+import {
   PUZZLE_COLLECTION_ID,
   PUZZLE_COLLECTION_NAME,
-} from "@/services/api";
+} from "@/services/constants";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import Button from "@/components/Button";
 import Card from "@/components/Card";
 import { GalleryPhoto } from "@/types";
 import { StatusBar } from "expo-status-bar";
+import apiService from "@/services/api";
 import { useLocalization } from "@/context/LocalizationContext";
 import { useRouter } from "expo-router";
 
