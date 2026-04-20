@@ -16,7 +16,9 @@
       "supportsTablet": false,
       "bundleIdentifier": "com.stygianlamp.eventcompanion",
       "infoPlist": {
-        "ITSAppUsesNonExemptEncryption": false
+        "ITSAppUsesNonExemptEncryption": false,
+        "NSCameraUsageDescription": "$(PRODUCT_NAME) needs access to your camera so you can take photos at the event and share them with the host. For example, you can snap a photo during the celebration and upload it to the shared event gallery. The camera is also needed for scanning QR codes to quickly join the event and access its features.",
+        "NSPhotoLibraryUsageDescription": "$(PRODUCT_NAME) needs access to your photo library so you can select existing photos from your device and upload them to the shared event gallery. For example, you can choose a photo you took at the event and share it with the host."
       }
     },
     "android": {
@@ -42,13 +44,13 @@
       [
         "expo-camera",
         {
-          "cameraPermission": "Allow $(PRODUCT_NAME) to access your camera to take photos."
+          "cameraPermission": "$(PRODUCT_NAME) needs access to your camera so you can take photos at the event and share them with the host. For example, you can snap a photo during the celebration and upload it to the event gallery. The camera is also needed for scanning QR codes to quickly join the event and access its features."
         }
       ],
       [
         "expo-image-picker",
         {
-          "photosPermission": "Allow $(PRODUCT_NAME) to access your photos."
+          "photosPermission": "$(PRODUCT_NAME) needs access to your photo library so you can select existing photos from your device and upload them to the event gallery. For example, you can choose a photo you took at the event and share it with the host."
         }
       ]
     ],
