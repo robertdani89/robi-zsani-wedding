@@ -167,3 +167,12 @@ export interface UploadPhotoResponse {
   personId: string;
   createdAt: string;
 }
+
+export interface GuestSummary {
+  id: string;
+  name: string;
+  createdAt: string;
+  answerCount: number;
+  photoCount: number;
+  songCount: number;
+}

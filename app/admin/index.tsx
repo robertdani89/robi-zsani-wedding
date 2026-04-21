@@ -9,22 +9,13 @@ import {
 } from "react-native";
 import { useCallback, useEffect, useState } from "react";
 
+import type { GuestSummary } from "@/types";
 import { StatusBar } from "expo-status-bar";
 import apiService from "@/services/api";
 import { useApp } from "@/context/AppContext";
 import { useEvent } from "@/context/EventContext";
 import { useLocalization } from "@/context/LocalizationContext";
 import { useRouter } from "expo-router";
-
-interface GuestSummary {
-  id: string;
-  name: string;
-  createdAt: string;
-  answerCount: number;
-  photoCount: number;
-  hasSong?: boolean;
-  songName?: string | null;
-}
 
 export default function AdminScreen() {
   const router = useRouter();
@@ -103,8 +94,8 @@ export default function AdminScreen() {
           <Text style={styles.statLabel}>{t("admin.photos")}</Text>
         </View>
         <View style={styles.stat}>
-          <Text style={styles.statNumber}>{item.hasSong ? "🎵" : "—"}</Text>
-          <Text style={styles.statLabel}>{t("admin.song")}</Text>
+          <Text style={styles.statNumber}>{item.songCount}</Text>
+          <Text style={styles.statLabel}>{t("admin.songs")}</Text>
         </View>
       </View>
       <Text style={styles.chevron}>›</Text>

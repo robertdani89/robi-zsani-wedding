@@ -15,6 +15,7 @@ import {
   type UploadPhotoAsset,
   type UpdateGuestPayload,
   type UploadPhotoResponse,
+  type GuestSummary,
 } from "@/types";
 
 import * as FileSystem from "expo-file-system/legacy";
@@ -674,15 +675,7 @@ class ApiService {
     );
   }
 
-  async getAllGuestsWithStats(eventId: string): Promise<
-    {
-      id: string;
-      name: string;
-      createdAt: string;
-      answerCount: number;
-      photoCount: number;
-    }[]
-  > {
+  async getAllGuestsWithStats(eventId: string): Promise<GuestSummary[]> {
     return this.fetch(`/admin/person?eventId=${encodeURIComponent(eventId)}`);
   }
 
@@ -915,15 +908,7 @@ class SmartApiService {
     return [];
   }
 
-  async getAllGuestsWithStats(eventId: string): Promise<
-    {
-      id: string;
-      name: string;
-      createdAt: string;
-      answerCount: number;
-      photoCount: number;
-    }[]
-  > {
+  async getAllGuestsWithStats(eventId: string): Promise<GuestSummary[]> {
     const service = await this.getService();
     return service.getAllGuestsWithStats(eventId);
   }

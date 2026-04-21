@@ -160,8 +160,8 @@ export default function GuestDetailScreen() {
           </View>
           <View style={styles.statDivider} />
           <View style={styles.statItem}>
-            <Text style={styles.statNumber}>{songs?.length ? "✓" : "—"}</Text>
-            <Text style={styles.statLabel}>{t("adminGuest.statsSong")}</Text>
+            <Text style={styles.statNumber}>{songs.length}</Text>
+            <Text style={styles.statLabel}>{t("adminGuest.statsSongs")}</Text>
           </View>
         </View>
 
