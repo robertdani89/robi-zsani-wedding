@@ -56,24 +56,37 @@ export default function DashboardShell({ children }: DashboardShellProps) {
             </TouchableOpacity>
           </View>
 
-          {activeEvent && (
-            <Text style={styles.eventLabel}>
-              {activeEvent.name}
-              {activeEvent.date ? ` · ${activeEvent.date}` : ""}
-              {activeEvent.code ? ` · ${activeEvent.code}` : ""}
-            </Text>
+          {state.guest?.role === "organizer" && activeEvent && (
+            <>
+              <Text style={styles.eventLabel}>
+                EventName: {activeEvent.name}
+              </Text>
+              <Text style={styles.eventLabel}>
+                Date:{" "}
+                {activeEvent.date
+                  ? ` · ${new Date(activeEvent.date).toLocaleDateString()}`
+                  : ""}
+              </Text>
+              <Text style={styles.eventLabel}>
+                Code: {activeEvent.code ? ` · ${activeEvent.code}` : ""}
+              </Text>
+            </>
           )}
 
-          <Text style={[styles.text, styles.subtitle]}>
-            {isCompleted
-              ? t("dashboard.completedSubtitle1")
-              : t("dashboard.subtitle1")}
-          </Text>
-          <Text style={[styles.text, styles.subtitle]}>
-            {isCompleted
-              ? t("dashboard.completedSubtitle2")
-              : t("dashboard.subtitle2")}
-          </Text>
+          {state.guest?.role !== "organizer" && (
+            <>
+              <Text style={[styles.text, styles.subtitle]}>
+                {isCompleted
+                  ? t("dashboard.completedSubtitle1")
+                  : t("dashboard.subtitle1")}
+              </Text>
+              <Text style={[styles.text, styles.subtitle]}>
+                {isCompleted
+                  ? t("dashboard.completedSubtitle2")
+                  : t("dashboard.subtitle2")}
+              </Text>
+            </>
+          )}
         </Card>
 
         {children}
@@ -171,7 +184,7 @@ const styles = StyleSheet.create({
   },
   eventLabel: {
     fontSize: 14,
-    color: "#999",
+    color: "#555",
     marginBottom: 8,
   },
   modalOverlay: {

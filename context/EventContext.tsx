@@ -1,11 +1,4 @@
-import {
-  AppEvent,
-  EventRole,
-  EventTemplate,
-  Question,
-  QuestionType,
-  ServerEvent,
-} from "@/types";
+import { AppEvent, EventRole, ServerEvent } from "@/types";
 import React, {
   ReactNode,
   createContext,
@@ -22,100 +15,6 @@ const STORAGE_KEYS = {
   ACTIVE_EVENT: "@events_app_active_event",
 };
 
-const DEFAULT_WEDDING_QUESTIONS: Question[] = [
-  {
-    id: "tpl_1",
-    text: {
-      en: "How do you know the hosts?",
-      hu: "Honnan ismered a házigazdákat?",
-    },
-    type: QuestionType.SINGLE_CHOICE,
-    options: [
-      { en: "Family", hu: "Család" },
-      { en: "Friends", hu: "Barátok" },
-      { en: "Work / School", hu: "Munka / Iskola" },
-      { en: "Other", hu: "Egyéb" },
-    ],
-  },
-  {
-    id: "tpl_2",
-    text: {
-      en: "What is your favorite memory with them?",
-      hu: "Mi a kedvenc emlékeid velük?",
-    },
-    type: QuestionType.FREE_TEXT,
-  },
-  {
-    id: "tpl_3",
-    text: {
-      en: "What advice would you give the couple?",
-      hu: "Milyen tanácsot adnál a párnak?",
-    },
-    type: QuestionType.FREE_TEXT,
-  },
-  {
-    id: "tpl_4",
-    text: {
-      en: "What are you most looking forward to?",
-      hu: "Mire vársz a legjobban?",
-    },
-    type: QuestionType.MULTIPLE_CHOICE,
-    options: [
-      { en: "The ceremony", hu: "A szertartás" },
-      { en: "The party", hu: "A buli" },
-      { en: "The food", hu: "Az étel" },
-      { en: "Meeting everyone", hu: "Találkozás mindenkivel" },
-      { en: "The music", hu: "A zene" },
-    ],
-  },
-  {
-    id: "tpl_5",
-    text: {
-      en: "How far did you travel to be here?",
-      hu: "Milyen messziről jöttél?",
-    },
-    type: QuestionType.SINGLE_CHOICE,
-    options: [
-      { en: "Less than 30 min", hu: "Kevesebb mint 30 perc" },
-      { en: "30 min – 2 hours", hu: "30 perc – 2 óra" },
-      { en: "2 – 5 hours", hu: "2 – 5 óra" },
-      { en: "More than 5 hours", hu: "Több mint 5 óra" },
-    ],
-  },
-  {
-    id: "tpl_6",
-    text: {
-      en: "Leave a wish or message for the hosts!",
-      hu: "Hagyj egy kívánságot vagy üzenetet a házigazdáknak!",
-    },
-    type: QuestionType.FREE_TEXT,
-  },
-];
-
-export const DEFAULT_WEDDING_TEMPLATE: EventTemplate = {
-  id: "wedding",
-  name: "Wedding Celebration",
-  description:
-    "A classic wedding guest experience with questions, photos, and music.",
-  questions: DEFAULT_WEDDING_QUESTIONS,
-  features: {
-    photos: true,
-    songs: true,
-    gift: true,
-    gallery: true,
-    puzzle: true,
-  },
-};
-
-const generateEventCode = (): string => {
-  const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
-  let code = "";
-  for (let i = 0; i < 6; i++) {
-    code += chars.charAt(Math.floor(Math.random() * chars.length));
-  }
-  return code;
-};
-
 const mapServerEventToAppEvent = (
   event: ServerEvent,
   role: EventRole,
@@ -125,12 +24,7 @@ const mapServerEventToAppEvent = (
   name: event.name,
   date: event.date ?? "",
   organizerName: event.organizerName,
-  template: {
-    ...DEFAULT_WEDDING_TEMPLATE,
-    questions: event.questions?.length
-      ? event.questions
-      : DEFAULT_WEDDING_TEMPLATE.questions,
-  },
+  template: "wedding",
   role,
   createdAt: event.createdAt,
 });
@@ -191,17 +85,10 @@ export const EventProvider = ({ children }: { children: ReactNode }) => {
     setEvents(updatedEvents);
   };
 
-  const createEvent = async (
-    name: string,
-    date: string,
-    organizerName?: string,
-  ): Promise<AppEvent> => {
+  const createEvent = async (name: string, date: string): Promise<AppEvent> => {
     const serverEvent = await apiService.createEvent({
-      code: generateEventCode(),
       name,
       date,
-      organizerName,
-      questions: DEFAULT_WEDDING_TEMPLATE.questions,
     });
     const event = mapServerEventToAppEvent(serverEvent, "organizer");
 

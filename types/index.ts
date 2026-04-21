@@ -23,19 +23,7 @@ export interface ServerEvent {
   createdAt: string;
 }
 
-export interface EventTemplate {
-  id: string;
-  name: string;
-  description?: string;
-  questions: Question[];
-  features: {
-    photos: boolean;
-    songs: boolean;
-    gift: boolean;
-    gallery: boolean;
-    puzzle: boolean;
-  };
-}
+export type EventTemplate = "wedding" | "birthday" | "custom";
 
 export interface AppEvent {
   id: string;
@@ -46,6 +34,7 @@ export interface AppEvent {
   template: EventTemplate;
   role: EventRole;
   createdAt: string;
+  questions?: Question[];
 }
 
 export enum QuestionType {

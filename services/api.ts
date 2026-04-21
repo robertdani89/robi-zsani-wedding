@@ -260,11 +260,8 @@ class ApiService {
   }
 
   async createEvent(payload: {
-    code: string;
     name: string;
     date: string;
-    organizerName?: string;
-    questions?: Question[];
   }): Promise<ServerEvent> {
     return this.fetch<ServerEvent>("/events", {
       method: "POST",
@@ -678,7 +675,7 @@ class ApiService {
     );
   }
 
-  async getAllGuestsWithStats(): Promise<
+  async getAllGuestsWithStats(eventId: string): Promise<
     {
       id: string;
       name: string;
@@ -687,7 +684,7 @@ class ApiService {
       photoCount: number;
     }[]
   > {
-    return this.fetch("/admin/guests");
+    return this.fetch(`/admin/guests?eventId=${encodeURIComponent(eventId)}`);
   }
 
   async getGuestAnswersWithQuestions(
@@ -779,11 +776,8 @@ class SmartApiService {
   }
 
   async createEvent(payload: {
-    code: string;
     name: string;
     date: string;
-    organizerName?: string;
-    questions?: Question[];
   }): Promise<ServerEvent> {
     const service = await this.getService();
     return service.createEvent(payload);
@@ -921,7 +915,7 @@ class SmartApiService {
     }
   }
 
-  async getAllGuestsWithStats(): Promise<
+  async getAllGuestsWithStats(eventId: string): Promise<
     {
       id: string;
       name: string;
@@ -931,7 +925,7 @@ class SmartApiService {
     }[]
   > {
     const service = await this.getService();
-    return service.getAllGuestsWithStats();
+    return service.getAllGuestsWithStats(eventId);
   }
 
   async getGuestAnswersWithQuestions(

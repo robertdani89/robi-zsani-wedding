@@ -169,17 +169,15 @@ export class MockApiService {
   }
 
   async createEvent(event: {
-    code: string;
     name: string;
     date: string;
     organizerName?: string;
     questions?: Question[];
   }): Promise<ServerEvent> {
     await this.delay();
-    const normalizedCode = event.code.trim().toUpperCase();
     const createdEvent: ServerEvent = {
       id: `mock-event-${Date.now()}`,
-      code: normalizedCode,
+      code: generateEventCode(),
       name: event.name,
       date: event.date,
       organizerName: event.organizerName,
@@ -187,6 +185,7 @@ export class MockApiService {
       createdAt: new Date().toISOString(),
     };
 
+    const normalizedCode = createdEvent.code.trim().toUpperCase();
     this.events.set(normalizedCode, createdEvent);
     return createdEvent;
   }
@@ -476,3 +475,12 @@ export class MockApiService {
     throw new Error("Song not found.");
   }
 }
+
+const generateEventCode = (): string => {
+  const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+  let code = "";
+  for (let i = 0; i < 6; i++) {
+    code += chars.charAt(Math.floor(Math.random() * chars.length));
+  }
+  return code;
+};

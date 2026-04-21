@@ -37,12 +37,15 @@ export default function AdminScreen() {
 
   const fetchGuests = useCallback(async () => {
     try {
-      const data = await apiService.getAllGuestsWithStats();
+      if (!activeEvent) {
+        throw new Error("Active event is not available");
+      }
+      const data = await apiService.getAllGuestsWithStats(activeEvent.id);
       setGuests(data);
     } catch (error) {
       console.error("Error fetching guests:", error);
     }
-  }, []);
+  }, [activeEvent]);
 
   const loadData = async () => {
     setIsLoading(true);

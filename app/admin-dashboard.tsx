@@ -29,22 +29,6 @@ export default function AdminDashboardScreen() {
 
         <TouchableOpacity
           style={styles.toolCard}
-          onPress={() => router.push("/admin")}
-          activeOpacity={0.7}
-        >
-          <View style={styles.toolIcon}>
-            <Text style={styles.toolEmoji}>🔐</Text>
-          </View>
-          <View style={styles.toolContent}>
-            <Text style={styles.toolTitle}>{t("dashboard.adminPanel")}</Text>
-            <Text style={styles.toolDescription}>
-              {t("dashboard.adminPanelDesc")}
-            </Text>
-          </View>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          style={styles.toolCard}
           onPress={() => router.push("/edit-template")}
           activeOpacity={0.7}
         >
@@ -55,6 +39,22 @@ export default function AdminDashboardScreen() {
             <Text style={styles.toolTitle}>{t("dashboard.editTemplate")}</Text>
             <Text style={styles.toolDescription}>
               {t("dashboard.editTemplateDesc")}
+            </Text>
+          </View>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={styles.toolCard}
+          onPress={() => router.push("/admin")}
+          activeOpacity={0.7}
+        >
+          <View style={styles.toolIcon}>
+            <Text style={styles.toolEmoji}>🔐</Text>
+          </View>
+          <View style={styles.toolContent}>
+            <Text style={styles.toolTitle}>{t("dashboard.adminPanel")}</Text>
+            <Text style={styles.toolDescription}>
+              {t("dashboard.adminPanelDesc")}
             </Text>
           </View>
         </TouchableOpacity>

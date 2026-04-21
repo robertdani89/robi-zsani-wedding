@@ -31,7 +31,7 @@ export default function EditTemplateScreen() {
   });
 
   const [questions, setQuestions] = useState<Question[]>(
-    activeEvent?.template.questions ?? [],
+    activeEvent?.questions ?? [],
   );
   const [showAddForm, setShowAddForm] = useState(false);
   const [newQuestionEn, setNewQuestionEn] = useState("");
@@ -123,10 +123,7 @@ export default function EditTemplateScreen() {
   const handleSave = async () => {
     const updatedEvent = {
       ...activeEvent,
-      template: {
-        ...activeEvent.template,
-        questions,
-      },
+      questions,
     };
 
     await updateEvent(updatedEvent);
@@ -500,7 +497,7 @@ const styles = StyleSheet.create({
   },
   optionInputs: {
     flex: 1,
-    flexDirection: "row",
+    flexDirection: "column",
     gap: 8,
   },
   optionInput: {
