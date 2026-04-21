@@ -9,6 +9,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { useEffect, useState } from "react";
 
 import Button from "@/components/Button";
 import Card from "@/components/Card";
@@ -22,18 +23,23 @@ import { useEvent } from "@/context/EventContext";
 import { useFonts } from "expo-font";
 import { useLocalization } from "@/context/LocalizationContext";
 import { useRouter } from "expo-router";
-import { useState } from "react";
 
 export default function IdentifyScreen() {
   const [name, setName] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
   const { t } = useLocalization();
-  const { setGuest, setAssignedQuestions } = useApp();
+  const { state, setGuest, setAssignedQuestions } = useApp();
   const { activeEvent, updateEvent } = useEvent();
   const [fontsLoaded] = useFonts({
     GreatVibes: require("@/assets/GreatVibes-Regular.ttf"),
   });
+
+  useEffect(() => {
+    if (activeEvent && state.guest) {
+      router.replace("/dashboard");
+    }
+  }, [activeEvent, state.guest]);
 
   if (!fontsLoaded) {
     return null;

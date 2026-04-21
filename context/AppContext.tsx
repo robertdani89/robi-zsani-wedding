@@ -51,7 +51,7 @@ const getStorageKeys = (eventCode: string) => {
 };
 
 export const AppProvider = ({ children }: { children: ReactNode }) => {
-  const { activeEvent } = useEvent();
+  const { activeEvent, isHydrated: isEventHydrated } = useEvent();
   const eventCode = activeEvent?.code;
 
   const [state, setState] = useState<AppState>({

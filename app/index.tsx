@@ -79,6 +79,7 @@ export default function OnboardingScreen() {
       })();
       return;
     }
+
     // If there's an active event but no guest, go to identify
     if (activeEvent && !state.guest) {
       router.replace("/identify");

@@ -57,8 +57,6 @@ export default function DashboardShell({ children }: DashboardShellProps) {
       cancelText: t("common.yes"),
       onConfirm: async () => {
         setSettingsVisible(false);
-        await app.removeEvent(activeEvent?.code ?? "");
-
         await leaveCurrentEvent();
         router.replace("/");
       },

@@ -39,7 +39,7 @@ export default function AssistScreen() {
     setError(null);
 
     try {
-      const nextSong = await apiService.getNextPendingSong();
+      const nextSong = await apiService.getNextPendingSong(activeEvent.id);
       setSong(nextSong);
     } catch (loadError) {
       console.error("Error loading pending song:", loadError);

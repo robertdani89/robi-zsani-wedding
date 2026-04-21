@@ -712,8 +712,10 @@ class ApiService {
     });
   }
 
-  async getNextPendingSong(): Promise<PendingSongReview | null> {
-    const response = await this.fetch<any>("/songs/next-pending");
+  async getNextPendingSong(eventId: string): Promise<PendingSongReview | null> {
+    const response = await this.fetch<any>(
+      `/songs/next-pending?eventId=${encodeURIComponent(eventId)}`,
+    );
     return this.normalizePendingSong(response);
   }
 
@@ -942,9 +944,9 @@ class SmartApiService {
     return service.deleteSong(songId);
   }
 
-  async getNextPendingSong(): Promise<PendingSongReview | null> {
+  async getNextPendingSong(eventId: string): Promise<PendingSongReview | null> {
     const service = await this.getService();
-    return service.getNextPendingSong();
+    return service.getNextPendingSong(eventId);
   }
 
   async updateSongAllowed(
