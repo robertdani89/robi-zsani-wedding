@@ -36,7 +36,7 @@ export default function CreateEventScreen() {
   const router = useRouter();
   const { t } = useLocalization();
   const { createEvent, updateEvent } = useEvent();
-  const { setGuest, setAssignedQuestions } = useApp();
+  const { setGuest } = useApp();
   const [fontsLoaded] = useFonts({
     GreatVibes: require("@/assets/GreatVibes-Regular.ttf"),
   });
@@ -92,26 +92,20 @@ export default function CreateEventScreen() {
         orgName || undefined,
       );
 
-      if (orgName) {
-        try {
-          const { guest: serverGuest, questions } =
-            await apiService.registerGuest(orgName, event.code, "organizer");
-          const newGuest: Guest = {
-            id: serverGuest.id,
-            name: serverGuest.name,
-            role: serverGuest.role,
-            completed: false,
-            createdAt: serverGuest.createdAt,
-          };
-          await setGuest(newGuest);
-          await setAssignedQuestions(event.questions ?? questions);
-          if (serverGuest.role && event.role !== serverGuest.role) {
-            await updateEvent({ ...event, role: serverGuest.role });
-          }
-        } catch {
-          // Registration failed – they'll land on identify instead
-        }
-      }
+      const { guest: serverGuest } = await apiService.registerGuest(
+        orgName,
+        event.code,
+        "organizer",
+      );
+      const newGuest: Guest = {
+        id: serverGuest.id,
+        name: serverGuest.name,
+        role: serverGuest.role,
+        completed: false,
+        createdAt: serverGuest.createdAt,
+      };
+
+      await setGuest(newGuest, event.code);
 
       showMessage(
         t("createEvent.successTitle"),

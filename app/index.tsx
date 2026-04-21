@@ -134,7 +134,7 @@ export default function OnboardingScreen() {
                   key={event.id}
                   style={styles.eventItem}
                   onPress={() => {
-                    router.push({
+                    router.replace({
                       pathname: "/join-event",
                       params: { code: event.code, rejoin: "1" },
                     });

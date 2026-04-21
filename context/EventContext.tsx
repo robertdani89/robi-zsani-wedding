@@ -1,4 +1,4 @@
-import { AppEvent, EventRole, ServerEvent } from "@/types";
+import { AppEvent, Event, EventRole } from "@/types";
 import React, {
   ReactNode,
   createContext,
@@ -8,27 +8,23 @@ import React, {
 } from "react";
 
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { STORAGE_KEYS } from "@/constants";
 import apiService from "@/services/api";
 
-const STORAGE_KEYS = {
-  EVENTS: "@events_app_events",
-  ACTIVE_EVENT: "@events_app_active_event",
-};
-
-const mapServerEventToAppEvent = (
-  event: ServerEvent,
-  role: EventRole,
-): AppEvent => ({
-  id: event.id,
-  code: event.code,
-  name: event.name,
-  date: event.date ?? "",
-  organizerName: event.organizerName,
-  template: "wedding",
-  role,
-  createdAt: event.createdAt,
-  questions: event.questions,
-});
+// const mapServerEventToAppEvent = (
+//   event: ServerEvent,
+//   role: EventRole,
+// ): AppEvent => ({
+//   id: event.id,
+//   code: event.code,
+//   name: event.name,
+//   date: event.date ?? "",
+//   organizerName: event.organizerName,
+//   template: "wedding",
+//   role,
+//   createdAt: event.createdAt,
+//   questions: event.questions,
+// });
 
 interface EventContextType {
   events: AppEvent[];
@@ -43,7 +39,7 @@ interface EventContextType {
   setActiveEvent: (eventId: string) => Promise<void>;
   updateEvent: (event: AppEvent) => Promise<void>;
   removeEvent: (eventId: string) => Promise<void>;
-  leaveCurrentEvent: () => Promise<void>;
+  leaveCurrentEvent: (forGood?: boolean) => Promise<void>;
 }
 
 const EventContext = createContext<EventContextType | undefined>(undefined);
@@ -79,6 +75,7 @@ export const EventProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const persistEvents = async (updatedEvents: AppEvent[]) => {
+    console.log("Persisting events:", updatedEvents);
     await AsyncStorage.setItem(
       STORAGE_KEYS.EVENTS,
       JSON.stringify(updatedEvents),
@@ -87,12 +84,10 @@ export const EventProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const createEvent = async (name: string, date: string): Promise<AppEvent> => {
-    const serverEvent = await apiService.createEvent({
+    const event = await apiService.createEvent({
       name,
       date,
     });
-    console.log("Created event on server:", serverEvent);
-    const event = mapServerEventToAppEvent(serverEvent, "organizer");
 
     const updatedEvents = [...events, event];
     await persistEvents(updatedEvents);
@@ -106,15 +101,15 @@ export const EventProvider = ({ children }: { children: ReactNode }) => {
     const normalizedCode = code.trim().toUpperCase();
     const serverEvent = await apiService.getEventByCode(normalizedCode);
     const existing = events.find((e) => e.code === normalizedCode);
-    const verifiedEvent = mapServerEventToAppEvent(
-      serverEvent,
-      existing?.role ?? "guest",
-    );
+    // const verifiedEvent = mapServerEventToAppEvent(
+    //   serverEvent,
+    //   existing?.role ?? "guest",
+    // );
 
     if (existing) {
       const updatedExisting = {
         ...existing,
-        ...verifiedEvent,
+        ...serverEvent,
         id: existing.id,
         role: existing.role,
       };
@@ -127,7 +122,7 @@ export const EventProvider = ({ children }: { children: ReactNode }) => {
       return updatedExisting;
     }
 
-    const event = verifiedEvent;
+    const event = serverEvent;
 
     const updatedEvents = [...events, event];
     await persistEvents(updatedEvents);
@@ -164,8 +159,14 @@ export const EventProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
-  const leaveCurrentEvent = async () => {
+  const leaveCurrentEvent = async (forGood = false) => {
     await AsyncStorage.removeItem(STORAGE_KEYS.ACTIVE_EVENT);
+
+    if (forGood && activeEvent) {
+      const newEvents = events.filter((e) => e.id !== activeEvent.id);
+      await persistEvents(newEvents);
+    }
+
     setActiveEventState(null);
   };
 

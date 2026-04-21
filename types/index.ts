@@ -13,7 +13,7 @@ export type GiftType = "gift_for_man" | "gift_for_ladies";
 
 export type EventRole = "organizer" | "assistant" | "guest";
 
-export interface ServerEvent {
+export interface Event {
   id: string;
   code: string;
   name: string;
@@ -24,18 +24,6 @@ export interface ServerEvent {
 }
 
 export type EventTemplate = "wedding" | "birthday" | "custom";
-
-export interface AppEvent {
-  id: string;
-  code: string;
-  name: string;
-  date: string;
-  organizerName?: string;
-  template: EventTemplate;
-  role: EventRole;
-  createdAt: string;
-  questions?: Question[];
-}
 
 export enum QuestionType {
   SINGLE_CHOICE = "single_choice",

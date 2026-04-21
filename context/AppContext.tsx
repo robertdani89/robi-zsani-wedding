@@ -23,7 +23,8 @@ import { useEvent } from "./EventContext";
 interface AppContextType {
   state: AppState;
   isHydrated: boolean;
-  setGuest: (guest: Guest) => Promise<void>;
+  setCode: (code: string) => Promise<void>;
+  setGuest: (guest: Guest, eventCode?: string) => Promise<void>;
   addAnswer: (answer: Answer) => Promise<void>;
   addPhoto: (photo: Photo) => Promise<void>;
   removePhoto: (photoId: string) => Promise<void>;
@@ -33,12 +34,13 @@ interface AppContextType {
   resetApp: () => Promise<void>;
   setAssignedQuestions: (questions: Question[]) => Promise<void>;
   getAssignedQuestions: () => Question[];
+  removeEvent: (code: string) => Promise<void>;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
 
-const getStorageKeys = (eventCode?: string) => {
-  const prefix = eventCode ? `@event_${eventCode}` : "@events_app";
+const getStorageKeys = (eventCode: string) => {
+  const prefix = `@event_${eventCode}`;
   return {
     GUEST: `${prefix}_guest`,
     ANSWERS: `${prefix}_answers`,
@@ -72,15 +74,15 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
   }, [activeEvent?.questions, eventCode]);
 
   const loadData = async () => {
-    const STORAGE_KEYS = getStorageKeys(eventCode);
+    const storageKeys = getStorageKeys(eventCode);
     try {
       const [guestData, answersData, photosData, questionsData, songData] =
         await Promise.all([
-          AsyncStorage.getItem(STORAGE_KEYS.GUEST),
-          AsyncStorage.getItem(STORAGE_KEYS.ANSWERS),
-          AsyncStorage.getItem(STORAGE_KEYS.PHOTOS),
-          AsyncStorage.getItem(STORAGE_KEYS.QUESTIONS),
-          AsyncStorage.getItem(STORAGE_KEYS.SONG),
+          AsyncStorage.getItem(storageKeys.GUEST),
+          AsyncStorage.getItem(storageKeys.ANSWERS),
+          AsyncStorage.getItem(storageKeys.PHOTOS),
+          AsyncStorage.getItem(storageKeys.QUESTIONS),
+          AsyncStorage.getItem(storageKeys.SONG),
         ]);
 
       const guest = guestData ? JSON.parse(guestData) : null;
@@ -117,10 +119,21 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
-  const setGuest = async (guest: Guest) => {
-    const STORAGE_KEYS = getStorageKeys(eventCode);
+  const removeEvent = async (code: string) => {
+    const storageKeys = getStorageKeys(code);
+    await AsyncStorage.multiRemove([
+      storageKeys.GUEST,
+      storageKeys.ANSWERS,
+      storageKeys.PHOTOS,
+      storageKeys.QUESTIONS,
+      storageKeys.SONG,
+    ]);
+  };
+
+  const setGuest = async (guest: Guest, code?: string) => {
+    const storageKeys = getStorageKeys(code ?? eventCode);
     try {
-      await AsyncStorage.setItem(STORAGE_KEYS.GUEST, JSON.stringify(guest));
+      await AsyncStorage.setItem(storageKeys.GUEST, JSON.stringify(guest));
       setState((prev) => ({ ...prev, guest }));
     } catch (error) {
       console.error("Error saving guest:", error);
@@ -128,14 +141,14 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const addAnswer = async (answer: Answer) => {
-    const STORAGE_KEYS = getStorageKeys(eventCode);
+    const storageKeys = getStorageKeys(eventCode);
     try {
       const updatedAnswers = [
         ...state.answers.filter((a) => a.questionId !== answer.questionId),
         answer,
       ];
       await AsyncStorage.setItem(
-        STORAGE_KEYS.ANSWERS,
+        storageKeys.ANSWERS,
         JSON.stringify(updatedAnswers),
       );
 
@@ -153,12 +166,12 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const addPhoto = async (photo: Photo) => {
-    const STORAGE_KEYS = getStorageKeys(eventCode);
+    const storageKeys = getStorageKeys(eventCode);
     try {
       const updatedPhotos = [...photosRef.current, photo];
       photosRef.current = updatedPhotos;
       await AsyncStorage.setItem(
-        STORAGE_KEYS.PHOTOS,
+        storageKeys.PHOTOS,
         JSON.stringify(updatedPhotos),
       );
       setState((prev) => ({ ...prev, photos: updatedPhotos }));
@@ -168,12 +181,12 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const removePhoto = async (photoId: string) => {
-    const STORAGE_KEYS = getStorageKeys(eventCode);
+    const storageKeys = getStorageKeys(eventCode);
     try {
       const updatedPhotos = photosRef.current.filter((p) => p.id !== photoId);
       photosRef.current = updatedPhotos;
       await AsyncStorage.setItem(
-        STORAGE_KEYS.PHOTOS,
+        storageKeys.PHOTOS,
         JSON.stringify(updatedPhotos),
       );
       setState((prev) => ({ ...prev, photos: updatedPhotos }));
@@ -294,6 +307,7 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
         resetApp,
         setAssignedQuestions,
         getAssignedQuestions,
+        removeEvent,
       }}
     >
       {children}

@@ -30,7 +30,7 @@ export default function DashboardShell({ children }: DashboardShellProps) {
   const { activeEvent, leaveCurrentEvent } = useEvent();
   const { t } = useLocalization();
   const [settingsVisible, setSettingsVisible] = useState(false);
-
+  const app = useApp();
   const maxName = state.guest?.name.split(" ").slice(0, 2).join(" ") ?? "";
   const name = maxName.length > 20 ? "" : maxName;
   const isCompleted = !!state.guest?.gotGiftAt;
@@ -44,7 +44,28 @@ export default function DashboardShell({ children }: DashboardShellProps) {
       onConfirm: async () => {
         setSettingsVisible(false);
         await resetApp();
+        router.replace("/");
+      },
+    });
+  };
+
+  const handleLeaveEvent = () => {
+    showDecision({
+      title: t("common.leaveEvent"),
+      message: t("common.leaveEventDescription"),
+      confirmText: t("common.no"),
+      cancelText: t("common.yes"),
+      onConfirm: async () => {
+        setSettingsVisible(false);
+        await app.removeEvent(activeEvent?.code ?? "");
+
         await leaveCurrentEvent();
+        router.replace("/");
+      },
+      onCancel: async () => {
+        setSettingsVisible(false);
+        await app.removeEvent(activeEvent?.code ?? "");
+        await leaveCurrentEvent(true);
         router.replace("/");
       },
     });
@@ -140,6 +161,16 @@ export default function DashboardShell({ children }: DashboardShellProps) {
 
             <TouchableOpacity
               style={styles.resetButton}
+              onPress={handleLeaveEvent}
+              activeOpacity={0.7}
+            >
+              <Text style={styles.resetButtonTitle}>
+                {t("common.leaveEvent")}
+              </Text>
+            </TouchableOpacity>
+
+            {/* <TouchableOpacity
+              style={styles.resetButton}
               onPress={handleReset}
               activeOpacity={0.7}
             >
@@ -147,7 +178,7 @@ export default function DashboardShell({ children }: DashboardShellProps) {
               <Text style={styles.resetButtonDescription}>
                 {t("common.resetDescription")}
               </Text>
-            </TouchableOpacity>
+            </TouchableOpacity> */}
 
             <View style={styles.settingsActions}>
               <Button

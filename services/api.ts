@@ -6,7 +6,7 @@ import {
   PendingSongReview,
   Photo,
   Question,
-  ServerEvent,
+  Event,
   Song,
   type GiftAssistancePayload,
   type GiftType,
@@ -259,19 +259,16 @@ class ApiService {
     };
   }
 
-  async createEvent(payload: {
-    name: string;
-    date: string;
-  }): Promise<ServerEvent> {
-    return this.fetch<ServerEvent>("/events", {
+  async createEvent(payload: { name: string; date: string }): Promise<Event> {
+    return this.fetch<Event>("/events", {
       method: "POST",
       body: JSON.stringify(payload),
     });
   }
 
-  async getEventByCode(code: string): Promise<ServerEvent> {
+  async getEventByCode(code: string): Promise<Event> {
     const normalizedCode = code.trim().toUpperCase();
-    return this.fetch<ServerEvent>(
+    return this.fetch<Event>(
       `/events/code/${encodeURIComponent(normalizedCode)}`,
     );
   }
@@ -766,15 +763,12 @@ class SmartApiService {
     return this.resolvePromise;
   }
 
-  async createEvent(payload: {
-    name: string;
-    date: string;
-  }): Promise<ServerEvent> {
+  async createEvent(payload: { name: string; date: string }): Promise<Event> {
     const service = await this.getService();
     return service.createEvent(payload);
   }
 
-  async getEventByCode(code: string): Promise<ServerEvent> {
+  async getEventByCode(code: string): Promise<Event> {
     const service = await this.getService();
     return service.getEventByCode(code);
   }

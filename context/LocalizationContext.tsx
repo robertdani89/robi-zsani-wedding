@@ -14,8 +14,7 @@ import React, {
 } from "react";
 
 import AsyncStorage from "@react-native-async-storage/async-storage";
-
-const LOCALE_STORAGE_KEY = "@wedding_app_locale";
+import { STORAGE_KEYS } from "@/constants";
 
 interface TranslationParams {
   [key: string]: string | number;
@@ -49,7 +48,7 @@ export const LocalizationProvider = ({ children }: { children: ReactNode }) => {
   useEffect(() => {
     const loadLocale = async () => {
       try {
-        const savedLocale = await AsyncStorage.getItem(LOCALE_STORAGE_KEY);
+        const savedLocale = await AsyncStorage.getItem(STORAGE_KEYS.LOCALE);
         if (savedLocale === "en" || savedLocale === "hu") {
           setLocaleState(savedLocale);
         }
@@ -63,7 +62,7 @@ export const LocalizationProvider = ({ children }: { children: ReactNode }) => {
 
   const setLocale = async (nextLocale: Locale) => {
     try {
-      await AsyncStorage.setItem(LOCALE_STORAGE_KEY, nextLocale);
+      await AsyncStorage.setItem(STORAGE_KEYS.LOCALE, nextLocale);
       setLocaleState(nextLocale);
     } catch (error) {
       console.error("Error saving locale:", error);

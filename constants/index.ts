@@ -27,10 +27,9 @@ export const CONFIG = {
   maxPhotosAllowed: 5,
 };
 
-// Storage keys
+// Common storage keys
 export const STORAGE_KEYS = {
-  GUEST: "@wedding_app_guest",
-  ANSWERS: "@wedding_app_answers",
-  PHOTOS: "@wedding_app_photos",
-  QUESTIONS: "@wedding_app_questions",
+  LOCALE: "@app_locale",
+  EVENTS: "@app_events",
+  ACTIVE_EVENT: "@app_active_event",
 };

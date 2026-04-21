@@ -35,11 +35,16 @@ export default function JoinEventScreen() {
   });
 
   useEffect(() => {
-    if (params.code && params.rejoin === "1") {
-      handleJoinWithCode(params.code);
-    } else if (params.code) {
-      setCode(params.code);
-    }
+    const joinEventIfNeeded = async () => {
+      if (params.code && params.rejoin === "1") {
+        await joinEvent(params.code);
+        router.replace("/dashboard");
+      } else if (params.code) {
+        setCode(params.code);
+      }
+    };
+
+    joinEventIfNeeded();
   }, [params.code, params.rejoin]);
 
   if (!fontsLoaded) {

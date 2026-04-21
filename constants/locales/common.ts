@@ -309,6 +309,10 @@ export const TRANSLATIONS = {
     "editTemplate.save": "Save changes",
     "editTemplate.savedTitle": "Saved!",
     "editTemplate.savedMessage": "Your template has been updated.",
+    "common.leaveEvent": "Leave event",
+    "common.leaveEventDescription": "Leave the event and clear all your data",
+    "common.yes": "Yes",
+    "common.no": "No",
   },
   hu: {
     "lang.short": "HU",
@@ -622,6 +626,10 @@ export const TRANSLATIONS = {
     "editTemplate.save": "Változtatások mentése",
     "editTemplate.savedTitle": "Mentve!",
     "editTemplate.savedMessage": "A sablonod frissítve lett.",
+    "common.leaveEvent": "Kilépés az eseményből",
+    "common.leaveEventDescription": "Véglegesen kilépnél?",
+    "common.yes": "Igen",
+    "common.no": "Nem",
   },
 } as const;
 
