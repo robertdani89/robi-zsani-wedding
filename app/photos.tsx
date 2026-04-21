@@ -2,7 +2,6 @@ import * as ImagePicker from "expo-image-picker";
 
 import {
   ActivityIndicator,
-  Alert,
   Image,
   ScrollView,
   StyleSheet,
@@ -18,6 +17,7 @@ import ConfirmationModal from "@/components/ConfirmationModal";
 import { Photo } from "@/types";
 import { StatusBar } from "expo-status-bar";
 import apiService from "@/services/api";
+import { showMessage } from "@/utils/alert";
 import { useApp } from "@/context/AppContext";
 import { useLocalization } from "@/context/LocalizationContext";
 import { useRouter } from "expo-router";
@@ -61,7 +61,7 @@ export default function PhotosScreen() {
   const requestPermissions = async () => {
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (status !== "granted") {
-      Alert.alert(t("photos.permissionTitle"), t("photos.galleryPermission"));
+      showMessage(t("photos.permissionTitle"), t("photos.galleryPermission"));
       return false;
     }
     return true;
@@ -71,12 +71,12 @@ export default function PhotosScreen() {
 
   const uploadPhotoToServer = async (asset: ImagePicker.ImagePickerAsset) => {
     if (isAlreadyUploaded(asset)) {
-      Alert.alert(t("photos.duplicateTitle"), t("photos.duplicateMessage"));
+      showMessage(t("photos.duplicateTitle"), t("photos.duplicateMessage"));
       return false;
     }
 
     if (asset.fileSize && asset.fileSize > MAX_PHOTO_SIZE_BYTES) {
-      Alert.alert(t("photos.tooLargeTitle"), t("photos.tooLargeMessage"));
+      showMessage(t("photos.tooLargeTitle"), t("photos.tooLargeMessage"));
       return false;
     }
 
@@ -101,7 +101,7 @@ export default function PhotosScreen() {
       return true;
     } catch (error) {
       console.error("Upload error:", error);
-      Alert.alert(
+      showMessage(
         t("photos.uploadFailedTitle"),
         t("photos.uploadFailedMessage"),
       );
@@ -113,7 +113,7 @@ export default function PhotosScreen() {
 
   const handleTakePhoto = async () => {
     if (state.photos.length >= MAX_PHOTOS_ALLOWED) {
-      Alert.alert(
+      showMessage(
         t("photos.limitTitle"),
         t("photos.limitMessage", { count: MAX_PHOTOS_ALLOWED }),
       );
@@ -122,7 +122,7 @@ export default function PhotosScreen() {
 
     const { status } = await ImagePicker.requestCameraPermissionsAsync();
     if (status !== "granted") {
-      Alert.alert(t("photos.permissionTitle"), t("photos.cameraPermission"));
+      showMessage(t("photos.permissionTitle"), t("photos.cameraPermission"));
       return;
     }
 
@@ -137,7 +137,7 @@ export default function PhotosScreen() {
         await uploadPhotoToServer(result.assets[0]);
       }
     } catch (error) {
-      Alert.alert(t("photos.errorTitle"), t("photos.uploadRetry"));
+      showMessage(t("photos.errorTitle"), t("photos.uploadRetry"));
     } finally {
       setIsLoading(false);
     }
@@ -145,7 +145,7 @@ export default function PhotosScreen() {
 
   const handleUploadFromGallery = async () => {
     if (state.photos.length >= MAX_PHOTOS_ALLOWED) {
-      Alert.alert(
+      showMessage(
         t("photos.limitTitle"),
         t("photos.limitMessage", { count: MAX_PHOTOS_ALLOWED }),
       );
@@ -177,7 +177,7 @@ export default function PhotosScreen() {
           const fingerprint = buildPhotoFingerprint(asset);
 
           if (seenFingerprints.has(fingerprint)) {
-            Alert.alert(
+            showMessage(
               t("photos.duplicateTitle"),
               t("photos.duplicateMessage"),
             );
@@ -189,7 +189,7 @@ export default function PhotosScreen() {
         }
       }
     } catch (error) {
-      Alert.alert(t("photos.errorTitle"), t("photos.uploadRetry"));
+      showMessage(t("photos.errorTitle"), t("photos.uploadRetry"));
     } finally {
       setIsLoading(false);
     }
@@ -217,7 +217,7 @@ export default function PhotosScreen() {
       }
     } catch (error) {
       console.error("Delete error:", error);
-      Alert.alert(
+      showMessage(
         t("photos.deleteFailedTitle"),
         t("photos.deleteFailedMessage"),
       );

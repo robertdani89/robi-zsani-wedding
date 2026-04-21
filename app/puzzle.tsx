@@ -1,6 +1,5 @@
 import {
   ActivityIndicator,
-  Alert,
   Animated,
   Image,
   ScrollView,
@@ -21,6 +20,7 @@ import Card from "@/components/Card";
 import { GalleryPhoto } from "@/types";
 import { StatusBar } from "expo-status-bar";
 import apiService from "@/services/api";
+import { showMessage } from "@/utils/alert";
 import { useLocalization } from "@/context/LocalizationContext";
 import { useRouter } from "expo-router";
 
@@ -140,7 +140,7 @@ export default function PuzzleScreen() {
       );
     } catch (error) {
       console.error("Puzzle library error:", error);
-      Alert.alert(
+      showMessage(
         t("questions.errorTitle"),
         t("identify.connectionErrorMessage"),
       );

@@ -1,14 +1,13 @@
+import type { GiftType, Guest } from "@/types";
 import {
-  Alert,
   Image,
-  Platform,
   ScrollView,
   StyleSheet,
   Text,
   TouchableOpacity,
   View,
 } from "react-native";
-import type { GiftType, Guest } from "@/types";
+import { showDecision, showMessage } from "@/utils/alert";
 
 import Button from "@/components/Button";
 import Card from "@/components/Card";
@@ -30,67 +29,6 @@ export default function GiftScreen() {
   const [alsoForChild, setAlsoForChild] = useState(false);
   const [childGiftType, setChildGiftType] = useState<GiftType | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
-
-  const showMessage = (
-    title: string,
-    message: string,
-    onDismiss?: () => void,
-  ) => {
-    if (Platform.OS === "web") {
-      window.alert(`${title}\n\n${message}`);
-      onDismiss?.();
-      return;
-    }
-
-    Alert.alert(title, message, [
-      {
-        text: t("common.done"),
-        onPress: onDismiss,
-      },
-    ]);
-  };
-
-  const showDecision = ({
-    title,
-    message,
-    confirmText,
-    cancelText,
-    onConfirm,
-    onCancel,
-  }: {
-    title: string;
-    message: string;
-    confirmText: string;
-    cancelText: string;
-    onConfirm: () => void;
-    onCancel?: () => void;
-  }) => {
-    if (Platform.OS === "web") {
-      const confirmed = window.confirm(
-        `${title}\n\n${message}\n\nOK = ${confirmText}\nCancel = ${cancelText}`,
-      );
-
-      if (confirmed) {
-        onConfirm();
-        return;
-      }
-
-      onCancel?.();
-      return;
-    }
-
-    Alert.alert(title, message, [
-      {
-        text: cancelText,
-        style: "cancel",
-        onPress: onCancel,
-      },
-      {
-        text: confirmText,
-        onPress: onConfirm,
-      },
-    ]);
-  };
 
   const handleRequestAssistance = async (
     guest: Guest,

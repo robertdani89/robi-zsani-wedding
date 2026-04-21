@@ -1,5 +1,4 @@
 import {
-  Alert,
   KeyboardAvoidingView,
   Linking,
   Platform,
@@ -17,6 +16,7 @@ import { Guest } from "@/types";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
 import { StatusBar } from "expo-status-bar";
 import apiService from "@/services/api";
+import { showMessage } from "@/utils/alert";
 import { useApp } from "@/context/AppContext";
 import { useEvent } from "@/context/EventContext";
 import { useFonts } from "expo-font";
@@ -43,7 +43,7 @@ export default function IdentifyScreen() {
     const trimmedName = name.trim();
 
     if (!trimmedName) {
-      Alert.alert(
+      showMessage(
         t("identify.nameRequiredTitle"),
         t("identify.nameRequiredMessage"),
       );
@@ -51,7 +51,7 @@ export default function IdentifyScreen() {
     }
 
     if (!activeEvent?.code) {
-      Alert.alert(
+      showMessage(
         t("identify.connectionErrorTitle"),
         t("joinEvent.errorMessage"),
       );
@@ -89,7 +89,7 @@ export default function IdentifyScreen() {
       router.replace("/dashboard");
     } catch (error) {
       console.error("Registration error:", error);
-      Alert.alert(
+      showMessage(
         t("identify.connectionErrorTitle"),
         t("identify.connectionErrorMessage"),
       );

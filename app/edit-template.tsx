@@ -1,5 +1,4 @@
 import {
-  Alert,
   KeyboardAvoidingView,
   Platform,
   ScrollView,
@@ -10,6 +9,7 @@ import {
   View,
 } from "react-native";
 import { Question, QuestionType } from "@/types";
+import { showDecision, showMessage } from "@/utils/alert";
 import { useEffect, useState } from "react";
 
 import Button from "@/components/Button";
@@ -56,20 +56,15 @@ export default function EditTemplateScreen() {
   }
 
   const handleRemoveQuestion = (questionId: string) => {
-    Alert.alert(
-      t("editTemplate.removeTitle"),
-      t("editTemplate.removeMessage"),
-      [
-        { text: t("common.cancel"), style: "cancel" },
-        {
-          text: t("editTemplate.remove"),
-          style: "destructive",
-          onPress: () => {
-            setQuestions((prev) => prev.filter((q) => q.id !== questionId));
-          },
-        },
-      ],
-    );
+    showDecision({
+      title: t("editTemplate.removeTitle"),
+      message: t("editTemplate.removeMessage"),
+      confirmText: t("editTemplate.remove"),
+      cancelText: t("common.cancel"),
+      onConfirm: () => {
+        setQuestions((prev) => prev.filter((q) => q.id !== questionId));
+      },
+    });
   };
 
   const handleAddOption = () => {
@@ -92,7 +87,7 @@ export default function EditTemplateScreen() {
 
   const handleAddQuestion = () => {
     if (!newQuestionEn.trim() && !newQuestionHu.trim()) {
-      Alert.alert(
+      showMessage(
         t("editTemplate.requiredTitle"),
         t("editTemplate.questionRequired"),
       );
@@ -135,9 +130,12 @@ export default function EditTemplateScreen() {
     };
 
     await updateEvent(updatedEvent);
-    Alert.alert(t("editTemplate.savedTitle"), t("editTemplate.savedMessage"), [
-      { text: t("common.done"), onPress: () => router.back() },
-    ]);
+    showMessage(
+      t("editTemplate.savedTitle"),
+      t("editTemplate.savedMessage"),
+      () => router.back(),
+      t("common.done"),
+    );
   };
 
   const questionTypeLabel = (type: QuestionType) => {

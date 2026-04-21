@@ -1,6 +1,5 @@
 import {
   ActivityIndicator,
-  Alert,
   ScrollView,
   StyleSheet,
   Text,
@@ -15,6 +14,7 @@ import Button from "@/components/Button";
 import Card from "@/components/Card";
 import { StatusBar } from "expo-status-bar";
 import apiService from "@/services/api";
+import { showMessage } from "@/utils/alert";
 import { useApp } from "@/context/AppContext";
 import { useLocalization } from "@/context/LocalizationContext";
 import { useRouter } from "expo-router";
@@ -77,7 +77,7 @@ export default function QuestionsScreen() {
   useEffect(() => {
     const assignedQuestions = getAssignedQuestions();
     if (assignedQuestions.length === 0) {
-      Alert.alert(t("questions.errorTitle"), t("questions.noAssigned"));
+      showMessage(t("questions.errorTitle"), t("questions.noAssigned"));
       router.back();
       return;
     }
@@ -124,7 +124,9 @@ export default function QuestionsScreen() {
 
   const handleMultipleChoice = (optionIndex: number) => {
     const currentAnswers = Array.isArray(currentAnswer)
-      ? currentAnswer.filter((value): value is number => typeof value === "number")
+      ? currentAnswer.filter(
+          (value): value is number => typeof value === "number",
+        )
       : [];
 
     if (currentAnswers.includes(optionIndex)) {
@@ -146,7 +148,7 @@ export default function QuestionsScreen() {
       (typeof currentAnswer !== "string" || currentAnswer.trim().length === 0);
 
     if (isSingleChoiceEmpty || isMultipleChoiceEmpty || isFreeTextEmpty) {
-      Alert.alert(
+      showMessage(
         t("questions.answerRequiredTitle"),
         t("questions.answerRequiredMessage"),
       );
@@ -178,15 +180,15 @@ export default function QuestionsScreen() {
       if (currentQuestionIndex < questions.length - 1) {
         setCurrentQuestionIndex(currentQuestionIndex + 1);
       } else {
-        Alert.alert(
+        showMessage(
           t("questions.thankYouTitle"),
           t("questions.thankYouMessage"),
-          [{ text: "OK", onPress: () => router.replace("/dashboard") }],
+          () => router.replace("/dashboard"),
         );
       }
     } catch (error) {
       console.error("Error submitting answer:", error);
-      Alert.alert(
+      showMessage(
         t("questions.submitErrorTitle"),
         t("questions.submitErrorMessage"),
       );
@@ -245,7 +247,9 @@ export default function QuestionsScreen() {
 
       case QuestionType.MULTIPLE_CHOICE:
         const selectedOptions = Array.isArray(currentAnswer)
-          ? currentAnswer.filter((value): value is number => typeof value === "number")
+          ? currentAnswer.filter(
+              (value): value is number => typeof value === "number",
+            )
           : [];
         return (
           <Card style={styles.optionsContainer}>

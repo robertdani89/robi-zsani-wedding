@@ -28,9 +28,13 @@ export const TRANSLATIONS = {
     "createEvent.weddingTemplate": "Wedding Celebration",
     "createEvent.weddingTemplateDesc":
       "Questions, photo sharing, and music picks for your wedding.",
+    "createEvent.moreComing": "More templates coming soon...",
     "createEvent.create": "Create event",
     "createEvent.requiredTitle": "Required",
     "createEvent.nameRequired": "Please enter an event name.",
+    "createEvent.dateRequired": "Please select an event date.",
+    "createEvent.organizerRequired": "Please enter your name.",
+    "createEvent.dateRequired": "Please enter a valid event date.",
     "createEvent.successTitle": "Event created!",
     "createEvent.successMessage":
       "Your event code is: {{code}}. Share it with your guests so they can join.",
@@ -332,9 +336,12 @@ export const TRANSLATIONS = {
     "createEvent.weddingTemplate": "Esküvői ünnepség",
     "createEvent.weddingTemplateDesc":
       "Kérdések, fotómegosztás és zenei választás az esküvődhöz.",
+    "createEvent.moreComing": "Hamarosan további sablonok...",
     "createEvent.create": "Esemény létrehozása",
     "createEvent.requiredTitle": "Kötelező",
     "createEvent.nameRequired": "Kérlek adj meg egy eseménynevet.",
+    "createEvent.dateRequired": "Kérlek válassz dátumot.",
+    "createEvent.organizerRequired": "Kérlek add meg a neved.",
     "createEvent.successTitle": "Esemény létrehozva!",
     "createEvent.successMessage":
       "Az eseménykódod: {{code}}. Oszd meg a vendégeiddel, hogy csatlakozhassanak.",

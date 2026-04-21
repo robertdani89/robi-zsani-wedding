@@ -1,6 +1,5 @@
 import {
   ActivityIndicator,
-  Alert,
   Image,
   Linking,
   ScrollView,
@@ -16,6 +15,7 @@ import Card from "@/components/Card";
 import { GalleryCollection } from "@/types";
 import { StatusBar } from "expo-status-bar";
 import apiService from "@/services/api";
+import { showMessage } from "@/utils/alert";
 import { useLocalization } from "@/context/LocalizationContext";
 import { useRouter } from "expo-router";
 
@@ -35,7 +35,7 @@ export default function GalleryScreen() {
       );
     } catch (error) {
       console.error("Gallery collections error:", error);
-      Alert.alert(
+      showMessage(
         t("questions.errorTitle"),
         t("identify.connectionErrorMessage"),
       );
@@ -67,7 +67,7 @@ export default function GalleryScreen() {
     try {
       await Linking.openURL(url);
     } catch (error) {
-      Alert.alert(
+      showMessage(
         t("questions.errorTitle"),
         t("identify.connectionErrorMessage"),
       );

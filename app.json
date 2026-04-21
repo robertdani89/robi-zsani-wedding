@@ -11,7 +11,9 @@
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
-    "assetBundlePatterns": ["**/*"],
+    "assetBundlePatterns": [
+      "**/*"
+    ],
     "ios": {
       "supportsTablet": false,
       "bundleIdentifier": "com.stygianlamp.eventcompanion",
@@ -52,7 +54,8 @@
         {
           "photosPermission": "$(PRODUCT_NAME) needs access to your photo library so you can select existing photos from your device and upload them to the event gallery. For example, you can choose a photo you took at the event and share it with the host."
         }
-      ]
+      ],
+      "@react-native-community/datetimepicker"
     ],
     "scheme": "event-companion",
     "extra": {
