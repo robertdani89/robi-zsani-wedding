@@ -82,7 +82,7 @@ export default function SongScreen() {
         album: result.album,
         albumArt: result.albumArt || undefined,
         previewUrl: result.previewUrl || undefined,
-        guestId: state.guest.id,
+        personId: state.guest.id,
       });
 
       const localSong: Song = {

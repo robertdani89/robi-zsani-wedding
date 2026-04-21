@@ -91,7 +91,7 @@ export default function PhotosScreen() {
       // Save locally with server photo ID
       const newPhoto: Photo = {
         id: serverPhoto.id,
-        guestId: state.guest!.id,
+        personId: state.guest!.id,
         uri: asset.uri,
         uploadedAt: serverPhoto.createdAt,
         uploadFingerprint,

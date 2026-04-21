@@ -9,7 +9,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { Answer, Guest, Question, Song } from "@/types";
+import { Answer, Guest, Question, Song, type Photo } from "@/types";
 import { useEffect, useState } from "react";
 import { useLocalSearchParams, useRouter } from "expo-router";
 
@@ -18,13 +18,6 @@ import apiService from "@/services/api";
 import { useApp } from "@/context/AppContext";
 import { useEvent } from "@/context/EventContext";
 import { useLocalization } from "@/context/LocalizationContext";
-
-interface PhotoData {
-  id: string;
-  filename: string;
-  guestId: string;
-  createdAt: string;
-}
 
 const { width: screenWidth } = Dimensions.get("window");
 
@@ -35,11 +28,9 @@ export default function GuestDetailScreen() {
   const { activeEvent } = useEvent();
   const { id } = useLocalSearchParams<{ id: string }>();
   const [guest, setGuest] = useState<Guest | null>(null);
-  const [answers, setAnswers] = useState<(Answer & { question?: Question })[]>(
-    [],
-  );
-  const [photos, setPhotos] = useState<PhotoData[]>([]);
-  const [song, setSong] = useState<Song | null>(null);
+  const [answers, setAnswers] = useState<Answer[]>([]);
+  const [photos, setPhotos] = useState<Photo[]>([]);
+  const [songs, setSongs] = useState<Song[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [selectedPhoto, setSelectedPhoto] = useState<string | null>(null);
 
@@ -63,18 +54,24 @@ export default function GuestDetailScreen() {
         apiService.getGuest(id!),
         apiService.getGuestAnswersWithQuestions(id!),
         apiService.getGuestPhotos(id!),
-        apiService.getGuestSong(id!),
+        apiService.getGuestSongs(id!),
       ]);
 
       setGuest(guestData);
       setAnswers(answersData);
-      setPhotos(photosData as any);
-      setSong(songData);
+      setPhotos(photosData ?? []);
+      setSongs(songData ?? []);
     } catch (error) {
       console.error("Error loading guest data:", error);
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const getQuestionForAnswer = (questionId: string): Question | undefined => {
+    return activeEvent?.questions?.find(
+      (question) => question.id === questionId,
+    );
   };
 
   const formatAnswer = (
@@ -163,39 +160,9 @@ export default function GuestDetailScreen() {
           </View>
           <View style={styles.statDivider} />
           <View style={styles.statItem}>
-            <Text style={styles.statNumber}>{song ? "✓" : "—"}</Text>
+            <Text style={styles.statNumber}>{songs?.length ? "✓" : "—"}</Text>
             <Text style={styles.statLabel}>{t("adminGuest.statsSong")}</Text>
           </View>
-        </View>
-
-        {/* Song Section */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>{t("adminGuest.songPick")}</Text>
-          {!song ? (
-            <View style={styles.emptyCard}>
-              <Text style={styles.emptyText}>{t("adminGuest.noSong")}</Text>
-            </View>
-          ) : (
-            <View style={styles.songCard}>
-              {song.albumArt && (
-                <Image
-                  source={{ uri: song.albumArt }}
-                  style={styles.songAlbumArt}
-                />
-              )}
-              <View style={styles.songInfo}>
-                <Text style={styles.songName} numberOfLines={2}>
-                  {song.name}
-                </Text>
-                <Text style={styles.songArtist} numberOfLines={1}>
-                  {song.artist}
-                </Text>
-                <Text style={styles.songAlbum} numberOfLines={1}>
-                  {song.album}
-                </Text>
-              </View>
-            </View>
-          )}
         </View>
 
         {/* Answers Section */}
@@ -208,22 +175,29 @@ export default function GuestDetailScreen() {
               <Text style={styles.emptyText}>{t("adminGuest.noAnswers")}</Text>
             </View>
           ) : (
-            answers.map((answer, index) => (
-              <View key={answer.id || index} style={styles.answerCard}>
-                <Text style={styles.questionText}>
-                  {answer.question?.text[locale] ||
-                    t("adminGuest.questionFallback", { id: answer.questionId })}
-                </Text>
-                <Text style={styles.answerText}>
-                  {formatAnswer(answer.value, answer.question)}
-                </Text>
-                <Text style={styles.answerDate}>
-                  {new Date(answer.answeredAt).toLocaleString(
-                    locale === "hu" ? "hu-HU" : "en-US",
-                  )}
-                </Text>
-              </View>
-            ))
+            answers.map((answer, index) => {
+              const question = getQuestionForAnswer(answer.questionId);
+
+              return (
+                <View key={answer.id || index} style={styles.answerCard}>
+                  <Text style={styles.questionText}>
+                    {question?.text[locale] ||
+                      question?.text.en ||
+                      t("adminGuest.questionFallback", {
+                        id: answer.questionId,
+                      })}
+                  </Text>
+                  <Text style={styles.answerText}>
+                    {formatAnswer(answer.value, question)}
+                  </Text>
+                  <Text style={styles.answerDate}>
+                    {new Date(answer.answeredAt).toLocaleString(
+                      locale === "hu" ? "hu-HU" : "en-US",
+                    )}
+                  </Text>
+                </View>
+              );
+            })
           )}
         </View>
 
@@ -254,6 +228,32 @@ export default function GuestDetailScreen() {
               ))}
             </View>
           )}
+        </View>
+
+        {/* Song Section */}
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>{t("adminGuest.songPick")}</Text>
+          {songs.map((song) => (
+            <View style={styles.songCard}>
+              {song.albumArt && (
+                <Image
+                  source={{ uri: song.albumArt }}
+                  style={styles.songAlbumArt}
+                />
+              )}
+              <View style={styles.songInfo}>
+                <Text style={styles.songName} numberOfLines={2}>
+                  {song.name}
+                </Text>
+                <Text style={styles.songArtist} numberOfLines={1}>
+                  {song.artist}
+                </Text>
+                <Text style={styles.songAlbum} numberOfLines={1}>
+                  {song.album}
+                </Text>
+              </View>
+            </View>
+          ))}
         </View>
       </ScrollView>
 

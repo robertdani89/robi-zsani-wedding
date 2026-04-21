@@ -57,7 +57,7 @@ export interface Question {
 
 export interface Answer {
   id: string;
-  guestId: string;
+  personId: string;
   questionId: string;
   value: string | number | number[];
   answeredAt: string;
@@ -65,7 +65,7 @@ export interface Answer {
 
 export interface Photo {
   id: string;
-  guestId: string;
+  personId: string;
   uri: string;
   uploadedAt: string;
   uploadFingerprint?: string;
@@ -103,7 +103,7 @@ export interface Song {
 
 export interface PendingSongReview extends Song {
   allowed?: boolean | null;
-  guestId?: string;
+  personId?: string;
   guestName?: string;
 }
 
@@ -164,6 +164,6 @@ export interface UploadPhotoResponse {
   path: string;
   mimetype: string;
   size: number;
-  guestId: string;
+  personId: string;
   createdAt: string;
 }

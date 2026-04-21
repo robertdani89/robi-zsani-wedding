@@ -70,8 +70,8 @@ export default function AdminScreen() {
     loadData();
   }, [activeEvent?.role, router, state.guest?.role]);
 
-  const handleGuestPress = (guestId: string) => {
-    router.push(`/admin/guest/${guestId}`);
+  const handleGuestPress = (personId: string) => {
+    router.push(`/admin/guest/${personId}`);
   };
 
   const handleExit = () => {

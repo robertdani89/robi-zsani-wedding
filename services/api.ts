@@ -21,7 +21,6 @@ import * as FileSystem from "expo-file-system/legacy";
 import { SaveFormat, manipulateAsync } from "expo-image-manipulator";
 import { Platform } from "react-native";
 import { PUZZLE_COLLECTION_ID } from "./constants";
-import { MockApiService } from "./mock";
 
 const getBaseUrl = () => {
   if (Platform.OS === "web") {
@@ -220,8 +219,8 @@ class ApiService {
           : item.allowed === null
             ? null
             : undefined,
-      guestId: item.guestId
-        ? String(item.guestId)
+      personId: item.personId
+        ? String(item.personId)
         : guest?.id
           ? String(guest.id)
           : undefined,
@@ -293,21 +292,21 @@ class ApiService {
     return this.normalizeRegisterResponse(response);
   }
 
-  async getGuest(guestId: string): Promise<Guest> {
-    return this.fetch<Guest>(`/guests/${guestId}`);
+  async getGuest(personId: string): Promise<Guest> {
+    return this.fetch<Guest>(`/persons/${personId}`);
   }
 
   async updateGuest(
-    guestId: string,
+    personId: string,
     payload: UpdateGuestPayload,
   ): Promise<Guest> {
     try {
-      return await this.fetch<Guest>(`/guests/${guestId}`, {
+      return await this.fetch<Guest>(`/persons/${personId}`, {
         method: "PATCH",
         body: JSON.stringify(payload),
       });
     } catch (error) {
-      return this.fetch<Guest>(`/guests/${guestId}`, {
+      return this.fetch<Guest>(`/persons/${personId}`, {
         method: "PUT",
         body: JSON.stringify(payload),
       });
@@ -315,29 +314,29 @@ class ApiService {
   }
 
   async requestGiftAssistance(
-    guestId: string,
+    personId: string,
     payload: GiftAssistancePayload,
   ): Promise<void> {
     const endpoints = [
       {
-        path: `/guests/${guestId}/gift-assistance`,
+        path: `/persons/${personId}/gift-assistance`,
         body: payload,
       },
       {
-        path: `/guests/${guestId}/assistance`,
+        path: `/persons/${personId}/assistance`,
         body: payload,
       },
       {
-        path: `/guests/${guestId}/assistance-request`,
+        path: `/persons/${personId}/assistance-request`,
         body: payload,
       },
       {
         path: "/gift-assistance",
-        body: { guestId, ...payload },
+        body: { personId, ...payload },
       },
       {
         path: "/assistance-requests",
-        body: { guestId, ...payload },
+        body: { personId, ...payload },
       },
     ];
 
@@ -361,18 +360,18 @@ class ApiService {
   }
 
   async openGift(
-    guestId: string,
+    personId: string,
     giftType: GiftType,
     childGiftType?: GiftType,
   ): Promise<{ status: string; message?: string }> {
     return this.fetch<{ status: string; message?: string }>("/gift/open", {
       method: "POST",
-      body: JSON.stringify({ guestId, giftType, childGiftType }),
+      body: JSON.stringify({ personId, giftType, childGiftType }),
     });
   }
 
-  async getGuestQuestions(guestId: string): Promise<Question[]> {
-    return this.fetch<Question[]>(`/guests/${guestId}/questions`);
+  async getGuestQuestions(personId: string): Promise<Question[]> {
+    return this.fetch<Question[]>(`/persons/${personId}/questions`);
   }
 
   async getAllQuestions(): Promise<Question[]> {
@@ -384,22 +383,22 @@ class ApiService {
   }
 
   async submitAnswer(
-    guestId: string,
+    personId: string,
     questionId: string,
     value: Answer["value"],
   ): Promise<Answer> {
     return this.fetch<Answer>("/answers", {
       method: "POST",
       body: JSON.stringify({
-        guestId,
+        personId,
         questionId,
         value,
       }),
     });
   }
 
-  async getGuestAnswers(guestId: string): Promise<Answer[]> {
-    return this.fetch<Answer[]>(`/answers/guest/${guestId}`);
+  async getGuestAnswers(personId: string): Promise<Answer[]> {
+    return this.fetch<Answer[]>(`/answers/persons/${personId}`);
   }
 
   private async resolveUploadUri(photo: UploadPhotoAsset): Promise<{
@@ -482,7 +481,7 @@ class ApiService {
   }
 
   async uploadPhoto(
-    guestId: string,
+    personId: string,
     photo: UploadPhotoAsset,
   ): Promise<UploadPhotoResponse> {
     const formData = new FormData();
@@ -512,7 +511,7 @@ class ApiService {
           type: uploadPhoto.mimeType,
         } as any);
 
-        formData.append("guestId", guestId);
+        formData.append("personId", personId);
 
         const response = await fetch(`${this.baseUrl}/photos/upload`, {
           method: "POST",
@@ -534,7 +533,7 @@ class ApiService {
       }
     }
 
-    formData.append("guestId", guestId);
+    formData.append("personId", personId);
 
     const response = await fetch(`${this.baseUrl}/photos/upload`, {
       method: "POST",
@@ -549,8 +548,8 @@ class ApiService {
     return response.json();
   }
 
-  async getGuestPhotos(guestId: string): Promise<Photo[]> {
-    return this.fetch<Photo[]>(`/photos/guest/${guestId}`);
+  async getGuestPhotos(personId: string): Promise<Photo[]> {
+    return this.fetch<Photo[]>(`/photos/persons/${personId}`);
   }
 
   async deletePhoto(photoId: string): Promise<void> {
@@ -684,13 +683,13 @@ class ApiService {
       photoCount: number;
     }[]
   > {
-    return this.fetch(`/admin/guests?eventId=${encodeURIComponent(eventId)}`);
+    return this.fetch(`/admin/person?eventId=${encodeURIComponent(eventId)}`);
   }
 
   async getGuestAnswersWithQuestions(
-    guestId: string,
+    personId: string,
   ): Promise<(Answer & { question?: Question })[]> {
-    return this.fetch(`/answers/guest/${guestId}`);
+    return this.fetch(`/answers/persons/${personId}`);
   }
 
   // Song methods
@@ -705,7 +704,7 @@ class ApiService {
     album: string;
     albumArt?: string;
     previewUrl?: string;
-    guestId: string;
+    personId: string;
   }): Promise<Song> {
     return this.fetch("/songs", {
       method: "POST",
@@ -713,8 +712,8 @@ class ApiService {
     });
   }
 
-  async getGuestSong(guestId: string): Promise<Song | null> {
-    return this.fetch(`/songs/guest/${guestId}`);
+  async getGuestSongs(personId: string): Promise<Song[] | null> {
+    return this.fetch(`/songs/persons/${personId}`);
   }
 
   async deleteSong(songId: string): Promise<void> {
@@ -749,15 +748,14 @@ class ApiService {
 
 class SmartApiService {
   private readonly api = new ApiService();
-  private readonly mock = new MockApiService();
-  private resolvedService: ApiService | MockApiService | null = null;
-  private resolvePromise: Promise<ApiService | MockApiService> | null = null;
+  private resolvedService: ApiService | null = null;
+  private resolvePromise: Promise<ApiService> | null = null;
 
   constructor() {
     void this.getService();
   }
 
-  private async getService(): Promise<ApiService | MockApiService> {
+  private async getService(): Promise<ApiService> {
     if (this.resolvedService) {
       return this.resolvedService;
     }
@@ -798,39 +796,39 @@ class SmartApiService {
     return service.registerGuest(name, eventCode, role, questionCount);
   }
 
-  async getGuest(guestId: string): Promise<Guest> {
+  async getGuest(personId: string): Promise<Guest> {
     const service = await this.getService();
-    return service.getGuest(guestId);
+    return service.getGuest(personId);
   }
 
   async updateGuest(
-    guestId: string,
+    personId: string,
     payload: UpdateGuestPayload,
   ): Promise<Guest> {
     const service = await this.getService();
-    return service.updateGuest(guestId, payload);
+    return service.updateGuest(personId, payload);
   }
 
   async requestGiftAssistance(
-    guestId: string,
+    personId: string,
     payload: GiftAssistancePayload,
   ): Promise<void> {
     const service = await this.getService();
-    return service.requestGiftAssistance(guestId, payload);
+    return service.requestGiftAssistance(personId, payload);
   }
 
   async openGift(
-    guestId: string,
+    personId: string,
     giftType: GiftType,
     childGiftType?: GiftType,
   ): Promise<{ status: string; message?: string }> {
     const service = await this.getService();
-    return service.openGift(guestId, giftType, childGiftType);
+    return service.openGift(personId, giftType, childGiftType);
   }
 
-  async getGuestQuestions(guestId: string): Promise<Question[]> {
+  async getGuestQuestions(personId: string): Promise<Question[]> {
     const service = await this.getService();
-    return service.getGuestQuestions(guestId);
+    return service.getGuestQuestions(personId);
   }
 
   async getAllQuestions(): Promise<Question[]> {
@@ -844,30 +842,30 @@ class SmartApiService {
   }
 
   async submitAnswer(
-    guestId: string,
+    personId: string,
     questionId: string,
     value: Answer["value"],
   ): Promise<Answer> {
     const service = await this.getService();
-    return service.submitAnswer(guestId, questionId, value);
+    return service.submitAnswer(personId, questionId, value);
   }
 
-  async getGuestAnswers(guestId: string): Promise<Answer[]> {
+  async getGuestAnswers(personId: string): Promise<Answer[]> {
     const service = await this.getService();
-    return service.getGuestAnswers(guestId);
+    return service.getGuestAnswers(personId);
   }
 
   async uploadPhoto(
-    guestId: string,
+    personId: string,
     photo: UploadPhotoAsset,
   ): Promise<UploadPhotoResponse> {
     const service = await this.getService();
-    return service.uploadPhoto(guestId, photo);
+    return service.uploadPhoto(personId, photo);
   }
 
-  async getGuestPhotos(guestId: string): Promise<Photo[]> {
+  async getGuestPhotos(personId: string): Promise<Photo[]> {
     const service = await this.getService();
-    return service.getGuestPhotos(guestId);
+    return service.getGuestPhotos(personId);
   }
 
   async deletePhoto(photoId: string): Promise<void> {
@@ -898,8 +896,9 @@ class SmartApiService {
       return await service.getGalleryCollections();
     } catch (error) {
       console.warn("Falling back to mock gallery collections:", error);
-      return this.mock.getGalleryCollections();
     }
+
+    return [];
   }
 
   async getGalleryCollectionPhotos(
@@ -911,8 +910,9 @@ class SmartApiService {
       return await service.getGalleryCollectionPhotos(collectionId);
     } catch (error) {
       console.warn("Falling back to mock gallery photos:", error);
-      return this.mock.getGalleryCollectionPhotos(collectionId);
     }
+
+    return [];
   }
 
   async getAllGuestsWithStats(eventId: string): Promise<
@@ -929,10 +929,10 @@ class SmartApiService {
   }
 
   async getGuestAnswersWithQuestions(
-    guestId: string,
+    personId: string,
   ): Promise<(Answer & { question?: Question })[]> {
     const service = await this.getService();
-    return service.getGuestAnswersWithQuestions(guestId);
+    return service.getGuestAnswersWithQuestions(personId);
   }
 
   async searchSongs(query: string): Promise<SpotifySearchResult[]> {
@@ -947,15 +947,15 @@ class SmartApiService {
     album: string;
     albumArt?: string;
     previewUrl?: string;
-    guestId: string;
+    personId: string;
   }): Promise<Song> {
     const service = await this.getService();
     return service.selectSong(songData);
   }
 
-  async getGuestSong(guestId: string): Promise<Song | null> {
+  async getGuestSongs(personId: string): Promise<Song[] | null> {
     const service = await this.getService();
-    return service.getGuestSong(guestId);
+    return service.getGuestSongs(personId);
   }
 
   async deleteSong(songId: string): Promise<void> {

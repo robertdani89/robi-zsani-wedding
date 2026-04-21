@@ -30,6 +30,8 @@ export default function EditTemplateScreen() {
     GreatVibes: require("@/assets/GreatVibes-Regular.ttf"),
   });
 
+  console.log(activeEvent);
+
   const [questions, setQuestions] = useState<Question[]>(
     activeEvent?.questions ?? [],
   );

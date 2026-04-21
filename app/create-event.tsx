@@ -104,7 +104,7 @@ export default function CreateEventScreen() {
             createdAt: serverGuest.createdAt,
           };
           await setGuest(newGuest);
-          await setAssignedQuestions(questions);
+          await setAssignedQuestions(event.questions ?? questions);
           if (serverGuest.role && event.role !== serverGuest.role) {
             await updateEvent({ ...event, role: serverGuest.role });
           }

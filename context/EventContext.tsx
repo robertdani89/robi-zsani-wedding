@@ -27,6 +27,7 @@ const mapServerEventToAppEvent = (
   template: "wedding",
   role,
   createdAt: event.createdAt,
+  questions: event.questions,
 });
 
 interface EventContextType {
@@ -90,6 +91,7 @@ export const EventProvider = ({ children }: { children: ReactNode }) => {
       name,
       date,
     });
+    console.log("Created event on server:", serverEvent);
     const event = mapServerEventToAppEvent(serverEvent, "organizer");
 
     const updatedEvents = [...events, event];

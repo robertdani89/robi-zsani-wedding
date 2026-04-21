@@ -69,7 +69,7 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
   // Load data from AsyncStorage on mount and when event changes
   useEffect(() => {
     loadData();
-  }, [eventCode]);
+  }, [activeEvent?.questions, eventCode]);
 
   const loadData = async () => {
     const STORAGE_KEYS = getStorageKeys(eventCode);
@@ -86,7 +86,11 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
       const guest = guestData ? JSON.parse(guestData) : null;
       const answers = answersData ? JSON.parse(answersData) : [];
       const photos = photosData ? JSON.parse(photosData) : [];
-      const questions = questionsData ? JSON.parse(questionsData) : [];
+      const storedQuestions = questionsData ? JSON.parse(questionsData) : [];
+      const questions =
+        storedQuestions.length > 0
+          ? storedQuestions
+          : (activeEvent?.questions ?? []);
       const parsedSong = songData ? JSON.parse(songData) : [];
       // Backward compatibility: migrate persisted single-song value to list.
       const song = Array.isArray(parsedSong)

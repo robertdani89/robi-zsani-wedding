@@ -76,7 +76,7 @@ export default function IdentifyScreen() {
       };
 
       await setGuest(newGuest);
-      await setAssignedQuestions(questions);
+      await setAssignedQuestions(activeEvent.questions ?? questions);
 
       if (
         activeEvent &&

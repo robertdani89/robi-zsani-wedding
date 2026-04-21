@@ -68,7 +68,7 @@ export default function OnboardingScreen() {
             createdAt: serverGuest.createdAt,
           };
           await setGuest(newGuest);
-          await setAssignedQuestions(questions);
+          await setAssignedQuestions(activeEvent.questions ?? questions);
           if (serverGuest.role && activeEvent.role !== serverGuest.role) {
             await updateEvent({ ...activeEvent, role: serverGuest.role });
           }

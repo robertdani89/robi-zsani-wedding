@@ -168,7 +168,7 @@ export default function QuestionsScreen() {
       // Save answer locally
       const newAnswer: Answer = {
         id: Date.now().toString(),
-        guestId: state.guest!.id,
+        personId: state.guest!.id,
         questionId: currentQuestion.id,
         value: currentAnswer,
         answeredAt: new Date().toISOString(),
