@@ -1,4 +1,5 @@
 import {
+  Alert,
   Linking,
   Modal,
   ScrollView,
@@ -13,23 +14,41 @@ import Button from "@/components/Button";
 import Card from "@/components/Card";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
 import { StatusBar } from "expo-status-bar";
+import { showDecision } from "@/utils/alert";
 import { useApp } from "@/context/AppContext";
 import { useEvent } from "@/context/EventContext";
 import { useLocalization } from "@/context/LocalizationContext";
+import { useRouter } from "expo-router";
 
 interface DashboardShellProps {
   children: ReactNode;
 }
 
 export default function DashboardShell({ children }: DashboardShellProps) {
-  const { state } = useApp();
-  const { activeEvent } = useEvent();
+  const router = useRouter();
+  const { state, resetApp } = useApp();
+  const { activeEvent, leaveCurrentEvent } = useEvent();
   const { t } = useLocalization();
   const [settingsVisible, setSettingsVisible] = useState(false);
 
   const maxName = state.guest?.name.split(" ").slice(0, 2).join(" ") ?? "";
   const name = maxName.length > 20 ? "" : maxName;
   const isCompleted = !!state.guest?.gotGiftAt;
+
+  const handleReset = () => {
+    showDecision({
+      title: t("common.resetConfirmTitle"),
+      message: t("common.resetConfirmMessage"),
+      confirmText: t("common.ok"),
+      cancelText: t("common.cancel"),
+      onConfirm: async () => {
+        setSettingsVisible(false);
+        await resetApp();
+        await leaveCurrentEvent();
+        router.replace("/");
+      },
+    });
+  };
 
   return (
     <View style={styles.container}>
@@ -116,6 +135,17 @@ export default function DashboardShell({ children }: DashboardShellProps) {
             >
               <Text style={styles.privacyPolicyLink}>
                 {t("identify.privacyPolicy")}
+              </Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={styles.resetButton}
+              onPress={handleReset}
+              activeOpacity={0.7}
+            >
+              <Text style={styles.resetButtonTitle}>{t("common.reset")}</Text>
+              <Text style={styles.resetButtonDescription}>
+                {t("common.resetDescription")}
               </Text>
             </TouchableOpacity>
 
@@ -216,5 +246,24 @@ const styles = StyleSheet.create({
     marginTop: 10,
     marginBottom: 10,
     textDecorationLine: "underline",
+  },
+  resetButton: {
+    marginTop: 8,
+    paddingVertical: 14,
+    paddingHorizontal: 16,
+    borderRadius: 14,
+    backgroundColor: "#FFF5F7",
+    borderWidth: 1,
+    borderColor: "#F0C9D3",
+  },
+  resetButtonTitle: {
+    fontSize: 16,
+    fontWeight: "700",
+    color: "#D4526E",
+    marginBottom: 4,
+  },
+  resetButtonDescription: {
+    fontSize: 14,
+    color: "#666",
   },
 });

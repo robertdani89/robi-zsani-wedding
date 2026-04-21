@@ -1,5 +1,4 @@
 import {
-  Alert,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -10,7 +9,6 @@ import {
 import Button from "@/components/Button";
 import Card from "@/components/Card";
 import { useApp } from "@/context/AppContext";
-import { useEvent } from "@/context/EventContext";
 import { useLocalization } from "@/context/LocalizationContext";
 import { useRouter } from "expo-router";
 
@@ -46,8 +44,7 @@ const getStatusBadge = (
 
 export default function DashboardTasksPanel() {
   const router = useRouter();
-  const { state, getTaskStatus, resetApp } = useApp();
-  const { leaveCurrentEvent } = useEvent();
+  const { state, getTaskStatus } = useApp();
   const { t } = useLocalization();
   const taskStatus = getTaskStatus();
   const { width } = useWindowDimensions();
@@ -77,28 +74,6 @@ export default function DashboardTasksPanel() {
     t("status.inProgress"),
     t("status.notStarted"),
   );
-
-  const handleReset = () => {
-    Alert.alert(
-      t("common.resetConfirmTitle"),
-      t("common.resetConfirmMessage"),
-      [
-        {
-          text: t("common.cancel"),
-          style: "cancel",
-        },
-        {
-          text: t("common.reset"),
-          style: "destructive",
-          onPress: async () => {
-            await resetApp();
-            await leaveCurrentEvent();
-            router.replace("/");
-          },
-        },
-      ],
-    );
-  };
 
   return (
     <>
@@ -314,26 +289,6 @@ export default function DashboardTasksPanel() {
               </View>
               <View style={styles.taskContent}>
                 <Text style={styles.taskTitle}>{t("dashboard.moreSongs")}</Text>
-              </View>
-            </View>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={[styles.taskCard, isSmallScreen && styles.taskCardSmall]}
-            onPress={handleReset}
-            activeOpacity={0.7}
-          >
-            <View
-              style={[styles.taskInfo, isSmallScreen && styles.taskInfoSmall]}
-            >
-              <View style={styles.taskIcon}>
-                <Text style={styles.taskEmoji}>🔄</Text>
-              </View>
-              <View style={styles.taskContent}>
-                <Text style={styles.taskTitle}>{t("common.reset")}</Text>
-                <Text style={styles.taskDescription}>
-                  {t("common.resetDescription")}
-                </Text>
               </View>
             </View>
           </TouchableOpacity>

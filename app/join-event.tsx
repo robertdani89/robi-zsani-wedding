@@ -15,6 +15,7 @@ import Button from "@/components/Button";
 import Card from "@/components/Card";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
 import { StatusBar } from "expo-status-bar";
+import { showMessage } from "@/utils/alert";
 import { useEvent } from "@/context/EventContext";
 import { useFonts } from "expo-font";
 import { useLocalSearchParams } from "expo-router";
@@ -49,7 +50,7 @@ export default function JoinEventScreen() {
     const trimmedCode = (eventCode ?? code).trim();
 
     if (!trimmedCode) {
-      Alert.alert(t("joinEvent.requiredTitle"), t("joinEvent.codeRequired"));
+      showMessage(t("joinEvent.requiredTitle"), t("joinEvent.codeRequired"));
       return;
     }
 
@@ -60,7 +61,7 @@ export default function JoinEventScreen() {
       router.replace("/identify");
     } catch (error) {
       console.error("Join event error:", error);
-      Alert.alert(t("joinEvent.errorTitle"), t("joinEvent.errorMessage"));
+      showMessage(t("joinEvent.errorTitle"), t("joinEvent.errorMessage"));
     } finally {
       setIsLoading(false);
     }
