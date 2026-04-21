@@ -33,3 +33,6 @@ export const STORAGE_KEYS = {
   EVENTS: "@app_events",
   ACTIVE_EVENT: "@app_active_event",
 };
+
+export const isShowTime =
+  new Date("2026-05-02").toDateString() === new Date().toDateString();

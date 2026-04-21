@@ -313,6 +313,11 @@ export const TRANSLATIONS = {
     "common.leaveEventDescription": "Leave the event and clear all your data",
     "common.yes": "Yes",
     "common.no": "No",
+    "weddingDay.title": "Robi & Zsani",
+    "weddingDay.subtitle": "Welcome to our wedding! 💍",
+    "weddingDay.description":
+      "Scan the QR code or enter the event code to join the celebration.",
+    "weddingDay.join": "Join the celebration",
   },
   hu: {
     "lang.short": "HU",
@@ -630,6 +635,11 @@ export const TRANSLATIONS = {
     "common.leaveEventDescription": "Véglegesen kilépnél?",
     "common.yes": "Igen",
     "common.no": "Nem",
+    "weddingDay.title": "Robi & Zsani",
+    "weddingDay.subtitle": "Üdvözlünk az esküvőnkön! 💍",
+    "weddingDay.description":
+      "Olvasd be a QR kódot vagy add meg az eseménykódot a csatlakozáshoz.",
+    "weddingDay.join": "Csatlakozz az ünnepséghez",
   },
 } as const;
 

@@ -1,4 +1,3 @@
-import { AppEvent, Event, EventRole } from "@/types";
 import React, {
   ReactNode,
   createContext,
@@ -7,24 +6,10 @@ import React, {
   useState,
 } from "react";
 
+import type { AppEvent } from "@/types";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { STORAGE_KEYS } from "@/constants";
 import apiService from "@/services/api";
-
-// const mapServerEventToAppEvent = (
-//   event: ServerEvent,
-//   role: EventRole,
-// ): AppEvent => ({
-//   id: event.id,
-//   code: event.code,
-//   name: event.name,
-//   date: event.date ?? "",
-//   organizerName: event.organizerName,
-//   template: "wedding",
-//   role,
-//   createdAt: event.createdAt,
-//   questions: event.questions,
-// });
 
 interface EventContextType {
   events: AppEvent[];
@@ -139,6 +124,8 @@ export const EventProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const updateEvent = async (updatedEvent: AppEvent) => {
+    await apiService.updateEvent(updatedEvent.id, updatedEvent);
+
     const updatedEvents = events.map((e) =>
       e.id === updatedEvent.id ? updatedEvent : e,
     );

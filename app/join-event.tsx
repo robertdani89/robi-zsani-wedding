@@ -28,7 +28,7 @@ export default function JoinEventScreen() {
   const [showScanner, setShowScanner] = useState(false);
   const router = useRouter();
   const { t } = useLocalization();
-  const { joinEvent, setActiveEvent } = useEvent();
+  const { joinEvent } = useEvent();
   const params = useLocalSearchParams<{ code?: string; rejoin?: string }>();
   const [fontsLoaded] = useFonts({
     GreatVibes: require("@/assets/GreatVibes-Regular.ttf"),

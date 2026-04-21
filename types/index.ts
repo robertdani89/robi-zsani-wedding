@@ -13,7 +13,7 @@ export type GiftType = "gift_for_man" | "gift_for_ladies";
 
 export type EventRole = "organizer" | "assistant" | "guest";
 
-export interface Event {
+export interface AppEvent {
   id: string;
   code: string;
   name: string;
@@ -21,6 +21,7 @@ export interface Event {
   organizerName?: string;
   questions?: Question[];
   createdAt: string;
+  role: "organizer" | "assistant" | "guest";
 }
 
 export type EventTemplate = "wedding" | "birthday" | "custom";

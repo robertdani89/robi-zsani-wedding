@@ -8,6 +8,7 @@ import {
 
 import Button from "@/components/Button";
 import Card from "@/components/Card";
+import { isShowTime } from "@/constants";
 import { useApp } from "@/context/AppContext";
 import { useLocalization } from "@/context/LocalizationContext";
 import { useRouter } from "expo-router";
@@ -206,15 +207,17 @@ export default function DashboardTasksPanel() {
       )}
 
       {!isCompleted ? (
-        <Button
-          title={
-            taskStatus.allTasksCompleted
-              ? t("dashboard.finish")
-              : t("dashboard.motivation")
-          }
-          onPress={() => router.push("/gift")}
-          disabled={!taskStatus.allTasksCompleted}
-        />
+        isShowTime && (
+          <Button
+            title={
+              taskStatus.allTasksCompleted
+                ? t("dashboard.finish")
+                : t("dashboard.motivation")
+            }
+            onPress={() => router.push("/gift")}
+            disabled={!taskStatus.allTasksCompleted}
+          />
+        )
       ) : (
         <Card style={styles.completedContainer}>
           <TouchableOpacity

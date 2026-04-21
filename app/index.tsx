@@ -12,6 +12,7 @@ import { Guest } from "@/types";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
 import { StatusBar } from "expo-status-bar";
 import apiService from "@/services/api";
+import { isShowTime } from "@/constants";
 import { useApp } from "@/context/AppContext";
 import { useEffect } from "react";
 import { useEvent } from "@/context/EventContext";
@@ -37,6 +38,15 @@ export default function OnboardingScreen() {
 
   useEffect(() => {
     if (!isHydrated || !eventsHydrated) {
+      return;
+    }
+
+    if (isShowTime) {
+      if (activeEvent) {
+        router.replace("/identify");
+      } else {
+        router.replace("/exclusive");
+      }
       return;
     }
 

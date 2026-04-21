@@ -6,7 +6,7 @@ import {
   PendingSongReview,
   Photo,
   Question,
-  Event,
+  AppEvent,
   Song,
   type GiftAssistancePayload,
   type GiftType,
@@ -29,8 +29,6 @@ const getBaseUrl = () => {
   }
 
   return "https://homeharmonyhub.hu/api";
-  // return "http://192.168.0.140:8096/api";
-  // return "http://192.168.0.232:8096/api";
 };
 
 const API_BASE_URL = getBaseUrl();
@@ -259,18 +257,28 @@ class ApiService {
     };
   }
 
-  async createEvent(payload: { name: string; date: string }): Promise<Event> {
-    return this.fetch<Event>("/events", {
+  async createEvent(payload: {
+    name: string;
+    date: string;
+  }): Promise<AppEvent> {
+    return this.fetch<AppEvent>("/events", {
       method: "POST",
       body: JSON.stringify(payload),
     });
   }
 
-  async getEventByCode(code: string): Promise<Event> {
+  async getEventByCode(code: string): Promise<AppEvent> {
     const normalizedCode = code.trim().toUpperCase();
-    return this.fetch<Event>(
+    return this.fetch<AppEvent>(
       `/events/code/${encodeURIComponent(normalizedCode)}`,
     );
+  }
+
+  async updateEvent(id: string, payload: Partial<AppEvent>): Promise<AppEvent> {
+    return this.fetch<AppEvent>(`/events/${encodeURIComponent(id)}`, {
+      method: "PATCH",
+      body: JSON.stringify(payload),
+    });
   }
 
   async registerGuest(
@@ -738,225 +746,5 @@ class ApiService {
   }
 }
 
-class SmartApiService {
-  private readonly api = new ApiService();
-  private resolvedService: ApiService | null = null;
-  private resolvePromise: Promise<ApiService> | null = null;
-
-  constructor() {
-    void this.getService();
-  }
-
-  private async getService(): Promise<ApiService> {
-    if (this.resolvedService) {
-      return this.resolvedService;
-    }
-
-    if (!this.resolvePromise) {
-      this.resolvePromise = (async () => {
-        this.resolvedService = this.api;
-
-        // const reachable = await isServerReachable();
-        // this.resolvedService = reachable ? this.api : this.mock;
-        return this.resolvedService;
-      })();
-    }
-
-    return this.resolvePromise;
-  }
-
-  async createEvent(payload: { name: string; date: string }): Promise<Event> {
-    const service = await this.getService();
-    return service.createEvent(payload);
-  }
-
-  async getEventByCode(code: string): Promise<Event> {
-    const service = await this.getService();
-    return service.getEventByCode(code);
-  }
-
-  async registerGuest(
-    name: string,
-    eventCode: string,
-    role: "organizer" | "assistant" | "guest" = "guest",
-    questionCount: number = 8,
-  ): Promise<RegisterResponse> {
-    const service = await this.getService();
-    return service.registerGuest(name, eventCode, role, questionCount);
-  }
-
-  async getGuest(personId: string): Promise<Guest> {
-    const service = await this.getService();
-    return service.getGuest(personId);
-  }
-
-  async updateGuest(
-    personId: string,
-    payload: UpdateGuestPayload,
-  ): Promise<Guest> {
-    const service = await this.getService();
-    return service.updateGuest(personId, payload);
-  }
-
-  async requestGiftAssistance(
-    personId: string,
-    payload: GiftAssistancePayload,
-  ): Promise<void> {
-    const service = await this.getService();
-    return service.requestGiftAssistance(personId, payload);
-  }
-
-  async openGift(
-    personId: string,
-    giftType: GiftType,
-    childGiftType?: GiftType,
-  ): Promise<{ status: string; message?: string }> {
-    const service = await this.getService();
-    return service.openGift(personId, giftType, childGiftType);
-  }
-
-  async getGuestQuestions(personId: string): Promise<Question[]> {
-    const service = await this.getService();
-    return service.getGuestQuestions(personId);
-  }
-
-  async getAllQuestions(): Promise<Question[]> {
-    const service = await this.getService();
-    return service.getAllQuestions();
-  }
-
-  async getRandomQuestions(count: number = 8): Promise<Question[]> {
-    const service = await this.getService();
-    return service.getRandomQuestions(count);
-  }
-
-  async submitAnswer(
-    personId: string,
-    questionId: string,
-    value: Answer["value"],
-  ): Promise<Answer> {
-    const service = await this.getService();
-    return service.submitAnswer(personId, questionId, value);
-  }
-
-  async getGuestAnswers(personId: string): Promise<Answer[]> {
-    const service = await this.getService();
-    return service.getGuestAnswers(personId);
-  }
-
-  async uploadPhoto(
-    personId: string,
-    photo: UploadPhotoAsset,
-  ): Promise<UploadPhotoResponse> {
-    const service = await this.getService();
-    return service.uploadPhoto(personId, photo);
-  }
-
-  async getGuestPhotos(personId: string): Promise<Photo[]> {
-    const service = await this.getService();
-    return service.getGuestPhotos(personId);
-  }
-
-  async deletePhoto(photoId: string): Promise<void> {
-    const service = await this.getService();
-    return service.deletePhoto(photoId);
-  }
-
-  getPhotoUrl(photoId: string): string {
-    if (this.resolvedService) {
-      return this.resolvedService.getPhotoUrl(photoId);
-    }
-
-    return this.api.getPhotoUrl(photoId);
-  }
-
-  getPhotoThumbnailUrl(photoId: string): string {
-    if (this.resolvedService) {
-      return this.resolvedService.getPhotoThumbnailUrl(photoId);
-    }
-
-    return this.api.getPhotoThumbnailUrl(photoId);
-  }
-
-  async getGalleryCollections(): Promise<GalleryCollection[]> {
-    const service = await this.getService();
-
-    try {
-      return await service.getGalleryCollections();
-    } catch (error) {
-      console.warn("Falling back to mock gallery collections:", error);
-    }
-
-    return [];
-  }
-
-  async getGalleryCollectionPhotos(
-    collectionId: string,
-  ): Promise<GalleryPhoto[]> {
-    const service = await this.getService();
-
-    try {
-      return await service.getGalleryCollectionPhotos(collectionId);
-    } catch (error) {
-      console.warn("Falling back to mock gallery photos:", error);
-    }
-
-    return [];
-  }
-
-  async getAllGuestsWithStats(eventId: string): Promise<GuestSummary[]> {
-    const service = await this.getService();
-    return service.getAllGuestsWithStats(eventId);
-  }
-
-  async getGuestAnswersWithQuestions(
-    personId: string,
-  ): Promise<(Answer & { question?: Question })[]> {
-    const service = await this.getService();
-    return service.getGuestAnswersWithQuestions(personId);
-  }
-
-  async searchSongs(query: string): Promise<SpotifySearchResult[]> {
-    const service = await this.getService();
-    return service.searchSongs(query);
-  }
-
-  async selectSong(songData: {
-    spotifyId: string;
-    name: string;
-    artist: string;
-    album: string;
-    albumArt?: string;
-    previewUrl?: string;
-    personId: string;
-  }): Promise<Song> {
-    const service = await this.getService();
-    return service.selectSong(songData);
-  }
-
-  async getGuestSongs(personId: string): Promise<Song[] | null> {
-    const service = await this.getService();
-    return service.getGuestSongs(personId);
-  }
-
-  async deleteSong(songId: string): Promise<void> {
-    const service = await this.getService();
-    return service.deleteSong(songId);
-  }
-
-  async getNextPendingSong(eventId: string): Promise<PendingSongReview | null> {
-    const service = await this.getService();
-    return service.getNextPendingSong(eventId);
-  }
-
-  async updateSongAllowed(
-    songId: string,
-    allowed: boolean,
-  ): Promise<PendingSongReview> {
-    const service = await this.getService();
-    return service.updateSongAllowed(songId, allowed);
-  }
-}
-
-export const apiService = new SmartApiService();
+export const apiService = new ApiService();
 export default apiService;
