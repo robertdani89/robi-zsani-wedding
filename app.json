@@ -1,8 +1,8 @@
 {
   "expo": {
-    "name": "Event Companion",
+    "name": "Special Event Companion",
     "slug": "robi-zsani-wedding",
-    "version": "1.0.13",
+    "version": "1.0.14",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
@@ -14,7 +14,7 @@
     "assetBundlePatterns": ["**/*"],
     "ios": {
       "supportsTablet": false,
-      "bundleIdentifier": "com.stygianlamp.eventcompanion",
+      "bundleIdentifier": "com.stygianlamp.zsanirobiwedding",
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false,
         "NSCameraUsageDescription": "$(PRODUCT_NAME) needs access to your camera so you can take photos at the event and share them with the host. For example, you can snap a photo during the celebration and upload it to the shared event gallery. The camera is also needed for scanning QR codes to quickly join the event and access its features.",
@@ -26,7 +26,7 @@
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.eventcompanion.app",
+      "package": "com.robizsniwedding.app",
       "permissions": [
         "android.permission.INTERNET",
         "android.permission.CAMERA",
@@ -34,7 +34,7 @@
         "android.permission.WRITE_EXTERNAL_STORAGE",
         "android.permission.RECORD_AUDIO"
       ],
-      "versionCode": 13
+      "versionCode": 14
     },
     "web": {
       "favicon": "./assets/favicon.png"
