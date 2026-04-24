@@ -53,14 +53,23 @@ export default function DashboardShell({ children }: DashboardShellProps) {
     showDecision({
       title: t("common.leaveEvent"),
       message: t("common.leaveEventDescription"),
-      confirmText: t("common.no"),
-      cancelText: t("common.yes"),
+      confirmText: t("common.yes"),
+      cancelText: t("common.cancel"),
       onConfirm: async () => {
         setSettingsVisible(false);
         await leaveCurrentEvent();
         router.replace("/");
       },
-      onCancel: async () => {
+    });
+  };
+
+  const handleDeleteAccount = () => {
+    showDecision({
+      title: t("common.deleteAccountConfirmTitle"),
+      message: t("common.deleteAccountDescription"),
+      confirmText: t("common.yes"),
+      cancelText: t("common.cancel"),
+      onConfirm: async () => {
         setSettingsVisible(false);
         await app.removeEvent(activeEvent?.code ?? "");
         await leaveCurrentEvent(true);
@@ -164,6 +173,16 @@ export default function DashboardShell({ children }: DashboardShellProps) {
             >
               <Text style={styles.resetButtonTitle}>
                 {t("common.leaveEvent")}
+              </Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={styles.deleteAccountButton}
+              onPress={handleDeleteAccount}
+              activeOpacity={0.7}
+            >
+              <Text style={styles.deleteAccountButtonTitle}>
+                {t("common.deleteAccount")}
               </Text>
             </TouchableOpacity>
 
@@ -294,5 +313,19 @@ const styles = StyleSheet.create({
   resetButtonDescription: {
     fontSize: 14,
     color: "#666",
+  },
+  deleteAccountButton: {
+    marginTop: 8,
+    paddingVertical: 14,
+    paddingHorizontal: 16,
+    borderRadius: 14,
+    backgroundColor: "#FFF0F0",
+    borderWidth: 1,
+    borderColor: "#D32F2F",
+  },
+  deleteAccountButtonTitle: {
+    fontSize: 16,
+    fontWeight: "700",
+    color: "#D32F2F",
   },
 });
