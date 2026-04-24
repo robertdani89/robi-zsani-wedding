@@ -316,8 +316,8 @@ export const TRANSLATIONS = {
     "common.deleteAccountDescription": "This will permanently delete your account and all your data from this event.",
     "common.yes": "Yes",
     "common.no": "No",
-    "weddingDay.title": "Robi & Zsani",
-    "weddingDay.subtitle": "Welcome to our wedding! 💍",
+    "weddingDay.title": "Event Companion",
+    "weddingDay.subtitle": "Welcome to the event! 🎉",
     "weddingDay.description":
       "Scan the QR code or enter the event code to join the celebration.",
     "weddingDay.join": "Join the celebration",
@@ -641,8 +641,8 @@ export const TRANSLATIONS = {
     "common.deleteAccountDescription": "Ez véglegesen törli a fiókodat és az összes adatodat ebből az eseményből.",
     "common.yes": "Igen",
     "common.no": "Nem",
-    "weddingDay.title": "Robi & Zsani",
-    "weddingDay.subtitle": "Üdvözlünk az esküvőnkön! 💍",
+    "weddingDay.title": "Esemény Társ",
+    "weddingDay.subtitle": "Üdvözlünk az eseményen! 🎉",
     "weddingDay.description":
       "Olvasd be a QR kódot vagy add meg az eseménykódot a csatlakozáshoz.",
     "weddingDay.join": "Csatlakozz az ünnepséghez",

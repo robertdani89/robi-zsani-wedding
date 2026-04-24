@@ -14,7 +14,7 @@
     "assetBundlePatterns": ["**/*"],
     "ios": {
       "supportsTablet": false,
-      "bundleIdentifier": "com.stygianlamp.zsanirobiwedding",
+      "bundleIdentifier": "com.stygianlamp.eventcompanion",
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false,
         "NSCameraUsageDescription": "$(PRODUCT_NAME) needs access to your camera so you can take photos at the event and share them with the host. For example, you can snap a photo during the celebration and upload it to the shared event gallery. The camera is also needed for scanning QR codes to quickly join the event and access its features.",
@@ -26,7 +26,7 @@
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.robizsniwedding.app",
+      "package": "com.eventcompanion.app",
       "permissions": [
         "android.permission.INTERNET",
         "android.permission.CAMERA",
