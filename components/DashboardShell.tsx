@@ -19,6 +19,7 @@ import { useApp } from "@/context/AppContext";
 import { useEvent } from "@/context/EventContext";
 import { useLocalization } from "@/context/LocalizationContext";
 import { useRouter } from "expo-router";
+import { isShowTime } from "../constants";
 
 interface DashboardShellProps {
   children: ReactNode;
@@ -166,25 +167,29 @@ export default function DashboardShell({ children }: DashboardShellProps) {
               </Text>
             </TouchableOpacity>
 
-            <TouchableOpacity
-              style={styles.resetButton}
-              onPress={handleLeaveEvent}
-              activeOpacity={0.7}
-            >
-              <Text style={styles.resetButtonTitle}>
-                {t("common.leaveEvent")}
-              </Text>
-            </TouchableOpacity>
+            {!isShowTime && (
+              <>
+                <TouchableOpacity
+                  style={styles.resetButton}
+                  onPress={handleLeaveEvent}
+                  activeOpacity={0.7}
+                >
+                  <Text style={styles.resetButtonTitle}>
+                    {t("common.leaveEvent")}
+                  </Text>
+                </TouchableOpacity>
 
-            <TouchableOpacity
-              style={styles.deleteAccountButton}
-              onPress={handleDeleteAccount}
-              activeOpacity={0.7}
-            >
-              <Text style={styles.deleteAccountButtonTitle}>
-                {t("common.deleteAccount")}
-              </Text>
-            </TouchableOpacity>
+                <TouchableOpacity
+                  style={styles.deleteAccountButton}
+                  onPress={handleDeleteAccount}
+                  activeOpacity={0.7}
+                >
+                  <Text style={styles.deleteAccountButtonTitle}>
+                    {t("common.deleteAccount")}
+                  </Text>
+                </TouchableOpacity>
+              </>
+            )}
 
             {/* <TouchableOpacity
               style={styles.resetButton}

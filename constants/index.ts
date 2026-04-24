@@ -20,13 +20,6 @@ export const COLORS = {
   },
 };
 
-// App configuration
-export const CONFIG = {
-  minQuestionsToAnswer: 8,
-  minPhotosRequired: 1,
-  maxPhotosAllowed: 5,
-};
-
 // Common storage keys
 export const STORAGE_KEYS = {
   LOCALE: "@app_locale",
