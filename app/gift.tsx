@@ -1,6 +1,9 @@
 import type { GiftType, Guest } from "@/types";
 import {
+  ActivityIndicator,
   Image,
+  Modal,
+  Platform,
   ScrollView,
   StyleSheet,
   Text,
@@ -18,6 +21,10 @@ import { useLocalization } from "@/context/LocalizationContext";
 import { useRouter } from "expo-router";
 import { useState } from "react";
 
+const SERVER_BASE_URL =
+  Platform.OS === "web" ? "http://localhost:8096" : "https://homeharmonyhub.hu";
+const MACHINE_IMAGE_URL = `${SERVER_BASE_URL}/uploads/machine.jpg`;
+
 export default function GiftScreen() {
   const router = useRouter();
   const { state, setGuest } = useApp();
@@ -29,6 +36,22 @@ export default function GiftScreen() {
   const [alsoForChild, setAlsoForChild] = useState(false);
   const [childGiftType, setChildGiftType] = useState<GiftType | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isDispensing, setIsDispensing] = useState(false);
+  const [isMachineImageUnavailable, setIsMachineImageUnavailable] =
+    useState(false);
+
+  const isSensorBlockedError = (message?: string) => {
+    if (!message) {
+      return false;
+    }
+
+    const normalized = message.toLowerCase();
+    return (
+      normalized.includes("nincs elég ajándék") ||
+      normalized.includes("no gift") ||
+      normalized.includes("not enough")
+    );
+  };
 
   const handleRequestAssistance = async (
     guest: Guest,
@@ -89,6 +112,7 @@ export default function GiftScreen() {
 
   const submitGiftRequest = async (guest: Guest, giftType: GiftType) => {
     setIsSubmitting(true);
+    setIsDispensing(true);
     const childGift = alsoForChild ? (childGiftType ?? undefined) : undefined;
 
     try {
@@ -122,6 +146,7 @@ export default function GiftScreen() {
       console.error("Gift update error:", error);
       showMessage(t("gift.saveErrorTitle"), t("gift.saveErrorMessage"));
     } finally {
+      setIsDispensing(false);
       setIsSubmitting(false);
     }
   };
@@ -194,11 +219,20 @@ export default function GiftScreen() {
 
         {!isGiftGiven && (
           <Card style={styles.machine}>
-            <Image
-              source={require("../assets/machine.jpg")}
-              style={styles.machineImage}
-              resizeMode="cover"
-            />
+            {isMachineImageUnavailable ? (
+              <View style={styles.machineImageFallback}>
+                <Text style={styles.machineImageFallbackText}>
+                  Machine image is unavailable.
+                </Text>
+              </View>
+            ) : (
+              <Image
+                source={{ uri: MACHINE_IMAGE_URL }}
+                style={styles.machineImage}
+                resizeMode="cover"
+                onError={() => setIsMachineImageUnavailable(true)}
+              />
+            )}
           </Card>
         )}
 
@@ -332,6 +366,21 @@ export default function GiftScreen() {
           />
         )}
       </ScrollView>
+
+      <Modal
+        visible={isDispensing}
+        transparent
+        animationType="fade"
+        statusBarTranslucent
+      >
+        <View style={styles.progressOverlay}>
+          <View style={styles.progressCard}>
+            <ActivityIndicator size="large" color="#D4526E" />
+            <Text style={styles.progressTitle}>{t("gift.dispensingTitle")}</Text>
+            <Text style={styles.progressMessage}>{t("gift.dispensingMessage")}</Text>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 }
@@ -382,6 +431,22 @@ const styles = StyleSheet.create({
     height: 260,
     borderRadius: 16,
     marginBottom: 24,
+  },
+  machineImageFallback: {
+    width: "100%",
+    height: 260,
+    borderRadius: 16,
+    marginBottom: 24,
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "#FFF4F6",
+    borderWidth: 1,
+    borderColor: "#F0C5CE",
+  },
+  machineImageFallbackText: {
+    fontSize: 15,
+    color: "#7D5260",
+    fontWeight: "600",
   },
   selectionCard: {
     backgroundColor: "#FFF",
@@ -484,5 +549,33 @@ const styles = StyleSheet.create({
     color: "#FFF",
     fontSize: 22,
     fontWeight: "bold",
+  },
+  progressOverlay: {
+    flex: 1,
+    backgroundColor: "rgba(0, 0, 0, 0.35)",
+    alignItems: "center",
+    justifyContent: "center",
+    paddingHorizontal: 24,
+  },
+  progressCard: {
+    width: "100%",
+    maxWidth: 340,
+    backgroundColor: "#FFF",
+    borderRadius: 18,
+    paddingVertical: 24,
+    paddingHorizontal: 20,
+    alignItems: "center",
+  },
+  progressTitle: {
+    marginTop: 14,
+    fontSize: 18,
+    fontWeight: "700",
+    color: "#333",
+  },
+  progressMessage: {
+    marginTop: 8,
+    fontSize: 14,
+    color: "#666",
+    textAlign: "center",
   },
 });

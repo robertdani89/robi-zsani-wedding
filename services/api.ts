@@ -10,6 +10,7 @@ import {
   Song,
   type GiftAssistancePayload,
   type GiftType,
+  type ErrorLogEntry,
   type RegisterResponse,
   type SpotifySearchResult,
   type UploadPhotoAsset,
@@ -369,11 +370,28 @@ class ApiService {
     personId: string,
     giftType: GiftType,
     childGiftType?: GiftType,
+    forceGift: boolean = false,
   ): Promise<{ status: string; message?: string }> {
     return this.fetch<{ status: string; message?: string }>("/gift/open", {
       method: "POST",
-      body: JSON.stringify({ personId, giftType, childGiftType }),
+      body: JSON.stringify({ personId, giftType, childGiftType, forceGift }),
     });
+  }
+
+  async openManualGift(
+    giftType: GiftType,
+  ): Promise<{ status: string; message?: string }> {
+    return this.fetch<{ status: string; message?: string }>(
+      "/gift/manual-open",
+      {
+        method: "POST",
+        body: JSON.stringify({ giftType }),
+      },
+    );
+  }
+
+  async getErrorLogs(): Promise<ErrorLogEntry[]> {
+    return this.fetch<ErrorLogEntry[]>("/errors");
   }
 
   async getGuestQuestions(personId: string): Promise<Question[]> {

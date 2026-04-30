@@ -233,9 +233,6 @@ export default function DashboardTasksPanel() {
               </View>
               <View style={styles.taskContent}>
                 <Text style={styles.taskTitle}>{t("dashboard.gallery")}</Text>
-                <Text style={styles.taskDescription}>
-                  {t("dashboard.galleryDescription")}
-                </Text>
               </View>
             </View>
           </TouchableOpacity>
@@ -253,9 +250,6 @@ export default function DashboardTasksPanel() {
               </View>
               <View style={styles.taskContent}>
                 <Text style={styles.taskTitle}>{t("dashboard.puzzle")}</Text>
-                <Text style={styles.taskDescription}>
-                  {t("dashboard.puzzleDescription")}
-                </Text>
               </View>
             </View>
           </TouchableOpacity>

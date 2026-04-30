@@ -94,6 +94,18 @@ export const TRANSLATIONS = {
     "dashboard.finish": "I'm done!",
     "dashboard.motivation": "Finish the tasks to get your gift! 🎁",
     "dashboard.organizerTools": "Organizer Tools",
+    "dashboard.giftMan": "Gift man",
+    "dashboard.giftWoman": "Gift woman",
+    "dashboard.giftRequests": "Gift requests",
+    "dashboard.giftRequestSuccessTitle": "Gift requested",
+    "dashboard.giftRequestSuccessMessage":
+      "The gift dispenser was asked to serve the selected side.",
+    "dashboard.giftRequestErrorTitle": "Gift request failed",
+    "dashboard.giftRequestErrorMessage":
+      "Could not send the gift request. Please try again.",
+    "dashboard.errorLogs": "Error logs",
+    "dashboard.errorLogsLoading": "Loading latest logs...",
+    "dashboard.errorLogsEmpty": "No recent errors.",
     "dashboard.adminPanel": "Responses",
     "dashboard.adminPanelDesc": "View all guests and their activity",
     "dashboard.editTemplate": "Edit Questions",
@@ -201,6 +213,13 @@ export const TRANSLATIONS = {
     "gift.childChoiceRequiredTitle": "Child selection required",
     "gift.childChoiceRequiredMessage":
       "Please choose a gift type for your child.",
+    "gift.forcePromptTitle": "Sensor blocked",
+    "gift.forcePromptMessage":
+      "The machine sensor reports no gift available. Do you want to force gift dispensing anyway?",
+    "gift.forcePromptConfirm": "Force gift",
+    "gift.dispensingTitle": "Dispensing your gift...",
+    "gift.dispensingMessage":
+      "Please stay at the machine until the process is complete.",
     "gift.submit": "Give me!",
     "song.searchFailed": "Failed to search songs. Please try again.",
     "song.saveFailed": "Failed to save song. Please try again.",
@@ -295,6 +314,10 @@ export const TRANSLATIONS = {
     "editTemplate.removeMessage":
       "This question will be removed from the template.",
     "editTemplate.remove": "Remove",
+    "editTemplate.clearAll": "Clear all",
+    "editTemplate.clearAllTitle": "Clear all questions?",
+    "editTemplate.clearAllMessage":
+      "This will remove every question from the template.",
     "editTemplate.addQuestion": "Add question",
     "editTemplate.questionEn": "Question (English)",
     "editTemplate.questionHu": "Question (Hungarian)",
@@ -417,6 +440,18 @@ export const TRANSLATIONS = {
     "dashboard.motivation":
       "Fejezd be a feladatokat, hogy megkapd az ajándékodat! 🎁",
     "dashboard.organizerTools": "Szervező eszközök",
+    "dashboard.giftMan": "Férfi ajándék",
+    "dashboard.giftWoman": "Női ajándék",
+    "dashboard.giftRequests": "Ajándékkérések",
+    "dashboard.giftRequestSuccessTitle": "Ajándékkérés elküldve",
+    "dashboard.giftRequestSuccessMessage":
+      "Az ajándékadagoló megkapta a kérést a kiválasztott oldalhoz.",
+    "dashboard.giftRequestErrorTitle": "Nem sikerült elküldeni",
+    "dashboard.giftRequestErrorMessage":
+      "Az ajándékkérés nem küldhető el. Próbáld újra.",
+    "dashboard.errorLogs": "Hibanapló",
+    "dashboard.errorLogsLoading": "Legfrissebb naplók betöltése...",
+    "dashboard.errorLogsEmpty": "Nincs friss hiba.",
     "dashboard.adminPanel": "Válaszok",
     "dashboard.adminPanelDesc": "Tekintsd meg a vendégeket és aktivitásukat",
     "dashboard.editTemplate": "Kérdések szerkesztése",
@@ -525,6 +560,13 @@ export const TRANSLATIONS = {
     "gift.childChoiceRequiredTitle": "Gyermek választás szükséges",
     "gift.childChoiceRequiredMessage":
       "Kérlek válaszd ki a gyermekednek szóló ajándék típusát.",
+    "gift.forcePromptTitle": "Szenzor tiltás",
+    "gift.forcePromptMessage":
+      "A gép szenzora szerint nincs elérhető ajándék. Ennek ellenére erőltetve indítsuk az ajándékadást?",
+    "gift.forcePromptConfirm": "Ajándék kényszerítése",
+    "gift.dispensingTitle": "Ajándék kiadása folyamatban...",
+    "gift.dispensingMessage":
+      "Kérlek maradj a gépnél, amíg a folyamat be nem fejeződik.",
     "gift.submit": "Add ide!",
     "song.searchFailed": "Nem sikerült dalt keresni. Kérlek próbáld újra.",
     "song.saveFailed": "Nem sikerült menteni a dalt. Kérlek próbáld újra.",
@@ -620,6 +662,10 @@ export const TRANSLATIONS = {
     "editTemplate.removeTitle": "Kérdés eltávolítása?",
     "editTemplate.removeMessage": "Ez a kérdés el lesz távolítva a sablonból.",
     "editTemplate.remove": "Eltávolítás",
+    "editTemplate.clearAll": "Összes törlése",
+    "editTemplate.clearAllTitle": "Minden kérdést töröljünk?",
+    "editTemplate.clearAllMessage":
+      "Ez eltávolítja az összes kérdést a sablonból.",
     "editTemplate.addQuestion": "Kérdés hozzáadása",
     "editTemplate.questionEn": "Kérdés (angol)",
     "editTemplate.questionHu": "Kérdés (magyar)",

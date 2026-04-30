@@ -67,6 +67,22 @@ export default function EditTemplateScreen() {
     });
   };
 
+  const handleClearAllQuestions = () => {
+    if (questions.length === 0) {
+      return;
+    }
+
+    showDecision({
+      title: t("editTemplate.clearAllTitle"),
+      message: t("editTemplate.clearAllMessage"),
+      confirmText: t("editTemplate.clearAll"),
+      cancelText: t("common.cancel"),
+      onConfirm: () => {
+        setQuestions([]);
+      },
+    });
+  };
+
   const handleAddOption = () => {
     setNewOptions((prev) => [...prev, { en: "", hu: "" }]);
   };
@@ -164,9 +180,25 @@ export default function EditTemplateScreen() {
         </Card>
 
         <Card style={styles.questionsContainer}>
-          <Text style={styles.sectionTitle}>
-            {t("editTemplate.questions", { count: questions.length })}
-          </Text>
+          <View style={styles.sectionHeaderRow}>
+            <Text style={styles.sectionTitle}>
+              {t("editTemplate.questions", { count: questions.length })}
+            </Text>
+            <TouchableOpacity
+              style={styles.clearAllButton}
+              onPress={handleClearAllQuestions}
+              disabled={questions.length === 0}
+            >
+              <Text
+                style={[
+                  styles.clearAllButtonText,
+                  questions.length === 0 && styles.clearAllButtonTextDisabled,
+                ]}
+              >
+                {t("editTemplate.clearAll")}
+              </Text>
+            </TouchableOpacity>
+          </View>
 
           {questions.map((question, index) => (
             <View key={question.id} style={styles.questionCard}>
@@ -368,6 +400,24 @@ const styles = StyleSheet.create({
     fontWeight: "700",
     color: "#333",
     marginBottom: 15,
+  },
+  sectionHeaderRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    marginBottom: 8,
+  },
+  clearAllButton: {
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+  },
+  clearAllButtonText: {
+    color: "#D4526E",
+    fontSize: 14,
+    fontWeight: "700",
+  },
+  clearAllButtonTextDisabled: {
+    color: "#C7B6BB",
   },
   questionCard: {
     flexDirection: "row",

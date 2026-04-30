@@ -165,3 +165,9 @@ export interface GuestSummary {
   photoCount: number;
   songCount: number;
 }
+
+export interface ErrorLogEntry {
+  timestamp: string;
+  type: "error" | "info";
+  message: string;
+}
